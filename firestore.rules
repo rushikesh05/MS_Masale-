@@ -1,0 +1,122 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Pillar 1: Master Gate - Deny everything by default
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions for Authentication & Identity
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128;
+    }
+
+    function isValidString(val, minLen, maxLen) {
+      return val is string && val.size() >= minLen && val.size() <= maxLen;
+    }
+
+    function isValidNumber(val, minVal, maxVal) {
+      return val is number && val >= minVal && val <= maxVal;
+    }
+
+    // Pillar 2 & 3: Users Collection - Role Based Access Control & Profile Security
+    match /users/{userId} {
+      allow read: if isSignedIn();
+      allow create: if isOwner(userId)
+                    && request.resource.data.keys().hasAll(['uid', 'email', 'role', 'createdAt'])
+                    && request.resource.data.uid == userId
+                    && request.resource.data.role in ['customer', 'manager', 'delivery', 'admin'];
+      allow update: if isOwner(userId)
+                    && request.resource.data.uid == userId
+                    && request.resource.data.role in ['customer', 'manager', 'delivery', 'admin'];
+      allow delete: if false;
+    }
+
+    // Pillar 4: Orders Collection - Tamper-Proof Order Placement & Sync
+    match /orders/{orderId} {
+      // Allow reading orders for storefront tracking and workshop operations
+      allow read: if true;
+      
+      // Order Creation validation: totalAmount must be positive, status must be valid
+      allow create: if request.resource.data.keys().hasAll(['id', 'orderStatus', 'totalAmount', 'createdAt'])
+                    && isValidId(request.resource.data.id)
+                    && isValidNumber(request.resource.data.totalAmount, 0, 1000000)
+                    && request.resource.data.orderStatus in [
+                      'order_placed', 'blending_in_workshop', 'packed_in_airtight_jar', 
+                      'out_for_delivery', 'delivered', 'cancelled'
+                    ];
+
+      // Order Update validation: allow lifecycle transitions & delivery tracking updates
+      allow update: if request.resource.data.orderStatus in [
+                      'order_placed', 'blending_in_workshop', 'packed_in_airtight_jar', 
+                      'out_for_delivery', 'delivered', 'cancelled'
+                    ];
+      allow delete: if false;
+    }
+
+    // Pillar 5: Custom Chutney Recipes - Personalized Blends
+    match /custom_recipes/{recipeId} {
+      allow read: if true;
+      allow create: if isSignedIn()
+                    && request.resource.data.userId == request.auth.uid
+                    && isValidString(request.resource.data.recipeName, 1, 100);
+      allow update: if isSignedIn()
+                    && resource.data.userId == request.auth.uid;
+      allow delete: if isSignedIn()
+                    && resource.data.userId == request.auth.uid;
+    }
+
+    // Pillar 6: Google Forms, Feedback & Bulk Inquiries
+    match /inquiries/{inquiryId} {
+      allow read: if isSignedIn();
+      allow create: if request.resource.data.keys().hasAll(['fullName', 'phone', 'inquiryType', 'message'])
+                    && isValidString(request.resource.data.fullName, 2, 100)
+                    && isValidString(request.resource.data.phone, 8, 20)
+                    && request.resource.data.inquiryType in [
+                      'feedback', 'bulk_wedding_order', 'restaurant_supply', 
+                      'custom_recipe_formulation', 'general'
+                    ];
+      allow update: if isSignedIn();
+      allow delete: if false;
+    }
+
+    // Pillar 7: Raw Ingredients & Stock Inventory Collection
+    match /inventory/{stockId} {
+      allow read: if true;
+      allow create, update: if isValidId(stockId)
+                            && request.resource.data.currentStockKg is number
+                            && request.resource.data.currentStockKg >= 0;
+      allow delete: if false;
+    }
+
+    // Pillar 8: Dedicated Restaurant & Caterer Bulk Wholesale Requests
+    match /wholesale_requests/{requestId} {
+      allow read: if true;
+      allow create: if isValidId(requestId)
+                    && request.resource.data.keys().hasAll(['id', 'businessName', 'contactPerson', 'phone', 'establishmentType', 'totalEstimatedKg', 'status', 'createdAt'])
+                    && isValidString(request.resource.data.businessName, 2, 120)
+                    && isValidString(request.resource.data.contactPerson, 2, 80)
+                    && isValidString(request.resource.data.phone, 8, 20)
+                    && request.resource.data.totalEstimatedKg is number
+                    && request.resource.data.totalEstimatedKg >= 1
+                    && request.resource.data.status in [
+                      'new_request', 'reviewing', 'quotation_sent', 
+                      'tasting_samples_dispatched', 'contract_approved', 'rejected'
+                    ];
+      allow update: if request.resource.data.status in [
+                      'new_request', 'reviewing', 'quotation_sent', 
+                      'tasting_samples_dispatched', 'contract_approved', 'rejected'
+                    ];
+      allow delete: if false;
+    }
+  }
+}

@@ -1,0 +1,216 @@
+@import "tailwindcss";
+
+@layer base {
+  :root, [data-theme="express"] {
+    --font-heading: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    
+    /* Assal Fresh Mart & Express Theme */
+    --theme-header-bg: #131921;
+    --theme-header-sub: #232F3E;
+    --theme-primary: #FF9900;
+    --theme-primary-hover: #E47911;
+    --theme-primary-light: #FFF8E7;
+    --theme-accent: #FEBD69;
+    --theme-deal: #CC0C39;
+    --theme-rating: #FFA41C;
+    --theme-bg: #EAEDED;
+    --theme-card: #FFFFFF;
+    --theme-border: #D5D9D9;
+    --theme-text: #0F1111;
+    --theme-subtext: #565959;
+    --theme-gradient: linear-gradient(135deg, #131921 0%, #232F3E 100%);
+  }
+
+  [data-theme="kolhapuri"] {
+    --font-heading: 'Rozha One', 'Yatra One', 'Tiro Devanagari Marathi', serif;
+    --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    
+    /* Royal Kolhapuri Crimson Terracotta Theme */
+    --theme-header-bg: #241C1A;
+    --theme-header-sub: #382A25;
+    --theme-primary: #B82A16;
+    --theme-primary-hover: #981E0D;
+    --theme-primary-light: #FDF1EE;
+    --theme-accent: #D97706;
+    --theme-deal: #B82A16;
+    --theme-rating: #D97706;
+    --theme-bg: #FAF7F2;
+    --theme-card: #FFFFFF;
+    --theme-border: #EFE4D8;
+    --theme-text: #241C1A;
+    --theme-subtext: #6B5D57;
+    --theme-gradient: linear-gradient(135deg, #B82A16 0%, #C84B31 50%, #8C1C0B 100%);
+  }
+
+  [data-theme="sahyadri"] {
+    /* Sahyadri Charcoal Slate & Brass Amber Theme */
+    --theme-header-bg: #1C1614;
+    --theme-header-sub: #2B211E;
+    --theme-primary: #2B211E;
+    --theme-primary-hover: #171110;
+    --theme-primary-light: #F6EFEA;
+    --theme-accent: #D97706;
+    --theme-deal: #8C1C0B;
+    --theme-rating: #D97706;
+    --theme-bg: #F5EFEB;
+    --theme-card: #FFFFFF;
+    --theme-border: #E2D7CF;
+    --theme-text: #1C1614;
+    --theme-subtext: #5D524C;
+    --theme-gradient: linear-gradient(135deg, #382A25 0%, #201715 100%);
+  }
+
+  [data-theme="konkan"] {
+    /* Konkan Emerald Herb & Sandalwood Theme */
+    --theme-header-bg: #0E2920;
+    --theme-header-sub: #1B4D3E;
+    --theme-primary: #1B4D3E;
+    --theme-primary-hover: #12352A;
+    --theme-primary-light: #EBF4F0;
+    --theme-accent: #C85A17;
+    --theme-deal: #C85A17;
+    --theme-rating: #E68A00;
+    --theme-bg: #F4F8F5;
+    --theme-card: #FFFFFF;
+    --theme-border: #D8E5DC;
+    --theme-text: #142820;
+    --theme-subtext: #486154;
+    --theme-gradient: linear-gradient(135deg, #1B4D3E 0%, #296D59 50%, #0E2920 100%);
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background-color: var(--theme-bg);
+    color: var(--theme-text);
+    overflow-x: hidden;
+    transition: background-color 0.25s ease, color 0.25s ease;
+  }
+
+  h1, h2, h3, .font-brand {
+    font-family: var(--font-heading);
+  }
+}
+
+/* Express button gradients & micro-styles */
+.express-btn-cart {
+  background: linear-gradient(to bottom, #FFD814, #F7CA00);
+  border: 1px solid #FCD200;
+  color: #0F1111;
+  box-shadow: 0 2px 5px 0 rgba(213, 217, 217, 0.5);
+}
+
+.express-btn-cart:hover {
+  background: linear-gradient(to bottom, #F7CA00, #F0B800);
+  border-color: #F2C200;
+}
+
+.express-btn-buy {
+  background: linear-gradient(to bottom, #FFA41C, #FF8F00);
+  border: 1px solid #FF8F00;
+  color: #0F1111;
+}
+
+.express-btn-buy:hover {
+  background: linear-gradient(to bottom, #FA8900, #E67A00);
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F4EBE1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #C84B31;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #A33A22;
+}
+
+/* Authentic Indian artisanal texture overlay effect */
+.bg-clay-card {
+  background-color: #FFFFFF;
+  border: 1px solid #EFE4D8;
+  box-shadow: 0 4px 20px -2px rgba(139, 69, 19, 0.06);
+}
+
+.bg-terracotta-gradient {
+  background: linear-gradient(135deg, #B82A16 0%, #D83A56 50%, #8C1C0B 100%);
+}
+
+.bg-earthy-dark {
+  background: #1F2833;
+}
+
+@keyframes pulse-subtle {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 3s ease-in-out infinite;
+}
+
+/* Spice grain dots simulation */
+.spice-dots-pattern {
+  background-image: radial-gradient(#C84B31 0.75px, transparent 0.75px), radial-gradient(#E89F4C 0.75px, #FAF6F0 0.75px);
+  background-size: 30px 30px;
+  background-position: 0 0, 15px 15px;
+  background-opacity: 0.15;
+}
+
+/* PRINT MEDIA QUERIES FOR TAX INVOICE */
+@media print {
+  body {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  header, footer, nav, #app-startup-skeleton, .print\\:hidden {
+    display: none !important;
+  }
+
+  .print\\:block {
+    display: block !important;
+  }
+
+  .print\\:shadow-none {
+    box-shadow: none !important;
+  }
+
+  .print\\:border-none {
+    border: none !important;
+  }
+
+  .print\\:p-0 {
+    padding: 0 !important;
+  }
+
+  .print\\:static {
+    position: static !important;
+  }
+
+  .print\\:max-h-none {
+    max-height: none !important;
+  }
+
+  .print\\:overflow-visible {
+    overflow: visible !important;
+  }
+
+  @page {
+    size: A4 portrait;
+    margin: 12mm;
+  }
+}
+
+

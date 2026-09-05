@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="mr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>MS Masale | मंगल सुवर्णा मसाले - अस्सल गावरान चटणी & मसाले</title>
+    <meta name="description" content="MS Masale (मंगल सुवर्णा मसाले - Mangal Suvarna Masale) - महाराष्ट्राची अस्सल पारंपरिक चव, दगडी खलबत्त्यात कुटलेली चटणी, स्पेशल मसाले व B2B होलसेल पुरवठा." />
+    <meta property="og:title" content="MS Masale | मंगल सुवर्णा मसाले" />
+    <meta property="og:description" content="MS Masale (Mangal Suvarna Masale) - Authentic Maharashtrian stone-pounded condiments, signature spice masale and custom recipes." />
+    <meta name="theme-color" content="#801414" />
+    
+    <!-- Google Fonts for authentic Devanagari & Luxury Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Rozha+One&family=Yatra+One&family=Cinzel:wght@600;700;800&family=Tiro+Devanagari+Marathi:ital@0;1&display=swap" rel="stylesheet">
+    <script>
+      // Gracefully prevent benign platform-level Vite HMR WebSocket disconnect messages from triggering console errors or unhandled rejections
+      (function() {
+        var origConsoleError = console.error;
+        console.error = function() {
+          var args = Array.prototype.slice.call(arguments);
+          var msg = args.map(function(a) { return (a && a.message) || String(a); }).join(' ');
+          if (
+            msg.indexOf('[vite] failed to connect to websocket') !== -1 ||
+            msg.indexOf('WebSocket closed without opened') !== -1
+          ) {
+            return;
+          }
+          return origConsoleError.apply(console, args);
+        };
+
+        var origConsoleWarn = console.warn;
+        console.warn = function() {
+          var args = Array.prototype.slice.call(arguments);
+          var msg = args.map(function(a) { return (a && a.message) || String(a); }).join(' ');
+          if (
+            msg.indexOf('[vite] failed to connect to websocket') !== -1 ||
+            msg.indexOf('WebSocket closed without opened') !== -1
+          ) {
+            return;
+          }
+          return origConsoleWarn.apply(console, args);
+        };
+
+        window.addEventListener('unhandledrejection', function(e) {
+          var reasonStr = (e && e.reason) ? (e.reason.message || String(e.reason)) : '';
+          if (
+            reasonStr.indexOf('WebSocket') !== -1 ||
+            reasonStr.indexOf('closed without opened') !== -1 ||
+            reasonStr.indexOf('vite') !== -1
+          ) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+          }
+        }, true);
+
+        window.addEventListener('error', function(e) {
+          var msg = (e && (e.message || (e.error && e.error.message))) ? String(e.message || e.error.message) : '';
+          if (
+            msg.indexOf('WebSocket') !== -1 ||
+            msg.indexOf('closed without opened') !== -1 ||
+            msg.indexOf('vite') !== -1
+          ) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+          }
+        }, true);
+      })();
+    </script>
+  </head>
+  <body class="bg-[#FAF6F0] text-[#2D2424] antialiased selection:bg-[#C84B31] selection:text-white">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+

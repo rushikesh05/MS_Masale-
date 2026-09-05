@@ -1,0 +1,157 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User profile with role-based access control, credentials, and preferences",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Firebase Auth user ID" },
+        "email": { "type": "string", "description": "User email" },
+        "displayName": { "type": "string", "description": "Full name" },
+        "phone": { "type": "string", "description": "Phone number" },
+        "role": { "type": "string", "enum": ["customer", "manager", "delivery", "admin"], "description": "Access role" },
+        "avatarUrl": { "type": "string", "description": "Profile picture URL" },
+        "preferredLanguage": { "type": "string", "enum": ["mr", "en"], "description": "Language preference" },
+        "defaultAddress": { "type": "string", "description": "Saved shipping address JSON string" },
+        "createdAt": { "type": "string", "description": "ISO timestamp" },
+        "updatedAt": { "type": "string", "description": "ISO timestamp" }
+      },
+      "required": ["uid", "email", "role", "createdAt"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "Customer order with live status, tracking coordinates, and items",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Order ID (e.g. AG-89421)" },
+        "userId": { "type": "string", "description": "UID of the placing user or guest" },
+        "customer": { "type": "string", "description": "Serialized customer details JSON" },
+        "items": { "type": "string", "description": "Serialized order items JSON" },
+        "subtotal": { "type": "number", "description": "Subtotal in INR" },
+        "shippingFee": { "type": "number", "description": "Shipping fee in INR" },
+        "discount": { "type": "number", "description": "Discount in INR" },
+        "couponCode": { "type": "string", "description": "Applied promo code" },
+        "totalAmount": { "type": "number", "description": "Final paid/payable amount in INR" },
+        "paymentMethod": { "type": "string", "enum": ["upi", "razorpay_cards", "cod"], "description": "Payment type" },
+        "paymentStatus": { "type": "string", "enum": ["paid", "pending_cod", "failed"], "description": "Payment status" },
+        "transactionId": { "type": "string", "description": "Gateway transaction ID" },
+        "orderStatus": { "type": "string", "enum": ["order_placed", "blending_in_workshop", "packed_in_airtight_jar", "out_for_delivery", "delivered", "cancelled"], "description": "Fulfillment status" },
+        "createdAt": { "type": "string", "description": "ISO timestamp" },
+        "estimatedDeliveryDate": { "type": "string", "description": "Estimated delivery date" },
+        "assignedDeliveryPerson": { "type": "string", "description": "Assigned delivery agent JSON" },
+        "deliveryOtp": { "type": "string", "description": "4-digit delivery security PIN" },
+        "deliveryTime": { "type": "string", "description": "ISO delivery timestamp" },
+        "deliveryLat": { "type": "number", "description": "Live delivery latitude" },
+        "deliveryLng": { "type": "number", "description": "Live delivery longitude" }
+      },
+      "required": ["id", "orderStatus", "totalAmount", "createdAt"]
+    },
+    "CustomRecipe": {
+      "title": "CustomRecipe",
+      "description": "User created custom stone-pounded chutney recipe",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Recipe ID" },
+        "userId": { "type": "string", "description": "Creator user UID" },
+        "recipeName": { "type": "string", "description": "Custom chutney name" },
+        "config": { "type": "string", "description": "Serialized configuration JSON" },
+        "likesCount": { "type": "number", "description": "Community likes count" },
+        "createdAt": { "type": "string", "description": "Creation ISO date" }
+      },
+      "required": ["id", "userId", "recipeName", "createdAt"]
+    },
+    "Inquiry": {
+      "title": "Inquiry",
+      "description": "Google Form inquiries, feedback, restaurant & wedding bulk orders",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Inquiry ID" },
+        "fullName": { "type": "string", "description": "Customer name" },
+        "phone": { "type": "string", "description": "Phone / WhatsApp number" },
+        "email": { "type": "string", "description": "Email address" },
+        "inquiryType": { "type": "string", "enum": ["feedback", "bulk_wedding_order", "restaurant_supply", "custom_recipe_formulation", "general"], "description": "Category" },
+        "rating": { "type": "number", "description": "Star rating out of 5" },
+        "message": { "type": "string", "description": "Message / details" },
+        "quantityKg": { "type": "number", "description": "Estimated quantity in KG" },
+        "city": { "type": "string", "description": "City or Village" },
+        "status": { "type": "string", "enum": ["new", "in_review", "quotation_sent", "resolved"], "description": "Status" },
+        "createdAt": { "type": "string", "description": "Creation ISO date" }
+      },
+      "required": ["id", "fullName", "phone", "inquiryType", "message", "createdAt"]
+    },
+    "RawIngredientStock": {
+      "title": "RawIngredientStock",
+      "description": "Stock of raw spices, nuts, seeds, and oils with low-stock thresholds",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Stock item ID (e.g. stock-peanuts)" },
+        "nameMr": { "type": "string", "description": "Marathi name" },
+        "nameEn": { "type": "string", "description": "English name" },
+        "currentStockKg": { "type": "number", "description": "Current available quantity in KG" },
+        "lowStockThresholdKg": { "type": "number", "description": "Critical low stock alert threshold in KG" },
+        "unitCostPerKg": { "type": "number", "description": "Unit cost per KG in INR" },
+        "sourceRegion": { "type": "string", "description": "Region of origin" },
+        "lastProcuredDate": { "type": "string", "description": "Last procurement date" }
+      },
+      "required": ["id", "nameMr", "nameEn", "currentStockKg", "lowStockThresholdKg"]
+    },
+    "WholesaleRequest": {
+      "title": "WholesaleRequest",
+      "description": "Dedicated B2B bulk & wholesale requests submitted by restaurants, hotels, and caterers for custom quantities and frequency",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Wholesale request identifier (e.g. WS-89421)" },
+        "userId": { "type": "string", "description": "Authenticated user UID if logged in" },
+        "businessName": { "type": "string", "description": "Name of restaurant, catering service, or commercial business" },
+        "contactPerson": { "type": "string", "description": "Representative / Head chef name" },
+        "designation": { "type": "string", "description": "Designation or business role" },
+        "phone": { "type": "string", "description": "Business phone / WhatsApp contact" },
+        "email": { "type": "string", "description": "Business email address" },
+        "establishmentType": { "type": "string", "enum": ["restaurant", "caterer", "hotel_resort", "dhaba_khanawal", "sweet_farsan_shop", "wedding_event_planner", "cloud_kitchen", "retail_distributor", "other"], "description": "Type of food business" },
+        "gstNumber": { "type": "string", "description": "GST Identification Number if registered" },
+        "city": { "type": "string", "description": "City / Village location" },
+        "talukaDistrict": { "type": "string", "description": "District or taluka" },
+        "pincode": { "type": "string", "description": "Delivery postal code" },
+        "deliveryAddress": { "type": "string", "description": "Full commercial delivery location address" },
+        "supplyFrequency": { "type": "string", "enum": ["one_time_event", "weekly_supply", "biweekly_supply", "monthly_contract", "quarterly_standing_order"], "description": "Frequency of bulk batches" },
+        "targetDeliveryDate": { "type": "string", "description": "Desired delivery or kickoff date" },
+        "products": { "type": "string", "description": "Serialized JSON array of selected chutney varieties, KG quantities, and packaging preferences" },
+        "totalEstimatedKg": { "type": "number", "description": "Total combined volume requested in KG" },
+        "estimatedBudgetInr": { "type": "number", "description": "Estimated quotation value in INR" },
+        "specialRequirements": { "type": "string", "description": "Custom stone grinding instructions, spice levels, or dietary requirements" },
+        "status": { "type": "string", "enum": ["new_request", "reviewing", "quotation_sent", "tasting_samples_dispatched", "contract_approved", "rejected"], "description": "Review lifecycle state" },
+        "managerNotes": { "type": "string", "description": "Internal notes from workshop manager regarding batch blending" },
+        "quotedPricePerKgAvg": { "type": "number", "description": "Quoted average price per KG" },
+        "createdAt": { "type": "string", "description": "Submission ISO timestamp" },
+        "updatedAt": { "type": "string", "description": "Last updated ISO timestamp" }
+      },
+      "required": ["id", "businessName", "contactPerson", "phone", "establishmentType", "totalEstimatedKg", "status", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User account profiles and role mappings"
+    },
+    "/orders/{orderId}": {
+      "schema": "Order",
+      "description": "Live orders synced across customers, workshop managers, and delivery agents"
+    },
+    "/custom_recipes/{recipeId}": {
+      "schema": "CustomRecipe",
+      "description": "Community and user-saved custom stone-pounded chutney recipes"
+    },
+    "/inquiries/{inquiryId}": {
+      "schema": "Inquiry",
+      "description": "Google Forms submissions, feedback, and bulk supply inquiries"
+    },
+    "/inventory/{stockId}": {
+      "schema": "RawIngredientStock",
+      "description": "Real-time raw spice and seed inventory with threshold monitoring"
+    },
+    "/wholesale_requests/{requestId}": {
+      "schema": "WholesaleRequest",
+      "description": "Dedicated collection for restaurant & caterer bulk custom requests for managers to review"
+    }
+  }
+}

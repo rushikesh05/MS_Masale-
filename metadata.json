@@ -1,0 +1,6 @@
+{
+  "name": "MS Masale (मंगल सुवर्णा मसाले)",
+  "description": "MS Masale (Mangal Suvarna Masale) - Industry-grade Maharashtrian Traditional Chutney & Spices D2C Platform with Stone-Pounded Custom Recipe Studio, Live Fleet Dispatch Tracking, and B2B Wholesale Supply.",
+  "requestFramePermissions": ["geolocation", "microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
