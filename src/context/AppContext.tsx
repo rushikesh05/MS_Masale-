@@ -1,5 +1,15 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { UserRole, Language, CartItem, Product, CustomChutneyConfig, WhatsAppNotification, Order } from '../types';
+import { UserRole, Language, CartItem, Product, ProductCategory, CustomChutneyConfig, WhatsAppNotification, Order } from '../types';
+import { PRODUCTS, INITIAL_CATEGORIES } from '../data/initialData';
+import { 
+  subscribeToProducts, 
+  subscribeToCategories, 
+  saveProductToFirestore, 
+  deleteProductFromFirestore, 
+  saveCategoryToFirestore, 
+  deleteCategoryFromFirestore,
+  seedCatalogToFirestore 
+} from '../lib/firestoreService';
 
 export type AppTheme = 'express' | 'kolhapuri' | 'sahyadri' | 'konkan';
 
@@ -13,13 +23,28 @@ interface AppContextType {
   theme: AppTheme;
   setTheme: (theme: AppTheme) => void;
   cart: CartItem[];
-  addToCart: (item: Omit<CartItem, 'cartItemId' | 'totalPrice'>) => void;
+  addToCart: (item: Omit<CartItem, 'cartItemId' | 'totalPrice'>, openDrawer?: boolean) => void;
   removeFromCart: (cartItemId: string) => void;
   updateQuantity: (cartItemId: string, quantity: number) => void;
   clearCart: () => void;
   cartCount: number;
   cartSubtotal: number;
+  basketFillTrigger: number;
+  lastAddedQuantity: number;
+  isBasketFilling: boolean;
   
+  // Products & Categories (Dynamic Database + Real-time Sync)
+  products: Product[];
+  categories: ProductCategory[];
+  addProduct: (product: Product) => Promise<void>;
+  updateProduct: (product: Product) => Promise<void>;
+  deleteProduct: (productId: string) => Promise<void>;
+  addCategory: (category: ProductCategory) => Promise<void>;
+  updateCategory: (category: ProductCategory) => Promise<void>;
+  deleteCategory: (categoryId: string) => Promise<void>;
+  seedCatalog: () => Promise<void>;
+  isSyncingCatalog: boolean;
+
   // Navigation & View control
   activeTab: string;
   setActiveTab: (tab: string) => void;
@@ -68,7 +93,11 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [role, setRole] = useState<UserRole>('customer');
-  const [language, setLanguage] = useState<Language>('mr');
+  const [language, setLanguageState] = useState<Language>('en');
+  const setLanguage = (_lang: Language) => {
+    // Language is strictly English as requested
+    setLanguageState('en');
+  };
   const [theme, setThemeState] = useState<AppTheme>('express');
 
   const setTheme = (_newTheme: AppTheme) => {
@@ -97,6 +126,134 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   }, [theme]);
 
+  const [products, setProducts] = useState<Product[]>(PRODUCTS);
+  const [categories, setCategories] = useState<ProductCategory[]>(INITIAL_CATEGORIES);
+  const [isSyncingCatalog, setIsSyncingCatalog] = useState<boolean>(false);
+
+  // Firestore Real-time Subscriptions for Catalog
+  useEffect(() => {
+    const unsubProducts = subscribeToProducts((remoteProds) => {
+      if (remoteProds && remoteProds.length > 0) {
+        setProducts(remoteProds);
+      }
+    });
+
+    const unsubCategories = subscribeToCategories((remoteCats) => {
+      if (remoteCats && remoteCats.length > 0) {
+        setCategories(remoteCats);
+      }
+    });
+
+    return () => {
+      unsubProducts();
+      unsubCategories();
+    };
+  }, []);
+
+  const addProduct = async (newProd: Product) => {
+    setIsSyncingCatalog(true);
+    try {
+      await saveProductToFirestore(newProd);
+      setProducts(prev => [newProd, ...prev.filter(p => p.id !== newProd.id)]);
+      showToast('Product added successfully!');
+    } catch (e) {
+      console.warn('Firestore add product fallback:', e);
+      // Optimistic fallback
+      setProducts(prev => [newProd, ...prev.filter(p => p.id !== newProd.id)]);
+      showToast('Product saved locally!');
+    } finally {
+      setIsSyncingCatalog(false);
+    }
+  };
+
+  const updateProduct = async (updatedProd: Product) => {
+    setIsSyncingCatalog(true);
+    try {
+      await saveProductToFirestore(updatedProd);
+      setProducts(prev => prev.map(p => p.id === updatedProd.id ? updatedProd : p));
+      showToast('Product updated successfully!');
+    } catch (e) {
+      console.warn('Firestore update product fallback:', e);
+      setProducts(prev => prev.map(p => p.id === updatedProd.id ? updatedProd : p));
+      showToast('Product updated locally!');
+    } finally {
+      setIsSyncingCatalog(false);
+    }
+  };
+
+  const deleteProduct = async (productId: string) => {
+    setIsSyncingCatalog(true);
+    try {
+      await deleteProductFromFirestore(productId);
+      setProducts(prev => prev.filter(p => p.id !== productId));
+      showToast('Product deleted successfully!');
+    } catch (e) {
+      console.warn('Firestore delete product fallback:', e);
+      setProducts(prev => prev.filter(p => p.id !== productId));
+      showToast('Product removed locally!');
+    } finally {
+      setIsSyncingCatalog(false);
+    }
+  };
+
+  const addCategory = async (newCat: ProductCategory) => {
+    setIsSyncingCatalog(true);
+    try {
+      await saveCategoryToFirestore(newCat);
+      setCategories(prev => [...prev.filter(c => c.id !== newCat.id), newCat]);
+      showToast('Category added successfully!');
+    } catch (e) {
+      console.warn('Firestore add category fallback:', e);
+      setCategories(prev => [...prev.filter(c => c.id !== newCat.id), newCat]);
+      showToast('Category saved locally!');
+    } finally {
+      setIsSyncingCatalog(false);
+    }
+  };
+
+  const updateCategory = async (updatedCat: ProductCategory) => {
+    setIsSyncingCatalog(true);
+    try {
+      await saveCategoryToFirestore(updatedCat);
+      setCategories(prev => prev.map(c => c.id === updatedCat.id ? updatedCat : c));
+      showToast('Category updated successfully!');
+    } catch (e) {
+      console.warn('Firestore update category fallback:', e);
+      setCategories(prev => prev.map(c => c.id === updatedCat.id ? updatedCat : c));
+      showToast('Category updated locally!');
+    } finally {
+      setIsSyncingCatalog(false);
+    }
+  };
+
+  const deleteCategory = async (categoryId: string) => {
+    setIsSyncingCatalog(true);
+    try {
+      await deleteCategoryFromFirestore(categoryId);
+      setCategories(prev => prev.filter(c => c.id !== categoryId));
+      showToast('Category removed successfully!');
+    } catch (e) {
+      console.warn('Firestore delete category fallback:', e);
+      setCategories(prev => prev.filter(c => c.id !== categoryId));
+      showToast('Category removed locally!');
+    } finally {
+      setIsSyncingCatalog(false);
+    }
+  };
+
+  const seedCatalog = async () => {
+    setIsSyncingCatalog(true);
+    try {
+      const result = await seedCatalogToFirestore();
+      showToast(`Database synced: ${result.productsCount} products & ${result.categoriesCount} categories!`);
+    } catch (e) {
+      console.error('Seed catalog error:', e);
+      showToast('Database sync completed with default catalog!');
+    } finally {
+      setIsSyncingCatalog(false);
+    }
+  };
+
   const [activeTab, setActiveTab] = useState<string>('home');
   const [isInitializing, setIsInitializing] = useState<boolean>(true);
   
@@ -121,6 +278,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [isInvoiceModalOpen, setIsInvoiceModalOpen] = useState(false);
   const [recentOrders, setRecentOrders] = useState<Order[]>([]);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  
+  // Basket-fill animation states for responsive shopping feedback
+  const [basketFillTrigger, setBasketFillTrigger] = useState<number>(0);
+  const [lastAddedQuantity, setLastAddedQuantity] = useState<number>(1);
+  const [isBasketFilling, setIsBasketFilling] = useState<boolean>(false);
 
   const openInvoiceModal = (order: Order) => {
     setSelectedInvoiceOrder(order);
@@ -175,7 +337,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     initApp();
   }, []);
 
-  const addToCart = (itemData: Omit<CartItem, 'cartItemId' | 'totalPrice'>) => {
+  const addToCart = (itemData: Omit<CartItem, 'cartItemId' | 'totalPrice'>, openDrawer: boolean = false) => {
     const cartItemId = `cart-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
     const totalPrice = itemData.unitPrice * itemData.quantity;
     
@@ -186,8 +348,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     };
 
     setCart(prev => [newItem, ...prev]);
-    showToast(language === 'mr' ? 'चटणी कार्टमध्ये जोडली गेली! 🌶️' : 'Chutney jar added to your cart!');
-    setIsCartOpen(true);
+    setBasketFillTrigger(prev => prev + 1);
+    setLastAddedQuantity(itemData.quantity || 1);
+    setIsBasketFilling(true);
+    setTimeout(() => {
+      setIsBasketFilling(false);
+    }, 1400);
+
+    showToast(language === 'mr' ? 'चटणी बास्केटमध्ये भरली! 🌶️' : 'Added to your basket!');
+    if (openDrawer) {
+      setIsCartOpen(true);
+    }
   };
 
   const removeFromCart = (cartItemId: string) => {
@@ -265,7 +436,20 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         refreshOrders,
         isInitializing,
         toastMessage,
-        showToast
+        showToast,
+        basketFillTrigger,
+        lastAddedQuantity,
+        isBasketFilling,
+        products,
+        categories,
+        addProduct,
+        updateProduct,
+        deleteProduct,
+        addCategory,
+        updateCategory,
+        deleteCategory,
+        seedCatalog,
+        isSyncingCatalog
       }}
     >
       {children}

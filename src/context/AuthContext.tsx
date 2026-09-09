@@ -138,12 +138,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setAuthError(null);
     try {
       const demoProfiles: Record<string, { name: string; email: string; role: UserRole }> = {
-        customer: { name: 'आनंदराव पाटील (Customer Demo)', email: 'anand.patil@assalgavran.in', role: 'customer' },
-        manager: { name: 'सुवर्णा (Suvarna - Workshop Manager)', email: 'suvarna.manager@assalgavran.in', role: 'manager' },
-        delivery: { name: 'मुकुंद (Mukund - Fleet Rider)', email: 'mukund.rider@assalgavran.in', role: 'delivery' },
-        mukund: { name: 'मुकुंद (Mukund - Fleet Rider)', email: 'mukund.rider@assalgavran.in', role: 'delivery' },
-        vishal: { name: 'विशाल (Vishal - Express Rider)', email: 'vishal.rider@assalgavran.in', role: 'delivery' },
-        admin: { name: 'ऋषिकेश सूर्यवंशी (Rushikesh - Admin)', email: 'rushikesh.founder@assalgavran.in', role: 'admin' }
+        customer: { name: 'Anand Patil (Customer Demo)', email: 'anand.patil@msmasale.com', role: 'customer' },
+        manager: { name: 'Sunil R. (Workshop Production Manager)', email: 'manager@msmasale.com', role: 'manager' },
+        delivery: { name: 'Mukund (Fleet Rider)', email: 'mukund.rider@msmasale.com', role: 'delivery' },
+        mukund: { name: 'Mukund (Fleet Rider)', email: 'mukund.rider@msmasale.com', role: 'delivery' },
+        vishal: { name: 'Vishal (Express Rider)', email: 'vishal.rider@msmasale.com', role: 'delivery' },
+        admin: { name: 'Rushikesh Suryavanshi (Administrator)', email: 'admin@msmasale.com', role: 'admin' }
       };
 
       const selectedKey = customStaffKey || targetRole;
@@ -155,7 +155,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         email: demo.email,
         displayName: demo.name,
         role: actualRole,
-        preferredLanguage: 'mr',
+        preferredLanguage: 'en',
         createdAt: new Date().toISOString()
       };
 
@@ -182,11 +182,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (error: any) {
       console.error('Google Sign In error:', error);
       if (error.code === 'auth/popup-closed-by-user' || error.code === 'auth/cancelled-popup-request') {
-        setAuthError('गुगल लॉगिन विंडो बंद केली गेली. तुम्ही खालील "झटपट १-क्लिक टेस्ट खाते" वापरूनही लगेच सुरू करू शकता.');
+        setAuthError('Google sign-in popup closed. You can also use the 1-Click Instant Demo account below.');
       } else if (error.code === 'auth/popup-blocked') {
-        setAuthError('ब्राउझरने पॉपअप ब्लॉक केला आहे. कृपया १-क्लिक टेस्ट खाते वापरून पुढे जा.');
+        setAuthError('The browser blocked the popup. Please allow popups or use 1-Click Instant Demo account.');
       } else {
-        setAuthError(error.message || 'गुगल लॉगिनमध्ये अडचण आली. कृपया १-क्लिक टेस्ट खाते निवडा.');
+        setAuthError(error.message || 'Error during Google sign-in. Please try 1-Click Demo account.');
       }
       throw error;
     }
@@ -208,19 +208,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         cleanEmail === 'rushikeshsurywanshi007@gmail.com'
       ) {
         targetRole = 'admin';
-        staffDefaultName = 'ऋषिकेश सूर्यवंशी (Rushikesh - Admin)';
-      } else if (cleanEmail.includes('suvarna') || cleanEmail.includes('manager') || cleanEmail.includes('chef')) {
+        staffDefaultName = 'Rushikesh Suryavanshi (Admin)';
+      } else if (cleanEmail.includes('manager') || cleanEmail.includes('chef') || cleanEmail.includes('workshop')) {
         targetRole = 'manager';
-        staffDefaultName = 'सुवर्णा (Suvarna - Manager)';
+        staffDefaultName = 'Sunil R. (Workshop Manager)';
       } else if (cleanEmail.includes('mukund')) {
         targetRole = 'delivery';
-        staffDefaultName = 'मुकुंद (Mukund - Delivery Rider)';
+        staffDefaultName = 'Mukund (Delivery Rider)';
       } else if (cleanEmail.includes('vishal')) {
         targetRole = 'delivery';
-        staffDefaultName = 'विशाल (Vishal - Delivery Rider)';
+        staffDefaultName = 'Vishal (Delivery Rider)';
       } else if (cleanEmail.includes('rider') || cleanEmail.includes('delivery')) {
         targetRole = 'delivery';
-        staffDefaultName = 'डिलिव्हरी रायडर (Fleet Partner)';
+        staffDefaultName = 'Delivery Fleet Rider';
       }
 
       try {

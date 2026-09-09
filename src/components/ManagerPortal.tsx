@@ -53,7 +53,7 @@ export const ManagerPortal: React.FC = () => {
   const { userProfile } = useAuth();
   const isMr = language === 'mr';
 
-  const managerName = userProfile?.displayName || 'सुवर्णा (Suvarna - Workshop Manager)';
+  const managerName = userProfile?.displayName || 'Sunil R. (Workshop Production Manager)';
 
   const [rawStocks, setRawStocks] = useState<RawIngredientStock[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);

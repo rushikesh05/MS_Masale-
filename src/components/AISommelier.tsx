@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Sparkles, ChefHat, Flame, ArrowRight, ShoppingCart, RefreshCw, Star, Info, Check } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { PRODUCTS } from '../data/initialData';
+import { ProductVisual } from './ProductVisual';
 
 export const AISommelier: React.FC = () => {
   const { language, addToCart, setSelectedProductDetail } = useApp();
@@ -184,15 +185,13 @@ export const AISommelier: React.FC = () => {
 
             {/* Right Product Card Match (4 cols) */}
             <div className="md:col-span-4 bg-white text-[#2D2424] rounded-xl p-4 shadow-xl border border-white/20 text-center">
-              <img
-                src={matchedProduct.imageUrl}
-                alt={isMr ? matchedProduct.nameMr : matchedProduct.nameEn}
-                referrerPolicy="no-referrer"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1596040033283-912165c845f3?auto=format&fit=crop&w=800&q=80';
-                }}
-                className="w-full h-28 object-cover rounded-lg mb-2"
-              />
+              <div className="w-full h-32 overflow-hidden rounded-lg mb-2 shadow-xs">
+                <ProductVisual
+                  product={matchedProduct}
+                  isMarathi={isMr}
+                  allowToggle={false}
+                />
+              </div>
               <div className="font-bold text-xs line-clamp-1 font-brand">
                 {isMr ? matchedProduct.nameMr : matchedProduct.nameEn}
               </div>

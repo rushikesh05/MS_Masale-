@@ -75,7 +75,19 @@ const AppContent: React.FC = () => {
   const { role } = useAuth();
 
   return (
-    <div className="min-h-screen bg-[#FFFDFB] text-[#2D2424] flex flex-col font-sans selection:bg-[#C84B31] selection:text-white">
+    <div className="min-h-screen bg-transparent text-[#2D2424] flex flex-col font-sans selection:bg-[#C84B31] selection:text-white relative">
+      {/* Subtle, Organic 'Spice-Grain' SVG Grain Texture Overlay */}
+      <div 
+        id="spice-grain-overlay"
+        className="fixed inset-0 pointer-events-none z-0 opacity-40 mix-blend-multiply print:hidden"
+        style={{
+          backgroundImage: 'url("/spice-grain.svg")',
+          backgroundRepeat: 'repeat',
+          backgroundSize: '300px 300px'
+        }}
+        aria-hidden="true"
+      />
+
       {/* Startup Skeleton Overlay Transition */}
       <AnimatePresence mode="wait">
         {isInitializing ? (
@@ -83,7 +95,7 @@ const AppContent: React.FC = () => {
             key="app-startup-skeleton"
             initial={{ opacity: 1 }}
             exit={{ opacity: 0, transition: { duration: 0.3 } }}
-            className="w-full"
+            className="w-full relative z-10"
           >
             <AppSkeleton />
           </motion.div>
@@ -93,7 +105,7 @@ const AppContent: React.FC = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.3 }}
-            className="flex-1 flex flex-col"
+            className="flex-1 flex flex-col relative z-10"
           >
             {/* Header */}
             <Header />

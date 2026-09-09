@@ -137,8 +137,8 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
 <body>
   <div class="header">
     <div>
-      <div class="brand-title">MS मसाले उद्योग (मंगल सुवर्णा मसाले)</div>
-      <div class="company-sub">MS Masale Foods (Mangal Suvarna Masale) Pvt. Ltd.</div>
+      <div class="brand-title">MS Masale Industries</div>
+      <div class="company-sub">MS Masale Foods Pvt. Ltd.</div>
       <div style="font-size: 10px; color: #78716c; margin-top: 4px;">
         MS Masale Complex, Baner-Mahalunge Road, Pune 411045, Maharashtra<br/>
         <strong>GSTIN:</strong> 27AABCU9603R1ZM | <strong>FSSAI Lic:</strong> 11523038000492
@@ -245,7 +245,7 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
   <div class="footer">
     <div style="font-size: 9px; color: #78716c;">
       Digital Signature Verified • Ref: ${order.id}<br/>
-      MS Masale Foods (Mangal Suvarna Masale) Pvt. Ltd.
+      MS Masale Foods Pvt. Ltd.
     </div>
     <div style="text-align: right;">
       <div style="font-size: 12px; font-weight: bold; color: #8c1c0b; font-style: italic;">MS Masale Foods</div>
@@ -451,13 +451,13 @@ ${order.items.map((it, i) => `  ${i + 1}. ${it.titleMr} (${it.size}) x ${it.quan
                   </div>
                   <div>
                     <h1 className="text-xl sm:text-2xl font-black font-serif text-[#241C1A] tracking-tight">
-                      MS मसाले उद्योग (मंगल सुवर्णा मसाले)
+                      MS Masale Industries
                     </h1>
                     <p className="text-xs font-semibold text-stone-600">
-                      MS Masale Foods (Mangal Suvarna Masale) Pvt. Ltd.
+                      MS Masale Foods Pvt. Ltd.
                     </p>
                     <p className="text-[11px] text-stone-500 mt-0.5">
-                      MS मसाले संकुल, बाणेर-म्हाळुंगे रोड, पुणे ४११०४५, महाराष्ट्र
+                      MS Masale Complex, Baner-Mahalunge Road, Pune 411045, Maharashtra
                     </p>
                     <div className="flex flex-wrap gap-2 text-[10px] font-mono font-bold text-stone-700 mt-1">
                       <span className="bg-stone-100 px-2 py-0.5 rounded border border-stone-300">

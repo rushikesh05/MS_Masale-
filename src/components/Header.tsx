@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { 
   ShoppingBag, 
-  Globe, 
   MessageSquare, 
   ChefHat, 
   Truck, 
@@ -25,21 +25,20 @@ import { BrandLogo } from './BrandLogo';
 
 export const Header: React.FC = () => {
   const { 
-    language, 
-    setLanguage, 
     cart, 
     setIsCartOpen, 
     setIsWhatsAppModalOpen,
     setIsFeedbackModalOpen,
     setIsBulkRequestModalOpen,
-    showToast
+    showToast,
+    basketFillTrigger,
+    lastAddedQuantity,
+    isBasketFilling
   } = useApp();
 
   const {
     currentUser,
-    userProfile,
     role,
-    setRole,
     setIsAuthModalOpen,
     setAuthMode,
     logout,
@@ -48,41 +47,36 @@ export const Header: React.FC = () => {
 
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
 
-  const isMr = language === 'mr';
   const cartItemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
-
   const isStaffRole = role === 'manager' || role === 'delivery' || role === 'admin';
 
   const handleReturnToCustomerStore = async () => {
     await updateUserRole('customer');
-    showToast(isMr ? 'ग्राहक स्टोअरफ्रंट उघडले' : 'Switched to Customer Storefront');
+    showToast('Switched to Customer Storefront');
   };
 
   return (
-    <header className="sticky top-0 z-40 backdrop-blur-md bg-[#131921] text-white border-b border-[#232F3E] shadow-md transition-colors">
-      {/* Top micro announcement bar */}
-      <div className="text-[11px] py-1.5 px-4 text-center font-medium flex justify-between items-center bg-[#232F3E] text-stone-200 border-b border-black/30">
-        <div className="hidden sm:flex items-center gap-1.5 text-[#FF9900] font-semibold">
-          <span>⚡</span>
-          <span>
-            {isMr ? 'MS मसाले (मंगल सुवर्णा मसाले) • अस्सल दगडी खलबत्ता चटणी & मसाले' : 'MS Masale (Mangal Suvarna Masale) • Authentic Stone-Crushed Condiments & Spices'}
-          </span>
+    <header className="sticky top-0 z-40 backdrop-blur-xl bg-[#1C1917]/95 text-stone-100 border-b border-[#2E2824] shadow-[0_4px_24px_rgba(0,0,0,0.14)] transition-all">
+      {/* Top minimal micro announcement bar */}
+      <div className="text-[11px] py-1.5 px-4 sm:px-8 flex justify-between items-center bg-[#141210] text-stone-300 border-b border-[#24201C] tracking-wide">
+        <div className="hidden sm:flex items-center gap-2 text-stone-300 font-medium">
+          <Sparkles className="w-3 h-3 text-amber-400" />
+          <span>MS Masale • Artisanal Stone-Crushed Condiments & Pure Spices</span>
         </div>
-        <div className="mx-auto sm:mx-0 flex items-center gap-2">
-          <span>✨ {isMr ? 'सर्व ऑर्डर्सवर मोफत डिलिव्हरी (₹४९९+)' : 'Free Express Delivery across Maharashtra on ₹499+'}</span>
+        <div className="mx-auto sm:mx-0 flex items-center gap-2 text-amber-300/90 font-medium">
+          <span>Free Express Delivery across Maharashtra on ₹499+</span>
         </div>
-        <div className="hidden md:flex items-center gap-2 text-stone-300">
-          <PhoneCall className="w-3 h-3 text-[#FF9900]" />
-          <span>{isMr ? 'हेल्पलाइन: +91 98234 56789' : 'Helpline: +91 98234 56789'}</span>
+        <div className="hidden md:flex items-center gap-2 text-stone-400">
+          <PhoneCall className="w-3 h-3 text-amber-400" />
+          <span>Support: +91 98234 56789</span>
         </div>
       </div>
 
       {/* Main Navigation Bar */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2.5 flex items-center justify-between gap-4">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between gap-4">
         
         {/* Left: Brand Identity Logo */}
         <BrandLogo 
-          isMarathi={isMr} 
           inverted={true}
           size="md" 
           onClick={handleReturnToCustomerStore} 
@@ -90,58 +84,58 @@ export const Header: React.FC = () => {
 
         {/* Center: When in authorized Staff Mode, show active portal indicator & switch back button */}
         {isStaffRole && (
-          <div className="flex items-center gap-2 bg-[#232F3E] px-3 py-1.5 rounded-2xl border border-amber-500/40">
-            <span className="text-xs font-extrabold text-amber-400 flex items-center gap-1.5">
-              {role === 'manager' && <ChefHat className="w-4 h-4 text-amber-400" />}
-              {role === 'delivery' && <Truck className="w-4 h-4 text-emerald-400" />}
-              {role === 'admin' && <BarChart3 className="w-4 h-4 text-indigo-400" />}
+          <div className="flex items-center gap-2 bg-stone-900 px-3 py-1.5 rounded-full border border-amber-500/40 shadow-sm">
+            <span className="text-xs font-semibold text-amber-300 flex items-center gap-1.5">
+              {role === 'manager' && <ChefHat className="w-3.5 h-3.5 text-amber-400" />}
+              {role === 'delivery' && <Truck className="w-3.5 h-3.5 text-emerald-400" />}
+              {role === 'admin' && <BarChart3 className="w-3.5 h-3.5 text-indigo-400" />}
               <span>
-                {role === 'manager' ? (isMr ? 'वर्कशॉप मॅनेजर' : 'Workshop Manager') :
-                 role === 'delivery' ? (isMr ? 'डिलिव्हरी पार्टनर' : 'Delivery Rider') :
-                 (isMr ? 'ॲडमिन डॅशबोर्ड' : 'Admin Portal')}
+                {role === 'manager' ? 'Workshop Manager' :
+                 role === 'delivery' ? 'Delivery Fleet' :
+                 'Admin Portal'}
               </span>
             </span>
 
             <button
               onClick={handleReturnToCustomerStore}
-              className="ml-2 px-2.5 py-1 rounded-xl text-[11px] font-bold bg-[#FF9900] text-[#131921] hover:bg-amber-400 transition-colors flex items-center gap-1 cursor-pointer"
+              className="ml-2 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-amber-400 text-stone-950 hover:bg-amber-300 transition-colors flex items-center gap-1 cursor-pointer"
             >
               <Store className="w-3 h-3" />
-              <span>{isMr ? 'ग्राहक दुकान पहा' : 'View Storefront'}</span>
+              <span>Storefront</span>
             </button>
           </div>
         )}
 
-        {/* Right Controls: Language, Google Forms, User Profile, WhatsApp, Cart */}
-        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-          {/* Bilingual Language Switcher Button */}
-          <button
-            onClick={() => setLanguage(language === 'mr' ? 'en' : 'mr')}
-            className="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-extrabold flex items-center gap-1.5 transition-colors cursor-pointer border border-stone-700 bg-[#232F3E] hover:bg-[#37475A] text-white"
-            title="Switch Marathi / English"
-          >
-            <Globe className="w-3.5 h-3.5 text-[#FF9900]" />
-            <span>{language === 'mr' ? 'English' : 'मराठी'}</span>
-          </button>
-
-          {/* Google Forms / Feedback Button */}
+        {/* Right Controls: Feedback, Wholesale B2B, WhatsApp, Profile, Cart */}
+        <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+          {/* Feedback Button */}
           <button
             onClick={() => setIsFeedbackModalOpen(true)}
-            className="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer border border-[#FF9900]/40 bg-[#232F3E] hover:bg-[#37475A] text-[#FF9900]"
-            title="Google Forms & Customer Feedback"
+            className="px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer border border-stone-700/80 bg-stone-900/90 hover:bg-stone-800 text-stone-200 hover:text-white"
+            title="Customer Feedback & Surveys"
           >
-            <FileText className="w-3.5 h-3.5 text-[#FF9900]" />
-            <span className="hidden md:inline">{isMr ? 'अभिप्राय & फॉर्म' : 'Feedback & Form'}</span>
+            <FileText className="w-3.5 h-3.5 text-amber-400" />
+            <span className="hidden lg:inline">Feedback</span>
           </button>
 
-          {/* Dedicated B2B / Bulk Wholesale Request Button */}
+          {/* Dedicated B2B Wholesale Request Button */}
           <button
             onClick={() => setIsBulkRequestModalOpen(true)}
-            className="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-extrabold flex items-center gap-1.5 transition-colors cursor-pointer border border-amber-500/50 bg-gradient-to-r from-amber-500/20 to-amber-600/20 hover:from-amber-500/30 hover:to-amber-600/30 text-amber-300 shadow-sm"
+            className="px-3 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer border border-amber-500/40 bg-gradient-to-r from-amber-500/15 to-rose-500/15 hover:from-amber-500/25 hover:to-rose-500/25 text-amber-200 hover:text-white shadow-sm"
             title="Restaurant & Bulk Wholesale Supply"
           >
             <Building2 className="w-3.5 h-3.5 text-amber-400" />
-            <span className="hidden sm:inline">{isMr ? 'होलसेल / B2B' : 'Wholesale / B2B'}</span>
+            <span className="hidden sm:inline">Wholesale / B2B</span>
+          </button>
+
+          {/* WhatsApp Simulator Drawer Button */}
+          <button
+            onClick={() => setIsWhatsAppModalOpen(true)}
+            className="p-2 sm:px-3 sm:py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer bg-emerald-950/60 hover:bg-emerald-900/80 text-emerald-300 border border-emerald-800/60"
+            title="Open WhatsApp Notifications"
+          >
+            <MessageSquare className="w-3.5 h-3.5 text-emerald-400" />
+            <span className="hidden sm:inline">WhatsApp</span>
           </button>
 
           {/* User Auth / Account Dropdown */}
@@ -149,77 +143,70 @@ export const Header: React.FC = () => {
             <div className="relative">
               <button
                 onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
-                className="flex items-center gap-2 p-1.5 sm:px-3 sm:py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-2xs bg-[#232F3E] text-white border border-stone-700 hover:bg-[#37475A]"
+                className="flex items-center gap-2 p-1.5 sm:px-3 sm:py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer bg-stone-900 text-stone-200 border border-stone-700 hover:bg-stone-800 hover:text-white"
               >
                 {currentUser.photoURL ? (
                   <img
                     src={currentUser.photoURL}
                     alt="avatar"
                     referrerPolicy="no-referrer"
-                    className="w-5 h-5 rounded-full object-cover border border-[#FF9900]"
+                    className="w-5 h-5 rounded-full object-cover border border-amber-400"
                   />
                 ) : (
-                  <div className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold bg-[#FF9900] text-[#131921]">
+                  <div className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold bg-amber-400 text-stone-950">
                     {(currentUser.displayName || currentUser.email || 'U')[0].toUpperCase()}
                   </div>
                 )}
-                <span className="max-w-[80px] sm:max-w-[110px] truncate hidden xs:inline">
+                <span className="max-w-[80px] sm:max-w-[100px] truncate hidden xs:inline">
                   {currentUser.displayName || currentUser.email?.split('@')[0]}
                 </span>
-                {isStaffRole && (
-                  <span className="text-[10px] px-1.5 py-0.5 rounded-md font-bold uppercase hidden sm:inline bg-[#FF9900] text-[#131921]">
-                    {role}
-                  </span>
-                )}
                 <ChevronDown className="w-3 h-3 text-stone-400" />
               </button>
 
               {/* Profile Menu Popup */}
               {isProfileDropdownOpen && (
                 <div
-                  className="absolute right-0 mt-2 w-64 rounded-2xl bg-white border border-[#EFE4D8] shadow-2xl p-2 z-50 animate-in fade-in slide-in-from-top-2 text-stone-900"
+                  className="absolute right-0 mt-2 w-64 rounded-2xl bg-white border border-stone-200 shadow-xl p-2 z-50 animate-in fade-in slide-in-from-top-2 text-stone-900"
                   onClick={() => setIsProfileDropdownOpen(false)}
                 >
-                  <div className="p-3 bg-[#FAF6F2] rounded-xl mb-2">
-                    <div className="font-bold text-xs text-stone-900 truncate">
-                      {currentUser.displayName || (isMr ? 'माझे खाते' : 'My Account')}
+                  <div className="p-3 bg-stone-50 rounded-xl mb-2">
+                    <div className="font-semibold text-xs text-stone-900 truncate">
+                      {currentUser.displayName || 'My Account'}
                     </div>
                     <div className="text-[11px] text-stone-500 truncate font-mono">
                       {currentUser.email}
                     </div>
                     <div className="mt-1 flex items-center gap-1 text-[10px] text-emerald-700 font-semibold">
                       <CheckCircle2 className="w-3 h-3" />
-                      <span>Firebase Verified</span>
+                      <span>Verified Account</span>
                     </div>
                   </div>
 
                   {/* Customer Quick Links */}
                   <div className="space-y-1">
                     <button
-                      onClick={() => {
-                        handleReturnToCustomerStore();
-                      }}
-                      className="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold hover:bg-stone-50 text-stone-700 flex items-center gap-2 transition-colors cursor-pointer"
+                      onClick={() => handleReturnToCustomerStore()}
+                      className="w-full text-left px-3 py-2 rounded-lg text-xs font-medium hover:bg-stone-100 text-stone-700 flex items-center gap-2 transition-colors cursor-pointer"
                     >
-                      <ShoppingBag className="w-3.5 h-3.5 text-[#C84B31]" />
-                      <span>{isMr ? 'माझ्या ऑर्डर्स (My Orders)' : 'My Orders & Tracking'}</span>
+                      <ShoppingBag className="w-3.5 h-3.5 text-stone-600" />
+                      <span>My Orders & Tracking</span>
                     </button>
                     <button
                       onClick={() => setIsFeedbackModalOpen(true)}
-                      className="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold hover:bg-stone-50 text-stone-700 flex items-center gap-2 transition-colors cursor-pointer"
+                      className="w-full text-left px-3 py-2 rounded-lg text-xs font-medium hover:bg-stone-100 text-stone-700 flex items-center gap-2 transition-colors cursor-pointer"
                     >
                       <FileText className="w-3.5 h-3.5 text-amber-600" />
-                      <span>{isMr ? 'अभिप्राय फॉर्म (Feedback)' : 'Customer Feedback'}</span>
+                      <span>Customer Feedback</span>
                     </button>
                   </div>
 
                   <div className="border-t border-stone-100 mt-2 pt-2">
                     <button
                       onClick={() => logout()}
-                      className="w-full text-left px-3 py-2 rounded-lg text-xs font-bold text-red-600 hover:bg-red-50 flex items-center gap-2 transition-colors cursor-pointer"
+                      className="w-full text-left px-3 py-2 rounded-lg text-xs font-semibold text-rose-600 hover:bg-rose-50 flex items-center gap-2 transition-colors cursor-pointer"
                     >
                       <LogOut className="w-3.5 h-3.5" />
-                      <span>{isMr ? 'बाहेर पडा (Sign Out)' : 'Sign Out'}</span>
+                      <span>Sign Out</span>
                     </button>
                   </div>
                 </div>
@@ -231,36 +218,120 @@ export const Header: React.FC = () => {
                 setAuthMode('login');
                 setIsAuthModalOpen(true);
               }}
-              className="px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs bg-[#232F3E] text-white border border-stone-700 hover:bg-[#37475A]"
+              className="px-3.5 py-1.5 rounded-full text-xs font-medium flex items-center gap-1.5 transition-all cursor-pointer bg-stone-900 text-stone-200 border border-stone-700 hover:bg-stone-800 hover:text-white shadow-sm"
             >
-              <LogIn className="w-3.5 h-3.5 text-[#FF9900]" />
-              <span>{isMr ? 'लॉगिन' : 'Sign In'}</span>
+              <LogIn className="w-3.5 h-3.5 text-amber-400" />
+              <span>Sign In</span>
             </button>
           )}
 
-          {/* WhatsApp Simulator Drawer Button */}
-          <button
-            onClick={() => setIsWhatsAppModalOpen(true)}
-            className="p-2 sm:px-3 sm:py-1.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs bg-emerald-900/40 hover:bg-emerald-900/60 text-emerald-300 border border-emerald-700/50"
-            title="Open WhatsApp Notifications"
-          >
-            <MessageSquare className="w-4 h-4 text-green-400" />
-            <span className="hidden sm:inline">WhatsApp</span>
-          </button>
-
-          {/* Cart Icon & Badge */}
-          <button
+          {/* Cart Floating Pill Button with Animated Basket-Fill Indicator & Pop */}
+          <motion.button
+            id="header-cart-button"
             onClick={() => setIsCartOpen(true)}
-            className="relative p-2 sm:px-3.5 sm:py-2 rounded-xl text-xs font-extrabold flex items-center gap-2 transition-all cursor-pointer express-btn-cart text-[#0F1111] shadow-md hover:scale-[1.02]"
+            whileTap={{ scale: 0.92 }}
+            animate={
+              isBasketFilling
+                ? {
+                    scale: [1, 1.22, 0.94, 1.1, 1],
+                    rotate: [0, -5, 6, -3, 0],
+                    boxShadow: [
+                      '0 4px 12px rgba(0,0,0,0.1)',
+                      '0 0 28px rgba(245,158,11,0.7)',
+                      '0 4px 12px rgba(0,0,0,0.1)'
+                    ]
+                  }
+                : { scale: 1, rotate: 0 }
+            }
+            transition={{ duration: 0.7, ease: "easeOut" }}
+            className={`relative p-2 sm:px-4 sm:py-2 rounded-full text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer shadow-md hover:shadow-lg ${
+              isBasketFilling
+                ? 'bg-amber-300 text-stone-950 ring-4 ring-amber-400/50'
+                : 'bg-amber-400 hover:bg-amber-300 text-stone-950'
+            }`}
           >
-            <ShoppingBag className="w-4 h-4" />
-            <span className="hidden sm:inline">{isMr ? 'कार्ट' : 'Cart'}</span>
+            {/* Flying +Qty burst animation when an item is added */}
+            <AnimatePresence>
+              {isBasketFilling && (
+                <motion.div
+                  key={`fill-${basketFillTrigger}`}
+                  initial={{ opacity: 0, y: 8, scale: 0.6 }}
+                  animate={{ opacity: 1, y: -26, scale: 1.15 }}
+                  exit={{ opacity: 0, y: -38, scale: 0.8 }}
+                  transition={{ duration: 0.75, ease: "easeOut" }}
+                  className="absolute -top-3 -right-2 px-2 py-0.5 rounded-full text-[10px] font-black bg-gradient-to-r from-amber-500 to-rose-600 text-white shadow-lg border border-amber-300 pointer-events-none z-30 flex items-center gap-0.5"
+                >
+                  <span>+{lastAddedQuantity || 1}</span>
+                  <Sparkles className="w-2.5 h-2.5 text-amber-200" />
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Custom Basket Icon with dynamic spice-fill liquid level */}
+            <div className="relative w-4 h-4 sm:w-4.5 sm:h-4.5 flex items-center justify-center shrink-0">
+              <svg viewBox="0 0 24 24" className="w-full h-full overflow-visible" fill="none">
+                <defs>
+                  <clipPath id="headerBasketClip">
+                    <path d="M5.5 9.5 L18.5 9.5 L17.2 19 C17 19.8 16.3 20.5 15.5 20.5 L8.5 20.5 C7.7 20.5 7 19.8 6.8 19 Z" />
+                  </clipPath>
+                  <linearGradient id="headerSpiceFill" x1="0" y1="1" x2="0" y2="0">
+                    <stop offset="0%" stopColor="#C84B31" />
+                    <stop offset="60%" stopColor="#F59E0B" />
+                    <stop offset="100%" stopColor="#FDE68A" />
+                  </linearGradient>
+                </defs>
+
+                {/* Animated Spice Fill Level */}
+                <g clipPath="url(#headerBasketClip)">
+                  <rect
+                    x="0"
+                    y={24 - (24 * Math.min(100, Math.max(cartItemCount > 0 ? 25 : 0, cartItemCount * 25))) / 100}
+                    width="24"
+                    height="24"
+                    fill="url(#headerSpiceFill)"
+                    className="transition-all duration-500 ease-out"
+                  />
+                  {cartItemCount > 0 && (
+                    <line
+                      x1="5"
+                      y1={24 - (24 * Math.min(100, Math.max(cartItemCount > 0 ? 25 : 0, cartItemCount * 25))) / 100}
+                      x2="19"
+                      y2={24 - (24 * Math.min(100, Math.max(cartItemCount > 0 ? 25 : 0, cartItemCount * 25))) / 100}
+                      stroke="#FEF3C7"
+                      strokeWidth="1.5"
+                      strokeDasharray="2 2"
+                    />
+                  )}
+                </g>
+
+                {/* Basket Silhouette and Handle */}
+                <path
+                  d="M9 9V6a3 3 0 0 1 6 0v3M4.5 9h15l-1.4 10.3a2 2 0 0 1-2 1.7H7.9a2 2 0 0 1-2-1.7L4.5 9z"
+                  stroke="currentColor"
+                  strokeWidth="2.2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </div>
+
+            <span className="hidden sm:inline font-bold">
+              {isBasketFilling ? 'Filling...' : 'Basket'}
+            </span>
+
+            {/* Cart Count Badge with spring pop bounce */}
             {cartItemCount > 0 && (
-              <span className="w-5 h-5 rounded-full text-[11px] font-extrabold flex items-center justify-center bg-[#131921] text-[#FF9900]">
+              <motion.span
+                key={cartItemCount}
+                initial={{ scale: 0.6 }}
+                animate={{ scale: [1, 1.35, 1] }}
+                transition={{ type: "spring", stiffness: 450, damping: 18 }}
+                className="w-5 h-5 rounded-full text-[10px] font-black flex items-center justify-center bg-stone-950 text-amber-300 shadow-sm border border-stone-800"
+              >
                 {cartItemCount}
-              </span>
+              </motion.span>
             )}
-          </button>
+          </motion.button>
         </div>
       </div>
     </header>

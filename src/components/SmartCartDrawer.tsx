@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Trash2, ShoppingBag, ArrowRight, Sparkles, Tag, ShieldCheck, Plus, Minus } from 'lucide-react';
 import { useApp } from '../context/AppContext';
+import { ChutneyArtwork } from './ChutneyArtwork';
 
 export const SmartCartDrawer: React.FC = () => {
   const { language, cart, isCartOpen, setIsCartOpen, removeFromCart, updateQuantity, cartSubtotal, setIsCheckoutOpen } = useApp();
@@ -95,15 +96,17 @@ export const SmartCartDrawer: React.FC = () => {
                             <span className="text-[8px] font-bold text-[#C84B31] block">Custom</span>
                           </div>
                         ) : item.product ? (
-                          <img
-                            src={item.product.imageUrl}
-                            alt="product"
-                            referrerPolicy="no-referrer"
-                            onError={(e) => {
-                              (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1596797038530-2c107229654b?auto=format&fit=crop&w=1000&q=85';
-                            }}
-                            className="w-full h-full object-cover"
-                          />
+                          <div className="w-full h-full overflow-hidden">
+                            <img
+                              src={item.product.imageUrl}
+                              alt={isMr ? item.product.nameMr : item.product.nameEn}
+                              referrerPolicy="no-referrer"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).src = '/products/kanda-lasun.jpg';
+                              }}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
                         ) : (
                           <span className="text-lg">🌶️</span>
                         )}

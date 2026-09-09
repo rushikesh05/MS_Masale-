@@ -126,9 +126,59 @@
         "updatedAt": { "type": "string", "description": "Last updated ISO timestamp" }
       },
       "required": ["id", "businessName", "contactPerson", "phone", "establishmentType", "totalEstimatedKg", "status", "createdAt"]
+    },
+    "Product": {
+      "title": "Product",
+      "description": "Artisanal chutney, pure masala, or heritage pickle product record",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Product unique ID (e.g. prod-malvani-masala)" },
+        "nameMr": { "type": "string", "description": "Marathi product title" },
+        "nameEn": { "type": "string", "description": "English product title" },
+        "taglineMr": { "type": "string", "description": "Short Marathi tagline" },
+        "taglineEn": { "type": "string", "description": "Short English tagline" },
+        "descriptionMr": { "type": "string", "description": "Full Marathi description" },
+        "descriptionEn": { "type": "string", "description": "Full English description" },
+        "category": { "type": "string", "description": "Category identifier" },
+        "spiceLevel": { "type": "number", "description": "Spice level from 1 to 5" },
+        "badgeMr": { "type": "string", "description": "Marathi badge text" },
+        "badgeEn": { "type": "string", "description": "English badge text" },
+        "rating": { "type": "number", "description": "Customer average rating" },
+        "reviewCount": { "type": "number", "description": "Number of reviews" },
+        "imageUrl": { "type": "string", "description": "Image URL or asset path" },
+        "sizes": { "type": "string", "description": "Serialized packaging sizes and prices JSON" },
+        "isBestSeller": { "type": "boolean", "description": "Flag for featured bestseller" },
+        "isRegionalSpecialty": { "type": "boolean", "description": "Flag for regional specialty" },
+        "regionOriginMr": { "type": "string", "description": "Marathi region name" },
+        "regionOriginEn": { "type": "string", "description": "English region name" }
+      },
+      "required": ["id", "nameMr", "nameEn", "category"]
+    },
+    "Category": {
+      "title": "Category",
+      "description": "Product category definition with multilingual titles and display metadata",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Category identifier (e.g. masala, chutney)" },
+        "nameMr": { "type": "string", "description": "Marathi category name" },
+        "nameEn": { "type": "string", "description": "English category name" },
+        "descriptionMr": { "type": "string", "description": "Marathi description" },
+        "descriptionEn": { "type": "string", "description": "English description" },
+        "icon": { "type": "string", "description": "Lucide icon name" },
+        "sortOrder": { "type": "number", "description": "Ordering priority" }
+      },
+      "required": ["id", "nameMr", "nameEn"]
     }
   },
   "firestore": {
+    "/products/{productId}": {
+      "schema": "Product",
+      "description": "Products catalog synced live to Firestore with admin CRUD capability"
+    },
+    "/categories/{categoryId}": {
+      "schema": "Category",
+      "description": "Product categories synced live to Firestore with admin CRUD capability"
+    },
     "/users/{userId}": {
       "schema": "UserProfile",
       "description": "User account profiles and role mappings"

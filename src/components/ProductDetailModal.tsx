@@ -6,17 +6,19 @@ import { useApp } from '../context/AppContext';
 import { ProductVisual } from './ProductVisual';
 
 export const ProductDetailModal: React.FC = () => {
-  const { language, selectedProductDetail, setSelectedProductDetail, addToCart } = useApp();
-  const isMr = language === 'mr';
+  const { selectedProductDetail, setSelectedProductDetail, addToCart } = useApp();
+  const isMr = false; // Strictly English as requested
 
   const [selectedSize, setSelectedSize] = useState<'250g' | '500g' | '1kg'>('500g');
   const [quantity, setQuantity] = useState<number>(1);
+  const [isAdding, setIsAdding] = useState<boolean>(false);
 
   if (!selectedProductDetail) return null;
   const product = selectedProductDetail;
   const activeSizeObj = product.sizes.find(s => s.size === selectedSize) || product.sizes[0];
 
   const handleAdd = () => {
+    setIsAdding(true);
     addToCart({
       isCustomRecipe: false,
       productId: product.id,
@@ -25,7 +27,10 @@ export const ProductDetailModal: React.FC = () => {
       quantity: quantity,
       unitPrice: activeSizeObj.price
     });
-    setSelectedProductDetail(null);
+    setTimeout(() => {
+      setIsAdding(false);
+      setSelectedProductDetail(null);
+    }, 450);
   };
 
   return (
@@ -253,14 +258,29 @@ export const ProductDetailModal: React.FC = () => {
                   </button>
                 </div>
 
-                {/* Add to Cart Button */}
-                <button
+                {/* Add to Cart Button with Pop animation */}
+                <motion.button
+                  whileTap={{ scale: 0.94 }}
+                  animate={
+                    isAdding
+                      ? { scale: [1, 1.08, 0.95, 1], backgroundColor: '#059669' }
+                      : { scale: 1 }
+                  }
                   onClick={handleAdd}
-                  className="flex-1 py-3 px-4 rounded-xl bg-[#C84B31] hover:bg-[#A83B23] text-white font-extrabold text-sm sm:text-base transition-all shadow-md shadow-[#C84B31]/25 flex items-center justify-center gap-2 cursor-pointer"
+                  className="flex-1 py-3 px-4 rounded-xl bg-[#C84B31] hover:bg-[#A83B23] text-white font-extrabold text-sm sm:text-base transition-all shadow-md shadow-[#C84B31]/25 flex items-center justify-center gap-2 cursor-pointer relative overflow-hidden"
                 >
-                  <ShoppingBag className="w-4 h-4" />
-                  <span>{isMr ? `कार्टमध्ये जोडा (₹${activeSizeObj.price * quantity})` : `Add to Cart (₹${activeSizeObj.price * quantity})`}</span>
-                </button>
+                  {isAdding ? (
+                    <>
+                      <Check className="w-5 h-5 text-emerald-200 animate-bounce" />
+                      <span className="text-white">Added to Basket!</span>
+                    </>
+                  ) : (
+                    <>
+                      <ShoppingBag className="w-4 h-4 text-amber-300" />
+                      <span>{isMr ? `कार्टमध्ये जोडा (₹${activeSizeObj.price * quantity})` : `Add to Cart (₹${activeSizeObj.price * quantity})`}</span>
+                    </>
+                  )}
+                </motion.button>
               </div>
             </div>
           </div>

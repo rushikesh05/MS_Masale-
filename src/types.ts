@@ -100,6 +100,16 @@ export interface CustomChutneyConfig {
   createdAt?: string;
 }
 
+export interface ProductCategory {
+  id: string;
+  nameMr: string;
+  nameEn: string;
+  descriptionMr?: string;
+  descriptionEn?: string;
+  icon?: string;
+  sortOrder?: number;
+}
+
 export interface Product {
   id: string;
   nameMr: string;
@@ -108,7 +118,7 @@ export interface Product {
   taglineEn: string;
   descriptionMr: string;
   descriptionEn: string;
-  category: 'chutney' | 'masala' | 'specialty';
+  category: 'chutney' | 'masala' | 'specialty' | 'pickle' | string;
   spiceLevel: number; // 1-5
   badgeMr?: string;
   badgeEn?: string;
@@ -133,7 +143,7 @@ export interface Product {
     fiber: string;
   };
   sizes: {
-    size: '250g' | '500g' | '1kg';
+    size: '100g' | '250g' | '500g' | '1kg' | string;
     grams: number;
     price: number;
     originalPrice: number;

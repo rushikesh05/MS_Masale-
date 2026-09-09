@@ -64,6 +64,7 @@ import {
 } from 'recharts';
 import { useApp } from '../context/AppContext';
 import { Order, WhatsAppNotification, Inquiry } from '../types';
+import { AdminCatalogManager } from './AdminCatalogManager';
 
 // Historical monthly sales data including festive surges
 const MONTHLY_SALES_DATA = [
@@ -244,7 +245,7 @@ export const AdminPortal: React.FC = () => {
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [staffUsers, setStaffUsers] = useState<StaffUserRecord[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<'analytics' | 'all_orders' | 'staff_management' | 'inquiries' | 'whatsapp_logs' | 'database'>('analytics');
+  const [activeTab, setActiveTab] = useState<'analytics' | 'products_management' | 'all_orders' | 'staff_management' | 'inquiries' | 'whatsapp_logs' | 'database'>('analytics');
   const [timeframe, setTimeframe] = useState<'6m' | '12m'>('12m');
   const [blendMetric, setBlendMetric] = useState<'volume' | 'revenue'>('revenue');
 
@@ -504,6 +505,15 @@ export const AdminPortal: React.FC = () => {
           <span>{isMr ? '📊 विक्री आलेख & मसाले ट्रेंड्स' : '📊 Recharts Sales & Spice Trends'}</span>
         </button>
         <button
+          onClick={() => setActiveTab('products_management')}
+          className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+            activeTab === 'products_management' ? 'bg-[#C84B31] text-white shadow-xs' : 'bg-white text-gray-600 hover:bg-gray-50'
+          }`}
+        >
+          <Flame className="w-4 h-4 text-amber-500" />
+          <span>{isMr ? '🌶️ उत्पादने व मसाले व्यवस्थापन' : '🌶️ Products & Masales Manager'}</span>
+        </button>
+        <button
           onClick={() => setActiveTab('all_orders')}
           className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
             activeTab === 'all_orders' ? 'bg-[#C84B31] text-white shadow-xs' : 'bg-white text-gray-600 hover:bg-gray-50'
@@ -558,6 +568,11 @@ export const AdminPortal: React.FC = () => {
           <span>{isMr ? '🗄️ फायरबेस डेटाबेस व ॲक्सेस' : '🗄️ Firestore Database & Schema'}</span>
         </button>
       </div>
+
+      {/* TAB: Products & Masales Manager (CRUD) */}
+      {activeTab === 'products_management' && (
+        <AdminCatalogManager />
+      )}
 
       {/* TAB 1: Analytics & Recharts Insights */}
       {activeTab === 'analytics' && (
@@ -1161,14 +1176,14 @@ export const AdminPortal: React.FC = () => {
               {/* Card 2: Manager / Chef */}
               <div className="bg-[#1F1919] p-4 rounded-2xl border border-amber-900/40 space-y-2 relative">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold px-2 py-0.5 rounded-md bg-amber-900/60 text-amber-200">👨‍🍳 Manager (सुवर्णा)</span>
+                  <span className="text-xs font-bold px-2 py-0.5 rounded-md bg-amber-900/60 text-amber-200">👨‍🍳 Workshop Manager</span>
                   <span className="text-[10px] text-stone-400">Workshop & Kitchen</span>
                 </div>
                 <div className="text-xs font-semibold text-stone-200 truncate">
-                  suvarna.manager@assalgavran.in
+                  manager@msmasale.com
                 </div>
                 <div className="text-[10px] text-stone-400 truncate">
-                  सुवर्णा (Workshop Manager)
+                  Workshop Production Manager
                 </div>
                 <div className="text-[11px] text-stone-400 font-mono bg-black/40 px-2 py-1 rounded-md">
                   URL: ?portal=manager
@@ -1699,8 +1714,8 @@ export const AdminPortal: React.FC = () => {
                     </div>
 
                     <div className="p-3 bg-white rounded-xl border border-stone-200 space-y-1">
-                      <div className="font-bold text-amber-900">👨‍🍳 2. Workshop Manager (सुवर्णा)</div>
-                      <div><strong>Default Email:</strong> suvarna.manager@assalgavran.in</div>
+                      <div className="font-bold text-amber-900">👨‍🍳 2. Workshop Manager</div>
+                      <div><strong>Default Email:</strong> manager@msmasale.com</div>
                       <div><strong>Role:</strong> Workshop Manager & Head Chef</div>
                       <div className="font-mono text-[11px] text-stone-600"><strong>URL:</strong> ?portal=manager</div>
                       <p className="text-[11px] text-stone-500">Live order queue, grinding stage advancement, raw ingredient inventory threshold alarms.</p>

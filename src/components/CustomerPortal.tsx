@@ -2,23 +2,21 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Sparkles, 
-  Flame, 
   ChefHat, 
   ShieldCheck, 
   Truck, 
-  Heart, 
   Leaf, 
-  Clock, 
   ArrowRight,
-  Star,
   Award,
-  SlidersHorizontal,
-  PackageCheck,
-  Navigation,
-  CheckCircle2,
   RefreshCw,
   FileText,
-  Building2
+  Building2,
+  Navigation,
+  ShoppingBag,
+  Flame,
+  Star,
+  Layers,
+  ChevronUp
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useAuth } from '../context/AuthContext';
@@ -28,55 +26,84 @@ import { AISommelier } from './AISommelier';
 import { LiveDeliveryTrackerModal } from './LiveDeliveryTrackerModal';
 import { FlavorProfileDashboard } from './FlavorProfileDashboard';
 import { VoiceSearchBar } from './VoiceSearchBar';
-import { PRODUCTS } from '../data/initialData';
-import { Order } from '../types';
+import { Order, ProductCategory } from '../types';
+import { ProductVisual } from './ProductVisual';
+import { FloatingTextsVisuals } from './FloatingTextsVisuals';
 
 export const CustomerPortal: React.FC = () => {
-  const { language, theme, orders, openWhatsAppAlert, openInvoiceModal, refreshOrders, setIsBulkRequestModalOpen } = useApp();
+  const { 
+    orders, 
+    openWhatsAppAlert, 
+    openInvoiceModal, 
+    refreshOrders, 
+    setIsBulkRequestModalOpen,
+    cartCount,
+    cartSubtotal,
+    setIsCartOpen,
+    setSelectedProductDetail,
+    products,
+    categories: dynamicCategories
+  } = useApp();
   const { currentUser, setIsAuthModalOpen, setAuthMode, setRole } = useAuth();
-  const isMr = language === 'mr';
-  const isExpress = theme === 'express';
 
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [activeSection, setActiveSection] = useState<'catalog' | 'builder' | 'sommelier' | 'flavor-profile' | 'orders'>('catalog');
   const [selectedTrackingOrder, setSelectedTrackingOrder] = useState<Order | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [floatingAmbiance, setFloatingAmbiance] = useState<'amber' | 'crimson' | 'emerald'>('amber');
 
+  // Merged categories with prominent "Pure Masales (Buy Separately)"
   const categories = [
-    { id: 'all', mr: 'सर्व उत्पादने (All)', en: 'All Chutneys' },
-    { id: 'bestsellers', mr: '🔥 बेस्ट सेलर्स (Top Deals)', en: '🔥 Best Sellers' },
-    { id: 'kolhapuri', mr: '🌶️ कोल्हापुरी झणझणीत', en: '🌶️ Spicy Kolhapuri' },
-    { id: 'solapuri', mr: '🥜 सोलापुरी शेंगदाणा', en: '🥜 Solapuri Peanut' },
-    { id: 'healthy', mr: '💪 ओमेगा-३ व फिटनेस', en: '💪 High Fiber & Omega-3' }
+    { id: 'all', en: 'All Items • सर्व उत्पादने' },
+    { id: 'masala', en: '🌶️ Pure Masales • अस्सल मसाले (Buy Separately)' },
+    { id: 'pickles', en: 'Traditional Pickles (लोणची)' },
+    { id: 'thecha', en: 'Thecha & Relishes (ठेचा)' },
+    { id: 'dry-chutneys', en: 'Dry Chutneys (कोरड्या चटण्या)' },
+    { id: 'metkut', en: 'Heritage Metkut (मेतकूट)' },
+    { id: 'kolhapuri', en: 'Kolhapur Flagship' },
+    { id: 'bestsellers', en: 'Best Sellers' },
+    { id: 'healthy', en: 'High Fiber & Seeds' },
+    ...dynamicCategories
+      .filter(dc => !['all', 'masala', 'pickles', 'thecha', 'dry-chutneys', 'metkut', 'kolhapuri', 'bestsellers', 'healthy', 'chutney', 'pickle', 'specialty'].includes(dc.id))
+      .map(dc => ({ id: dc.id, en: `${dc.nameEn} (${dc.nameMr})` }))
   ];
 
-  const filteredProducts = PRODUCTS.filter(p => {
+  const filteredProducts = products.filter(p => {
     // 1. Category Filter
     let matchesCategory = true;
-    if (selectedCategory === 'bestsellers') matchesCategory = p.isBestSeller;
-    else if (selectedCategory === 'kolhapuri') matchesCategory = p.id.includes('kanda-lasun') || p.id.includes('kolhapuri-thecha') || p.id.includes('sukha-chilli');
-    else if (selectedCategory === 'solapuri') matchesCategory = p.id.includes('shengdana');
-    else if (selectedCategory === 'healthy') matchesCategory = p.id.includes('javas') || p.id.includes('til') || p.id.includes('karale');
+    if (selectedCategory === 'masala') {
+      matchesCategory = p.category === 'masala' || p.id.includes('masala');
+    } else if (selectedCategory === 'kolhapuri') {
+      matchesCategory = p.id.includes('kanda-lasun') || p.id.includes('kolhapuri-thecha') || p.id.includes('sukha-chilli');
+    } else if (selectedCategory === 'pickles') {
+      matchesCategory = p.category === 'pickle' || p.id.includes('lonche') || p.id.includes('pickle');
+    } else if (selectedCategory === 'thecha') {
+      matchesCategory = p.id.includes('thecha') || p.id.includes('panchamrut');
+    } else if (selectedCategory === 'dry-chutneys') {
+      matchesCategory = (p.category === 'chutney' || !p.category) && !p.id.includes('thecha') && !p.id.includes('masala');
+    } else if (selectedCategory === 'metkut') {
+      matchesCategory = p.id.includes('metkut');
+    } else if (selectedCategory === 'bestsellers') {
+      matchesCategory = Boolean(p.isBestSeller);
+    } else if (selectedCategory === 'healthy') {
+      matchesCategory = p.id.includes('javas') || p.id.includes('til') || p.id.includes('karale');
+    } else if (selectedCategory !== 'all') {
+      matchesCategory = p.category === selectedCategory;
+    }
 
     if (!matchesCategory) return false;
 
-    // 2. Voice / Text Search Filter
+    // 2. Search Filter
     if (!searchQuery.trim()) return true;
 
     const q = searchQuery.toLowerCase().trim();
-    const matchesName = p.nameMr.toLowerCase().includes(q) || p.nameEn.toLowerCase().includes(q);
-    const matchesTagline = p.taglineMr.toLowerCase().includes(q) || p.taglineEn.toLowerCase().includes(q);
-    const matchesDesc = p.descriptionMr.toLowerCase().includes(q) || p.descriptionEn.toLowerCase().includes(q);
-    const matchesIngredients = 
-      p.ingredientsMr.some(i => i.toLowerCase().includes(q)) ||
-      p.ingredientsEn.some(i => i.toLowerCase().includes(q));
-    const matchesRegion = 
-      (p.regionOriginMr && p.regionOriginMr.toLowerCase().includes(q)) ||
-      (p.regionOriginEn && p.regionOriginEn.toLowerCase().includes(q));
-    const matchesBadge = 
-      (p.badgeMr && p.badgeMr.toLowerCase().includes(q)) ||
-      (p.badgeEn && p.badgeEn.toLowerCase().includes(q));
+    const matchesName = p.nameEn.toLowerCase().includes(q) || p.nameMr.toLowerCase().includes(q);
+    const matchesTagline = (p.taglineEn || '').toLowerCase().includes(q) || (p.taglineMr || '').toLowerCase().includes(q);
+    const matchesDesc = (p.descriptionEn || '').toLowerCase().includes(q) || (p.descriptionMr || '').toLowerCase().includes(q);
+    const matchesIngredients = (p.ingredientsEn || []).some(i => i.toLowerCase().includes(q)) || (p.ingredientsMr || []).some(i => i.toLowerCase().includes(q));
+    const matchesRegion = p.regionOriginEn && p.regionOriginEn.toLowerCase().includes(q);
+    const matchesBadge = (p.badgeEn && p.badgeEn.toLowerCase().includes(q)) || (p.badgeMr && p.badgeMr.toLowerCase().includes(q));
 
     return matchesName || matchesTagline || matchesDesc || matchesIngredients || matchesRegion || matchesBadge;
   });
@@ -92,8 +119,8 @@ export const CustomerPortal: React.FC = () => {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.08,
-        delayChildren: 0.05,
+        staggerChildren: 0.07,
+        delayChildren: 0.04,
       },
     },
   };
@@ -101,8 +128,8 @@ export const CustomerPortal: React.FC = () => {
   const cardItemVariants = {
     hidden: { 
       opacity: 0, 
-      y: 30,
-      scale: 0.96,
+      y: 20,
+      scale: 0.97,
     },
     visible: {
       opacity: 1,
@@ -110,282 +137,254 @@ export const CustomerPortal: React.FC = () => {
       scale: 1,
       transition: {
         type: 'spring',
-        stiffness: 260,
-        damping: 22,
+        stiffness: 280,
+        damping: 24,
         mass: 0.8,
       },
     },
   };
 
   return (
-    <div className="space-y-8 sm:space-y-10 pb-12">
-      {/* 1. Hero Brand Presentation Banner */}
-      <section className={`relative overflow-hidden text-white rounded-3xl p-6 sm:p-10 shadow-xl mx-4 sm:mx-6 lg:mx-8 transition-colors ${
-        isExpress 
-          ? 'bg-gradient-to-r from-[#131921] via-[#232F3E] to-[#131921] border border-stone-800'
-          : 'bg-gradient-to-br from-[#2D2424] via-[#3C2E2E] to-[#1E1717] border border-[#443838]'
-      }`}>
-        {/* Ambient Glow */}
-        <div className={`absolute top-0 right-0 w-96 h-96 rounded-full blur-3xl pointer-events-none ${
-          isExpress ? 'bg-[#FF9900]/15' : 'bg-[#C84B31]/25'
-        }`} />
-        <div className="absolute bottom-0 left-1/3 w-64 h-64 bg-amber-500/10 rounded-full blur-2xl pointer-events-none" />
-        
-        <div className="relative z-10 max-w-3xl space-y-4 sm:space-y-5">
-          <div className="flex flex-wrap items-center gap-2">
-            <div className={`inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-bold backdrop-blur-md ${
-              isExpress
-                ? 'bg-[#FF9900]/20 text-[#FFB84D] border border-[#FF9900]/40'
-                : 'bg-[#C84B31]/40 text-[#F5C2B8] border border-[#C84B31]/50'
-            }`}>
-              <Sparkles className="w-3.5 h-3.5 text-[#FFA41C]" />
-              <span>{isMr ? 'पारंपरिक दगडी खलबत्त्यात कुटलेली अस्सल चव' : '100% Stone-Pounded Heritage Maharashtrian Chutneys'}</span>
+    <div className="space-y-8 sm:space-y-10 pb-16">
+      {/* 1. Hero Brand Presentation Banner - High-End Artisanal & Uncluttered */}
+      <section className="relative overflow-hidden text-stone-100 rounded-3xl p-6 sm:p-10 lg:p-12 shadow-[0_12px_40px_rgba(0,0,0,0.12)] mx-4 sm:mx-6 lg:mx-8 bg-gradient-to-br from-[#1C1816] via-[#241F1C] to-[#1A1614] border border-[#332A25] transition-all">
+        {/* Soft Warm Ambient Glow */}
+        <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full blur-3xl pointer-events-none bg-amber-500/10" />
+        <div className="absolute -bottom-24 -left-12 w-80 h-80 rounded-full blur-3xl pointer-events-none bg-[#C2410C]/10" />
+
+        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+          {/* Left Column: Brand Story & Clear Primary CTAs */}
+          <div className="lg:col-span-7 space-y-4 sm:space-y-5">
+            <div className="flex flex-wrap items-center gap-2.5">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-semibold bg-[#C2410C]/20 text-[#FDBA74] border border-[#C2410C]/40">
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>100% Traditional Stone-Pounded Condiments</span>
+              </div>
+
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-stone-800/80 text-stone-300 border border-stone-700/60 text-xs font-medium">
+                <span>Heritage Recipes</span>
+                <span className="text-stone-500">•</span>
+                <span>Zero High-Heat Milling</span>
+              </span>
             </div>
 
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#007185]/30 text-[#6CE0F5] border border-[#007185]/60 text-[11px] font-bold">
-              <span>🎬 {isMr ? 'लाईव्ह खलबत्ता' : 'Live Blending'}</span>
-              <span className="text-white/80">• {isMr ? 'पारंपरिक पद्धत' : 'Heritage Stone Grinding'}</span>
-            </span>
-          </div>
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold font-serif text-white tracking-tight leading-tight">
+              MS Masale
+              <span className="block text-xl sm:text-2xl lg:text-3xl mt-2 font-sans font-bold text-amber-400">
+                Stone-Crushed Artisanal Chutneys & Spices
+              </span>
+            </h1>
 
-          <h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold font-brand leading-tight tracking-tight">
-            {isMr ? (
-              <>
-                MS मसाले <span className="text-amber-400 font-normal text-lg sm:text-2xl block sm:inline sm:ml-2">(मंगल सुवर्णा मसाले)</span>
-                <span className={`block text-xl sm:text-3xl mt-1.5 font-bold ${
-                  isExpress ? 'text-[#FF9900]' : 'text-[#E89F4C]'
-                }`}>
-                  दगडी खलबत्त्यातील अस्सल गावरान चव व ठसका!
-                </span>
-              </>
-            ) : (
-              <>
-                MS Masale <span className="text-amber-400 font-normal text-lg sm:text-2xl block sm:inline sm:ml-2">(Mangal Suvarna Masale)</span>
-                <span className={`block text-xl sm:text-3xl mt-1.5 font-bold ${
-                  isExpress ? 'text-[#FF9900]' : 'text-[#E89F4C]'
-                }`}>
-                  Stone-Crushed Heritage Maharashtrian Chutneys & Spices
-                </span>
-              </>
-            )}
-          </h1>
+            <p className="text-xs sm:text-sm text-stone-300 max-w-xl leading-relaxed">
+              Legendary Kolhapuri Kanda-Lasun chutney, Solapuri shengdana, fiery green thecha, flaxseed chutney, and pure stone-crushed cooking masalas. Hand-pounded in stone mortars and sealed fresh in airtight glass jars.
+            </p>
 
-          <p className="text-xs sm:text-sm text-gray-300 max-w-2xl leading-relaxed">
-            {isMr
-              ? 'सोलापूरची प्रसिद्ध शेंगदाणा चटणी, कोल्हापूरचा अस्सल कांदा-लसूण मसाला, जवसाची सुपरफूड चटणी आणि वडापावची खोबरे-लसूण चटणी. थेट खलबत्त्यातून ताज्या काचेच्या बरणीत तुमच्या दारात.'
-              : 'Solapuri roasted peanut chutney, fiery Kolhapuri Kanda-Lasun masala, omega-3 flaxseed, and authentic Mumbai Vada Pav coconut-garlic crumble.'}
-          </p>
-
-          <div className="pt-2 flex flex-wrap items-center gap-3 sm:gap-4">
-            <button
-              onClick={() => setActiveSection('catalog')}
-              className={`px-6 py-3 font-extrabold text-xs sm:text-sm rounded-xl transition-all shadow-lg flex items-center gap-2 cursor-pointer ${
-                isExpress
-                  ? 'express-btn-cart text-[#0F1111] font-black'
-                  : 'bg-[#C84B31] hover:bg-[#A83B23] text-white shadow-[#C84B31]/30'
-              }`}
-            >
-              <span>{isMr ? 'सर्व चटण्या पहा (Explore Catalog)' : 'Explore Chutney Jars'}</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
-
-            <button
-              onClick={() => setActiveSection('builder')}
-              className="px-5 py-3 bg-white/10 hover:bg-white/20 text-white font-bold text-xs sm:text-sm rounded-xl border border-white/20 transition-all flex items-center gap-2 cursor-pointer"
-            >
-              <ChefHat className="w-4 h-4 text-amber-300" />
-              <span>{isMr ? 'स्वतःची चटणी बनवा' : 'Custom Spice Studio'}</span>
-            </button>
-
-            {!currentUser && (
+            <div className="pt-2 flex flex-wrap items-center gap-3">
               <button
                 onClick={() => {
-                  setAuthMode('login');
-                  setIsAuthModalOpen(true);
+                  setActiveSection('catalog');
+                  setSelectedCategory('all');
                 }}
-                className={`px-4 py-3 border font-bold text-xs sm:text-sm rounded-xl transition-all flex items-center gap-1.5 cursor-pointer ${
-                  isExpress
-                    ? 'bg-[#FF9900]/20 hover:bg-[#FF9900]/30 text-amber-300 border-[#FF9900]/40'
-                    : 'bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 border-amber-400/30'
-                }`}
+                className="px-6 py-3 font-bold text-xs sm:text-sm rounded-full transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-2 cursor-pointer bg-[#C2410C] hover:bg-[#9A3412] text-white"
               >
-                <span>🔑 {isMr ? 'गुगल / ईमेल लॉगिन' : 'Sign In / Register'}</span>
+                <span>Explore All Condiments</span>
+                <ArrowRight className="w-4 h-4" />
               </button>
-            )}
+
+              <button
+                onClick={() => {
+                  setActiveSection('catalog');
+                  setSelectedCategory('masala');
+                }}
+                className="px-5 py-3 bg-stone-900/90 hover:bg-stone-800 text-amber-300 font-semibold text-xs sm:text-sm rounded-full border border-amber-500/40 transition-all hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-2 cursor-pointer"
+              >
+                <Flame className="w-4 h-4 text-amber-400" />
+                <span>🌶️ Buy Pure Masales (मसाले)</span>
+              </button>
+
+              <button
+                onClick={() => setActiveSection('builder')}
+                className="px-4 py-3 bg-stone-900/60 hover:bg-stone-800 text-stone-300 font-medium text-xs sm:text-sm rounded-full border border-stone-700/60 transition-all flex items-center gap-1.5 cursor-pointer"
+              >
+                <ChefHat className="w-4 h-4 text-stone-400" />
+                <span className="hidden sm:inline">Custom Blend Studio</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Right Column: High-Quality Product Showcase with Clean Badges */}
+          <div className="lg:col-span-5 relative hidden sm:flex items-center justify-center p-4">
+            <div 
+              onClick={() => {
+                const kandaProduct = products.find(p => p.id === 'prod-kanda-lasun') || products[0];
+                if (kandaProduct) setSelectedProductDetail(kandaProduct);
+              }}
+              className="relative w-full max-w-sm aspect-4/3 rounded-3xl overflow-hidden border border-[#3E342D] shadow-[0_16px_40px_rgba(0,0,0,0.45)] group cursor-pointer"
+            >
+              {products.length > 0 && (
+                <ProductVisual
+                  product={products.find(p => p.id === 'prod-kanda-lasun') || products[0]}
+                  isMarathi={false}
+                  allowToggle={true}
+                />
+              )}
+            </div>
+
+            {/* Single Clean Floating Badge */}
+            <div className="absolute -bottom-2 -left-2 z-20 pointer-events-none">
+              <div className="px-3.5 py-1.5 rounded-full bg-[#1C1816]/95 backdrop-blur-md border border-amber-500/40 text-amber-200 text-xs font-semibold shadow-lg flex items-center gap-1.5">
+                <Flame className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+                <span>Stone-Mortar Batch #428 • 100% Wood-Pressed Oil</span>
+              </div>
+            </div>
+
+            <div className="absolute -top-2 -right-2 z-20 pointer-events-none">
+              <div className="px-3 py-1.5 rounded-full bg-[#1C1816]/95 backdrop-blur-md border border-stone-700 text-stone-200 text-xs font-semibold shadow-lg flex items-center gap-1.5">
+                <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+                <span>4.96/5 (1.2k+ Reviews)</span>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Feature Badges Row */}
-        <div className="relative z-10 grid grid-cols-2 md:grid-cols-4 gap-4 mt-8 pt-6 border-t border-white/10 text-xs">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-amber-500/20 flex items-center justify-center text-amber-400">
+        {/* Minimal Feature Badges Row */}
+        <div className="relative z-10 grid grid-cols-2 md:grid-cols-4 gap-4 mt-8 pt-6 border-t border-stone-800/80 text-xs">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-amber-500/15 flex items-center justify-center text-amber-400 shrink-0">
               <Award className="w-4 h-4" />
             </div>
             <div>
-              <div className="font-bold text-white">{isMr ? 'दगडी खलबत्ता कुटाई' : 'Stone Mortar Ground'}</div>
-              <div className="text-[10px] text-gray-400">{isMr ? 'कधीही मिक्सर नाही' : 'Zero High-Heat Grinders'}</div>
+              <div className="font-semibold text-stone-100">Stone Mortar Ground</div>
+              <div className="text-[10px] text-stone-400">Zero High-Heat Grinders</div>
             </div>
           </div>
 
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-emerald-500/20 flex items-center justify-center text-emerald-400">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-emerald-500/15 flex items-center justify-center text-emerald-400 shrink-0">
               <Leaf className="w-4 h-4" />
             </div>
             <div>
-              <div className="font-bold text-white">{isMr ? '१००% नैसर्गिक' : '100% Pure & Vegan'}</div>
-              <div className="text-[10px] text-gray-400">{isMr ? 'शून्य कृत्रिम रंग' : 'Zero Preservatives'}</div>
+              <div className="font-semibold text-stone-100">100% Pure & Natural</div>
+              <div className="text-[10px] text-stone-400">Zero Chemical Preservatives</div>
             </div>
           </div>
 
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-red-500/20 flex items-center justify-center text-red-400">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-rose-500/15 flex items-center justify-center text-rose-400 shrink-0">
               <ShieldCheck className="w-4 h-4" />
             </div>
             <div>
-              <div className="font-bold text-white">{isMr ? 'एअरटाइट ग्लास जार' : 'Heritage Glass Jar'}</div>
-              <div className="text-[10px] text-gray-400">{isMr ? '९० दिवस टिकणारा खमंगपणा' : 'Preserves Natural Aroma'}</div>
+              <div className="font-semibold text-stone-100">Airtight Glass Jars</div>
+              <div className="text-[10px] text-stone-400">Preserves Fresh Aroma</div>
             </div>
           </div>
 
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-blue-500/20 flex items-center justify-center text-blue-400">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-blue-500/15 flex items-center justify-center text-blue-400 shrink-0">
               <Truck className="w-4 h-4" />
             </div>
             <div>
-              <div className="font-bold text-white">{isMr ? 'प्राईम सुपरफास्ट' : 'Prime Fast Fleet'}</div>
-              <div className="text-[10px] text-gray-400">{isMr ? '२४-४८ तासांत घरपोच' : 'Live Fleet Tracking'}</div>
+              <div className="font-semibold text-stone-100">Express Maharashtra Delivery</div>
+              <div className="text-[10px] text-stone-400">Packed & Dispatched in 24 Hrs</div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 2. Interactive App Navigation Tabs */}
+      {/* Floating Texts Visuals & Live Streaming Highlights */}
+      <FloatingTextsVisuals 
+        onTagClick={(tag) => {
+          setSearchQuery(tag);
+          setSelectedCategory('all');
+        }} 
+      />
+
+      {/* 2. Floating Navigation Segmented Bar */}
       <div className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className={`flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none p-1.5 rounded-2xl border w-fit ${
-          isExpress
-            ? 'bg-[#232F3E] border-stone-700 text-stone-200'
-            : 'bg-[#FAF6F2] border-[#EFE4D8]'
-        }`}>
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-2 scrollbar-none p-1.5 rounded-full bg-white border border-stone-200/80 shadow-2xs w-fit">
           <button
-            onClick={() => setActiveSection('catalog')}
-            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
-              activeSection === 'catalog'
-                ? isExpress
-                  ? 'bg-[#FF9900] text-[#131921] font-black shadow-xs'
-                  : 'bg-[#C84B31] text-white shadow-xs'
-                : isExpress
-                  ? 'text-stone-300 hover:text-white hover:bg-stone-700/60'
-                  : 'text-[#574B4B] hover:bg-white'
+            onClick={() => {
+              setActiveSection('catalog');
+              if (selectedCategory === 'masala') setSelectedCategory('all');
+            }}
+            className={`px-4 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+              activeSection === 'catalog' && selectedCategory !== 'masala'
+                ? 'bg-stone-900 text-white shadow-xs'
+                : 'text-stone-600 hover:text-stone-900 hover:bg-stone-100'
             }`}
           >
-            {isMr ? '🌶️ तयार चटण्या (Catalog)' : '🌶️ Heritage Jars'}
+            All Condiments & Pickles
+          </button>
+
+          <button
+            id="tab-pure-masalas"
+            onClick={() => {
+              setActiveSection('catalog');
+              setSelectedCategory('masala');
+              setSearchQuery('');
+            }}
+            className={`px-4 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
+              activeSection === 'catalog' && selectedCategory === 'masala'
+                ? 'bg-[#C2410C] text-white shadow-xs'
+                : 'text-[#C2410C] hover:bg-orange-50 bg-white border border-orange-200/80'
+            }`}
+          >
+            <Flame className="w-3.5 h-3.5" />
+            <span>🌶️ Pure Masales (मसाले)</span>
           </button>
 
           <button
             onClick={() => setActiveSection('builder')}
-            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+            className={`px-4 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
               activeSection === 'builder'
-                ? isExpress
-                  ? 'bg-[#FF9900] text-[#131921] font-black shadow-xs'
-                  : 'bg-[#C84B31] text-white shadow-xs'
-                : isExpress
-                  ? 'text-stone-300 hover:text-white hover:bg-stone-700/60'
-                  : 'text-[#574B4B] hover:bg-white'
+                ? 'bg-stone-900 text-white shadow-xs'
+                : 'text-stone-600 hover:text-stone-900 hover:bg-stone-100'
             }`}
           >
-            {isMr ? '✨ स्वतःची बनवा (Custom)' : '✨ Custom Builder Studio'}
+            Custom Spice Studio
           </button>
 
           <button
             onClick={() => setActiveSection('sommelier')}
-            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+            className={`px-4 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
               activeSection === 'sommelier'
-                ? isExpress
-                  ? 'bg-[#FF9900] text-[#131921] font-black shadow-xs'
-                  : 'bg-[#B82A16] text-white shadow-xs'
-                : isExpress
-                  ? 'text-stone-300 hover:text-white hover:bg-stone-700/60'
-                  : 'text-[#574B4B] hover:bg-white'
+                ? 'bg-stone-900 text-white shadow-xs'
+                : 'text-stone-600 hover:text-stone-900 hover:bg-stone-100'
             }`}
           >
-            {isMr ? '🤖 AI चव पारखी (Sommelier)' : '🤖 AI Sommelier'}
+            AI Sommelier
           </button>
 
           <button
             id="tab-flavor-profile"
             onClick={() => setActiveSection('flavor-profile')}
-            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+            className={`px-4 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
               activeSection === 'flavor-profile'
-                ? isExpress
-                  ? 'bg-[#FF9900] text-[#131921] font-black shadow-xs'
-                  : 'bg-[#B82A16] text-white shadow-xs'
-                : isExpress
-                  ? 'text-stone-300 hover:text-white hover:bg-stone-700/60'
-                  : 'text-[#574B4B] hover:bg-white'
+                ? 'bg-stone-900 text-white shadow-xs'
+                : 'text-stone-600 hover:text-stone-900 hover:bg-stone-100'
             }`}
           >
-            <span>📊 {isMr ? 'चव प्रोफाइल (Flavor DNA)' : 'Flavor Profile & Trends'}</span>
-          </button>
-
-          {/* Dedicated B2B / Bulk Wholesale Action Tab */}
-          <button
-            id="btn-open-b2b-wholesale-modal"
-            onClick={() => setIsBulkRequestModalOpen(true)}
-            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-extrabold transition-all cursor-pointer flex items-center gap-1.5 ${
-              isExpress
-                ? 'bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 border border-amber-500/50'
-                : 'bg-amber-100 text-amber-900 hover:bg-amber-200 border border-amber-300'
-            }`}
-            title="Bulk Supply for Restaurants & Caterers"
-          >
-            <Building2 className="w-3.5 h-3.5 text-[#FF9900]" />
-            <span>{isMr ? '🏢 होलसेल / केटरर्स (B2B)' : '🏢 Wholesale / B2B (Bulk)'}</span>
+            Flavor DNA
           </button>
 
           <button
             onClick={() => setActiveSection('orders')}
-            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer relative ${
+            className={`px-4 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer relative ${
               activeSection === 'orders'
-                ? isExpress
-                  ? 'bg-[#FF9900] text-[#131921] font-black shadow-xs'
-                  : 'bg-[#B82A16] text-white shadow-xs'
-                : isExpress
-                  ? 'text-stone-300 hover:text-white hover:bg-stone-700/60'
-                  : 'text-[#574B4B] hover:bg-white'
+                ? 'bg-stone-900 text-white shadow-xs'
+                : 'text-stone-600 hover:text-stone-900 hover:bg-stone-100'
             }`}
           >
-            <span>{isMr ? '📦 माझ्या ऑर्डर्स' : '📦 My Orders'}</span>
+            <span>My Orders</span>
             {orders.length > 0 && (
-              <span className={`ml-1.5 text-[10px] px-1.5 py-0.5 rounded-full font-extrabold ${
+              <span className={`ml-1.5 text-[10px] px-1.5 py-0.5 rounded-full font-bold ${
                 activeSection === 'orders' 
-                  ? 'bg-[#131921] text-[#FF9900]' 
-                  : isExpress ? 'bg-[#FF9900] text-[#131921]' : 'bg-[#B82A16] text-white'
+                  ? 'bg-amber-400 text-stone-950' 
+                  : 'bg-stone-200 text-stone-800'
               }`}>
                 {orders.length}
               </span>
             )}
-          </button>
-
-          <button
-            id="btn-seller-manage-orders"
-            onClick={() => {
-              if (!currentUser) {
-                setAuthMode('login');
-                setIsAuthModalOpen(true);
-                return;
-              }
-              // If user is authenticated, switch role to manager
-              setRole('manager');
-            }}
-            className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-              isExpress
-                ? 'bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 border border-amber-500/40'
-                : 'bg-stone-100 text-stone-700 hover:bg-stone-200 border border-stone-300'
-            }`}
-            title="Seller / Workshop Order Fulfillment"
-          >
-            <ChefHat className="w-3.5 h-3.5 text-[#FF9900]" />
-            <span>{isMr ? '🔒 सेलर ऑर्डर मॅनेज (Manage Orders)' : '🔒 Manage Orders (Seller)'}</span>
           </button>
         </div>
       </div>
@@ -394,88 +393,79 @@ export const CustomerPortal: React.FC = () => {
       {activeSection === 'catalog' && (
         <section id="catalog-grid-section" className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-6">
           
-          {/* Marathi Web Speech Voice & Text Search Bar */}
-          <div className="bg-gradient-to-r from-[#FAF6F2] via-white to-[#FAF6F2] p-4 sm:p-5 rounded-3xl border border-[#EFE4D8] shadow-xs">
+          {/* Minimal Floating Search Bar */}
+          <div className="bg-white p-4 sm:p-5 rounded-2xl border border-stone-200/80 shadow-2xs">
             <VoiceSearchBar
               searchQuery={searchQuery}
               onSearchChange={setSearchQuery}
-              isMarathi={isMr}
+              isMarathi={false}
               totalResultsCount={filteredProducts.length}
               onClear={() => setSearchQuery('')}
             />
           </div>
 
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pt-2">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pt-1">
             <div>
-              <h2 className="text-2xl font-extrabold text-[#2D2424] font-brand flex items-center gap-2">
-                <span>{isMr ? 'आमच्या लोकप्रिय अस्सल चटण्या' : 'Signature Heritage Jars'}</span>
+              <h2 className="text-2xl font-bold text-stone-900 font-serif flex items-center gap-2">
+                <span>{selectedCategory === 'masala' ? 'Pure Stone-Crushed Masalas (मसाले)' : 'Artisanal Chutneys, Pickles & Spices'}</span>
                 {searchQuery && (
                   <span className="text-xs font-normal text-amber-800 bg-amber-100 px-2.5 py-0.5 rounded-full">
                     "{searchQuery}"
                   </span>
                 )}
               </h2>
-              <p className="text-xs text-gray-500 mt-0.5">
-                {isMr ? '२५० ग्रॅम, ५०० ग्रॅम आणि १ किलो काचेच्या सुरक्षित जारमध्ये उपलब्ध.' : 'Available in 250g, 500g, and 1kg glass jars.'}
+              <p className="text-xs text-stone-500 mt-0.5">
+                Authentic Maharashtrian stone-pounded recipes & heirloom spices in airtight jars.
               </p>
             </div>
 
-            {/* Category Filter Pills */}
+            {/* Category Filter Pills - Clean & Balanced */}
             <div className="flex flex-wrap gap-1.5">
               {categories.map(cat => (
                 <button
                   key={cat.id}
                   onClick={() => setSelectedCategory(cat.id)}
-                  className={`px-3 py-1 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer ${
                     selectedCategory === cat.id
-                      ? 'bg-[#C84B31] text-white shadow-xs'
-                      : 'bg-[#FAF6F2] text-[#574B4B] hover:bg-[#EFE4D8]'
+                      ? cat.id === 'masala'
+                        ? 'bg-[#C2410C] text-white shadow-xs'
+                        : 'bg-stone-900 text-white shadow-xs'
+                      : 'bg-stone-100 text-stone-600 hover:bg-stone-200 hover:text-stone-900'
                   }`}
                 >
-                  {isMr ? cat.mr : cat.en}
+                  {cat.en}
                 </button>
               ))}
             </div>
           </div>
 
-          {/* B2B Wholesale / Bulk Supply Banner */}
-          <div className="p-4 sm:p-5 rounded-3xl bg-gradient-to-r from-[#232F3E] via-[#1c2633] to-[#232F3E] border border-amber-500/40 text-white shadow-lg flex flex-col md:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-3.5">
-              <div className="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0">
-                <Building2 className="w-6 h-6" />
-              </div>
-              <div className="space-y-0.5">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-[11px] font-black uppercase px-2 py-0.5 rounded bg-amber-500 text-[#131921]">
-                    {isMr ? 'हॉटेल & केटरर्स खास' : 'B2B Wholesale'}
-                  </span>
-                  <span className="text-xs font-bold text-amber-300">
-                    {isMr ? 'किमान ५ किलोपासून ५०० किलोपर्यंत घाऊक पुरवठा' : 'Bulk Supply from 5 KG to 500 KG'}
-                  </span>
+          {/* Clean Masala Notice when Masala Category is Active */}
+          {selectedCategory === 'masala' && (
+            <div className="p-4 sm:p-5 rounded-2xl bg-[#FFF7ED] border border-[#FDBA74]/70 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-stone-800 shadow-2xs">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-[#C2410C]/10 text-[#C2410C] flex items-center justify-center shrink-0">
+                  <Flame className="w-5 h-5 text-[#C2410C]" />
                 </div>
-                <h3 className="text-sm sm:text-base font-extrabold font-brand text-white">
-                  {isMr 
-                    ? 'आपल्या रेस्टॉरंट, मेस किंवा लग्नकार्यासाठी हवी आहे अस्सल गावरान चव?' 
-                    : 'Need authentic stone-ground batches for your restaurant or catering event?'}
-                </h3>
-                <p className="text-xs text-stone-300">
-                  {isMr 
-                    ? 'दगडी खलबत्त्यात कुटलेली चटणी, बल्क बकेट/ड्रम पॅकिंग, थेट किचन डिलिव्हरी व सवलतीचे घाऊक दर.' 
-                    : 'Stone-crushed recipes, commercial food-grade drums, custom spice levels & tiered B2B pricing.'}
-                </p>
+                <div>
+                  <div className="font-bold text-sm text-stone-900 font-serif flex items-center gap-2">
+                    <span>अस्सल घरगुती खडे व बारीक मसाले • Pure Stone-Crushed Spices</span>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#C2410C] text-white">Separate Packs</span>
+                  </div>
+                  <div className="text-xs text-stone-600 mt-0.5">
+                    Available in 100g trial pouches, 250g jars, 500g, or 1kg kitchen packs. No chutney required.
+                  </div>
+                </div>
               </div>
+              <button
+                onClick={() => setSelectedCategory('all')}
+                className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-white border border-stone-200 hover:bg-stone-50 text-stone-700 cursor-pointer shadow-2xs shrink-0"
+              >
+                Show All Items
+              </button>
             </div>
+          )}
 
-            <button
-              onClick={() => setIsBulkRequestModalOpen(true)}
-              className="w-full md:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-[#131921] font-black text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer shadow-md shrink-0"
-            >
-              <span>{isMr ? 'बल्क मागणी फॉर्म भरा' : 'Submit Wholesale Request'}</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          </div>
-
-          {/* Product Cards Grid with Staggered Fluid Motion or Empty State */}
+          {/* Product Cards Grid with Staggered Fluid Motion */}
           {filteredProducts.length > 0 ? (
             <motion.div 
               key={`${selectedCategory}-${searchQuery}`}
@@ -497,18 +487,16 @@ export const CustomerPortal: React.FC = () => {
               ))}
             </motion.div>
           ) : (
-            <div className="py-12 px-6 rounded-3xl bg-white border border-[#EFE4D8] text-center space-y-4 shadow-xs">
-              <div className="w-16 h-16 rounded-full bg-amber-100 text-amber-800 mx-auto flex items-center justify-center text-2xl font-bold">
+            <div className="py-12 px-6 rounded-2xl bg-white border border-stone-200 text-center space-y-4 shadow-xs">
+              <div className="w-14 h-14 rounded-full bg-stone-100 text-stone-500 mx-auto flex items-center justify-center text-xl font-bold">
                 🔍
               </div>
               <div className="space-y-1">
-                <h3 className="text-lg font-bold text-stone-900">
-                  {isMr ? `"${searchQuery}" साठी कोणतीही चटणी सापडली नाही` : `No products found matching "${searchQuery}"`}
+                <h3 className="text-base font-bold text-stone-900">
+                  No products found matching "{searchQuery}"
                 </h3>
                 <p className="text-xs text-stone-500 max-w-md mx-auto">
-                  {isMr 
-                    ? 'कृपया इतर शब्द बोला किंवा खालील लोकप्रिय पर्यायांवर टॅप करा: शेंगदाणा, ठेचा, कांदा-लसूण, खोबरे किंवा जवस.'
-                    : 'Try another search term or click one of our quick tags: Peanut, Thecha, Garlic, Coconut or Flaxseed.'}
+                  Try searching for ingredients: peanut, thecha, garlic, coconut, or flaxseed.
                 </p>
               </div>
               <div className="pt-2 flex justify-center gap-2">
@@ -517,34 +505,65 @@ export const CustomerPortal: React.FC = () => {
                     setSearchQuery('');
                     setSelectedCategory('all');
                   }}
-                  className="px-4 py-2 rounded-xl bg-[#C84B31] text-white text-xs font-bold hover:bg-[#A83B23] transition-colors cursor-pointer shadow-xs"
+                  className="px-4 py-2 rounded-full bg-stone-900 text-white text-xs font-semibold hover:bg-stone-800 transition-colors cursor-pointer shadow-xs"
                 >
-                  {isMr ? 'सर्व उत्पादने पहा' : 'View All Products'}
+                  View All Products
                 </button>
               </div>
             </div>
           )}
 
-          {/* Banner Promo for Custom Studio */}
-          <div className="mt-10 p-8 rounded-3xl bg-[#FFF9F6] border border-[#F5C2B8] flex flex-col md:flex-row justify-between items-center gap-6 shadow-xs">
-            <div className="space-y-2">
-              <span className="px-3 py-1 rounded-full bg-[#C84B31] text-white text-[11px] font-bold">
-                {isMr ? 'विशेष सेवा' : 'Bespoke Custom Blend'}
+          {/* B2B Wholesale Section - Cleanly positioned below products to avoid congestion */}
+          <div className="p-6 rounded-2xl bg-[#1C1816] text-stone-100 border border-[#302722] shadow-sm flex flex-col md:flex-row items-center justify-between gap-5">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0">
+                <Building2 className="w-6 h-6" />
+              </div>
+              <div className="space-y-1">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-400 text-stone-950">
+                    B2B Wholesale Supply
+                  </span>
+                  <span className="text-xs font-semibold text-amber-300">
+                    Bulk Supply from 5 KG to 500 KG
+                  </span>
+                </div>
+                <h3 className="text-sm sm:text-base font-bold text-white">
+                  Need authentic stone-ground batches for restaurants, caterers, or retail?
+                </h3>
+                <p className="text-xs text-stone-400">
+                  Stone-crushed recipes, commercial food-grade packaging, and tiered wholesale pricing.
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setIsBulkRequestModalOpen(true)}
+              className="w-full md:w-auto px-5 py-2.5 rounded-full bg-amber-400 hover:bg-amber-300 text-stone-950 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm shrink-0"
+            >
+              <span>Submit Wholesale Request</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
+          </div>
+
+          {/* Promo Banner for Custom Spice Studio */}
+          <div className="mt-10 p-6 sm:p-8 rounded-2xl bg-stone-50 border border-stone-200 flex flex-col md:flex-row justify-between items-center gap-6 shadow-xs">
+            <div className="space-y-1.5">
+              <span className="px-3 py-0.5 rounded-full bg-stone-200 text-stone-800 text-[11px] font-semibold">
+                Bespoke Custom Blend
               </span>
-              <h3 className="text-xl sm:text-2xl font-extrabold text-[#2D2424] font-brand">
-                {isMr ? 'हवी तशी चटणी हवी आहे? स्वतःचे घटक निवडा!' : 'Want your exact spice ratio? Design your own custom jar!'}
+              <h3 className="text-xl font-bold text-stone-900 font-serif">
+                Want your exact spice ratio? Design your own custom jar!
               </h3>
-              <p className="text-xs text-gray-600 max-w-xl">
-                {isMr
-                  ? 'शेंगदाणे, खोबरे, तीळ आणि लसूण यांचे अचूक टक्केवारी प्रमाण निवडा, आणि जारवर तुमचे स्वतःचे नाव प्रिंट करून घ्या.'
-                  : 'Customize peanut-to-coconut ratios, choose Bedgi or Lavangi heat, and personalize your name on the label.'}
+              <p className="text-xs text-stone-600 max-w-xl leading-relaxed">
+                Customize peanut-to-coconut ratios, choose spice heat levels, and personalize your own custom label.
               </p>
             </div>
             <button
               onClick={() => setActiveSection('builder')}
-              className="px-6 py-3.5 bg-[#C84B31] hover:bg-[#A83B23] text-white font-extrabold text-xs sm:text-sm rounded-xl transition-all shadow-md shrink-0 flex items-center gap-2 cursor-pointer"
+              className="px-5 py-3 bg-stone-900 hover:bg-stone-800 text-white font-semibold text-xs sm:text-sm rounded-full transition-all shadow-sm shrink-0 flex items-center gap-2 cursor-pointer"
             >
-              <span>{isMr ? 'कस्टम स्टुडिओ उघडा' : 'Launch Custom Studio'}</span>
+              <span>Launch Custom Studio</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
@@ -575,25 +594,25 @@ export const CustomerPortal: React.FC = () => {
         </section>
       )}
 
-      {/* VIEW: 5. Customer Active Orders Tracking with Live GPS Tracker Trigger */}
+      {/* VIEW: 5. Customer Active Orders Tracking */}
       {activeSection === 'orders' && (
         <section className="px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto space-y-6">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
             <div>
-              <h2 className="text-2xl font-extrabold text-[#2D2424] font-brand">
-                {isMr ? 'तुमच्या ऑर्डर्स व डिलिव्हरी ट्रॅकिंग' : 'Your Orders & Live Tracking'}
+              <h2 className="text-2xl font-bold text-stone-900 font-serif">
+                Your Orders & Live Tracking
               </h2>
-              <p className="text-xs text-gray-500 mt-0.5">
-                {isMr ? 'खलबत्त्यातील ताज्या वाटणापासून घरपोच वितरणापर्यंतचा प्रवास.' : 'Track your freshly blended jars from mortar grinding to doorstep.'}
+              <p className="text-xs text-stone-500 mt-0.5">
+                Track your freshly ground jars from workshop preparation to doorstep delivery.
               </p>
             </div>
 
             <button
               onClick={handleRefresh}
-              className="px-3.5 py-1.5 rounded-xl border border-stone-200 bg-white hover:bg-stone-50 text-stone-700 text-xs font-bold flex items-center gap-1.5 shadow-2xs cursor-pointer"
+              className="px-3.5 py-1.5 rounded-full border border-stone-200 bg-white hover:bg-stone-50 text-stone-700 text-xs font-semibold flex items-center gap-1.5 shadow-2xs cursor-pointer"
             >
-              <RefreshCw className={`w-3.5 h-3.5 text-[#C84B31] ${isRefreshing ? 'animate-spin' : ''}`} />
-              <span>{isMr ? 'ताजी स्थिती तपासा' : 'Sync Live Status'}</span>
+              <RefreshCw className={`w-3.5 h-3.5 text-stone-600 ${isRefreshing ? 'animate-spin' : ''}`} />
+              <span>Sync Live Status</span>
             </button>
           </div>
 
@@ -601,19 +620,19 @@ export const CustomerPortal: React.FC = () => {
             {orders.map(order => (
               <div
                 key={order.id}
-                className="bg-white rounded-3xl p-6 border border-[#EFE4D8] shadow-sm space-y-4 hover:shadow-md transition-shadow"
+                className="bg-white rounded-2xl p-6 border border-stone-200/90 shadow-sm space-y-4 hover:shadow-md transition-shadow"
               >
                 {/* Header */}
-                <div className="flex flex-wrap justify-between items-center gap-2 border-b border-[#F5EDE4] pb-3">
+                <div className="flex flex-wrap justify-between items-center gap-2 border-b border-stone-100 pb-3">
                   <div>
-                    <span className="text-xs font-bold text-[#C84B31] font-mono">#{order.id}</span>
-                    <span className="text-xs text-gray-500 ml-2">
+                    <span className="text-xs font-bold text-amber-700 font-mono">#{order.id}</span>
+                    <span className="text-xs text-stone-500 ml-2">
                       Date: {new Date(order.createdAt).toLocaleDateString()}
                     </span>
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <span className={`text-xs px-2.5 py-1 rounded-full font-bold uppercase ${
+                    <span className={`text-xs px-2.5 py-1 rounded-full font-semibold uppercase ${
                       order.orderStatus === 'delivered'
                         ? 'bg-emerald-100 text-emerald-800'
                         : order.orderStatus === 'out_for_delivery'
@@ -622,88 +641,88 @@ export const CustomerPortal: React.FC = () => {
                     }`}>
                       {order.orderStatus.replace(/_/g, ' ')}
                     </span>
-                    <span className="text-xs font-extrabold text-[#2D2424]">₹{order.totalAmount}</span>
+                    <span className="text-xs font-bold text-stone-900">₹{order.totalAmount}</span>
                   </div>
                 </div>
 
                 {/* Tracking Stepper */}
                 <div className="grid grid-cols-4 gap-2 text-center text-xs py-2">
                   <div className="space-y-1">
-                    <div className="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center mx-auto text-xs font-bold shadow">
+                    <div className="w-7 h-7 rounded-full bg-emerald-600 text-white flex items-center justify-center mx-auto text-xs font-bold shadow-xs">
                       ✓
                     </div>
-                    <span className="text-[11px] font-bold text-[#2D2424]">{isMr ? 'नोंदणी' : 'Placed'}</span>
+                    <span className="text-[11px] font-medium text-stone-800">Placed</span>
                   </div>
 
                   <div className="space-y-1">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center mx-auto text-xs font-bold ${
-                      order.orderStatus !== 'order_placed' ? 'bg-emerald-600 text-white shadow' : 'bg-amber-100 text-amber-800 ring-2 ring-amber-300'
+                    <div className={`w-7 h-7 rounded-full flex items-center justify-center mx-auto text-xs font-bold ${
+                      order.orderStatus !== 'order_placed' ? 'bg-emerald-600 text-white shadow-xs' : 'bg-amber-100 text-amber-800 ring-2 ring-amber-300'
                     }`}>
                       {order.orderStatus !== 'order_placed' ? '✓' : '2'}
                     </div>
-                    <span className="text-[11px] font-bold text-[#2D2424]">{isMr ? 'खलबत्ता वाटण' : 'Blending'}</span>
+                    <span className="text-[11px] font-medium text-stone-800">Stone Ground</span>
                   </div>
 
                   <div className="space-y-1">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center mx-auto text-xs font-bold ${
+                    <div className={`w-7 h-7 rounded-full flex items-center justify-center mx-auto text-xs font-bold ${
                       order.orderStatus === 'packed_in_airtight_jar' || order.orderStatus === 'out_for_delivery' || order.orderStatus === 'delivered'
-                        ? 'bg-emerald-600 text-white shadow' : 'bg-stone-100 text-stone-400'
+                        ? 'bg-emerald-600 text-white shadow-xs' : 'bg-stone-100 text-stone-400'
                     }`}>
                       {order.orderStatus === 'out_for_delivery' || order.orderStatus === 'delivered' ? '✓' : '3'}
                     </div>
-                    <span className="text-[11px] font-bold text-[#2D2424]">{isMr ? 'जार सील पॅक' : 'Packed'}</span>
+                    <span className="text-[11px] font-medium text-stone-800">Sealed Jar</span>
                   </div>
 
                   <div className="space-y-1">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center mx-auto text-xs font-bold ${
-                      order.orderStatus === 'delivered' ? 'bg-emerald-600 text-white shadow' : 'bg-stone-100 text-stone-400'
+                    <div className={`w-7 h-7 rounded-full flex items-center justify-center mx-auto text-xs font-bold ${
+                      order.orderStatus === 'delivered' ? 'bg-emerald-600 text-white shadow-xs' : 'bg-stone-100 text-stone-400'
                     }`}>
                       {order.orderStatus === 'delivered' ? '✓' : '4'}
                     </div>
-                    <span className="text-[11px] font-bold text-[#2D2424]">{isMr ? 'वितरित' : 'Delivered'}</span>
+                    <span className="text-[11px] font-medium text-stone-800">Delivered</span>
                   </div>
                 </div>
 
                 {/* Delivery details bar + Live GPS Map Trigger Button */}
-                <div className="bg-[#FAF8F5] p-4 rounded-2xl border border-[#EFE4D8] text-xs flex flex-wrap justify-between items-center gap-3">
+                <div className="bg-stone-50 p-4 rounded-xl border border-stone-200/80 text-xs flex flex-wrap justify-between items-center gap-3">
                   <div className="space-y-0.5">
                     <div>
-                      <span className="text-gray-500">{isMr ? 'वितरण पत्ता:' : 'Address:'} </span>
-                      <span className="font-semibold text-[#2D2424]">{order.customer.addressLine1}, {order.customer.talukaDistrict}</span>
+                      <span className="text-stone-500">Address: </span>
+                      <span className="font-semibold text-stone-900">{order.customer.addressLine1}, {order.customer.talukaDistrict}</span>
                     </div>
                     {order.assignedDeliveryPerson && (
                       <div className="text-stone-500">
-                        {isMr ? 'डिलिव्हरी रायडर:' : 'Courier Partner:'} <strong className="text-stone-800">{order.assignedDeliveryPerson.name}</strong> ({order.assignedDeliveryPerson.phone})
+                        Courier Partner: <strong className="text-stone-800">{order.assignedDeliveryPerson.name}</strong> ({order.assignedDeliveryPerson.phone})
                       </div>
                     )}
                   </div>
 
-                  <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                  <div className="flex flex-wrap items-center gap-2">
                     <button
                       onClick={() => setSelectedTrackingOrder(order)}
-                      className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-[#C84B31] to-[#A0331C] text-white font-bold flex items-center gap-1.5 shadow-sm hover:shadow transition-all cursor-pointer"
+                      className="px-3.5 py-1.5 rounded-full bg-stone-900 text-white font-medium flex items-center gap-1.5 shadow-xs hover:bg-stone-800 transition-all cursor-pointer"
                     >
-                      <Navigation className="w-3.5 h-3.5" />
-                      <span>{isMr ? '🗺️ लाइव्ह GPS ट्रॅक' : '🗺️ Live GPS'}</span>
+                      <Navigation className="w-3.5 h-3.5 text-amber-400" />
+                      <span>Live GPS</span>
                     </button>
 
                     <button
                       onClick={() => openInvoiceModal(order)}
-                      className="px-3 py-2 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-800 border border-stone-300 font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+                      className="px-3 py-1.5 rounded-full bg-white hover:bg-stone-100 text-stone-800 border border-stone-300 font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
                     >
-                      <FileText className="w-3.5 h-3.5 text-[#C84B31]" />
-                      <span>{isMr ? 'कर बीजक (Invoice)' : 'Tax Invoice'}</span>
+                      <FileText className="w-3.5 h-3.5 text-stone-600" />
+                      <span>Tax Invoice</span>
                     </button>
 
                     <button
                       onClick={() => openWhatsAppAlert()}
-                      className="px-3 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 font-bold transition-colors cursor-pointer"
+                      className="px-3 py-1.5 rounded-full bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 font-medium transition-colors cursor-pointer"
                     >
-                      {isMr ? 'व्हॉट्सॲप' : 'WhatsApp'}
+                      WhatsApp
                     </button>
 
-                    <div className="font-bold text-[#C84B31] bg-white px-2.5 py-1.5 rounded-xl border border-[#EADFD5]">
-                      OTP: <span className="font-mono text-stone-900">{order.deliveryOtp}</span>
+                    <div className="font-semibold text-stone-900 bg-white px-3 py-1.5 rounded-full border border-stone-200">
+                      OTP: <span className="font-mono text-amber-800">{order.deliveryOtp}</span>
                     </div>
                   </div>
                 </div>
@@ -717,10 +736,92 @@ export const CustomerPortal: React.FC = () => {
       {selectedTrackingOrder && (
         <LiveDeliveryTrackerModal
           order={selectedTrackingOrder}
-          language={language}
+          language="en"
           onClose={() => setSelectedTrackingOrder(null)}
         />
       )}
+
+      {/* Floating Bottom Quick-Action & Cart Dock */}
+      <div className="fixed bottom-5 left-1/2 -translate-x-1/2 z-40 max-w-xl w-[94%] sm:w-auto">
+        <div className="floating-dock rounded-full bg-stone-950/90 text-white border border-stone-800/80 px-4 py-2.5 flex items-center justify-between sm:justify-center gap-3 sm:gap-4 shadow-[0_16px_40px_rgba(0,0,0,0.45)]">
+          {/* Quick Jump Buttons */}
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => {
+                setActiveSection('catalog');
+                window.scrollTo({ top: 400, behavior: 'smooth' });
+              }}
+              className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+                activeSection === 'catalog'
+                  ? 'bg-stone-800 text-amber-300'
+                  : 'text-stone-400 hover:text-stone-200'
+              }`}
+            >
+              Jars
+            </button>
+
+            <button
+              onClick={() => {
+                setActiveSection('builder');
+                window.scrollTo({ top: 400, behavior: 'smooth' });
+              }}
+              className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all flex items-center gap-1 cursor-pointer ${
+                activeSection === 'builder'
+                  ? 'bg-stone-800 text-amber-300'
+                  : 'text-stone-400 hover:text-stone-200'
+              }`}
+            >
+              <ChefHat className="w-3.5 h-3.5 text-amber-400" />
+              <span>Studio</span>
+            </button>
+
+            <button
+              onClick={() => {
+                setActiveSection('sommelier');
+                window.scrollTo({ top: 400, behavior: 'smooth' });
+              }}
+              className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all flex items-center gap-1 cursor-pointer ${
+                activeSection === 'sommelier'
+                  ? 'bg-stone-800 text-amber-300'
+                  : 'text-stone-400 hover:text-stone-200'
+              }`}
+            >
+              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+              <span>AI Sommelier</span>
+            </button>
+          </div>
+
+          <div className="w-px h-5 bg-stone-800 hidden sm:block" />
+
+          {/* Floating Cart Launcher */}
+          {cartCount > 0 ? (
+            <button
+              onClick={() => setIsCartOpen(true)}
+              className="px-4 py-1.5 rounded-full bg-amber-400 hover:bg-amber-300 text-stone-950 font-bold text-xs flex items-center gap-2 shadow-md transition-all cursor-pointer hover:scale-105 active:scale-95 animate-pulse-subtle"
+            >
+              <div className="relative">
+                <ShoppingBag className="w-3.5 h-3.5" />
+                <span className="absolute -top-2 -right-2 w-3.5 h-3.5 rounded-full bg-stone-950 text-amber-300 text-[9px] font-black flex items-center justify-center">
+                  {cartCount}
+                </span>
+              </div>
+              <span>₹{cartSubtotal}</span>
+              <span className="opacity-60">•</span>
+              <span>Checkout</span>
+            </button>
+          ) : (
+            <button
+              onClick={() => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              className="p-2 rounded-full bg-stone-900 hover:bg-stone-800 text-stone-300 hover:text-white transition-colors cursor-pointer"
+              title="Back to top"
+            >
+              <ChevronUp className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+      </div>
     </div>
   );
 };

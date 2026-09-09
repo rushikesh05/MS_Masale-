@@ -287,14 +287,14 @@ export const AuthModal: React.FC = () => {
                 type="button"
                 onClick={() => {
                   demoLogin('manager');
-                  showToast(isMr ? '👨‍🍳 सुवर्णा (मॅनेजर) म्हणून लॉगिन केले' : 'Logged in as Suvarna (Manager)');
+                  showToast('Logged in as Workshop Manager');
                 }}
                 className="p-2.5 rounded-xl text-left bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-900 transition-all cursor-pointer flex items-center gap-2 text-xs font-bold"
               >
                 <span className="text-base">👨‍🍳</span>
                 <div className="min-w-0">
-                  <div className="truncate">{isMr ? 'सुवर्णा (मॅनेजर)' : 'Suvarna (Manager)'}</div>
-                  <div className="text-[9px] text-amber-600 font-normal truncate">Workshop & Kitchen</div>
+                  <div className="truncate">Workshop Manager</div>
+                  <div className="text-[9px] text-amber-600 font-normal truncate">Workshop & Production</div>
                 </div>
               </button>
 
