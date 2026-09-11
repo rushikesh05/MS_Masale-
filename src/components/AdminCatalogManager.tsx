@@ -450,8 +450,11 @@ export const AdminCatalogManager: React.FC = () => {
                   <div className="flex items-start justify-between gap-3 mb-3">
                     <div className="w-16 h-16 rounded-2xl overflow-hidden border border-stone-200 dark:border-stone-800 shrink-0 bg-stone-100 dark:bg-stone-800">
                       <img 
-                        src={product.imageUrl} 
+                        src={product.imageUrl || '/products/kala-masala.jpg'} 
                         alt={product.nameEn} 
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = '/products/kala-masala.jpg';
+                        }}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform" 
                       />
                     </div>

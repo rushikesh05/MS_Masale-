@@ -10,7 +10,6 @@ interface BrandLogoProps {
 
 export const BrandLogo: React.FC<BrandLogoProps> = ({
   size = 'md',
-  showTagline = true,
   inverted = false,
   className = '',
   onClick
@@ -18,27 +17,19 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
   const sizeMap = {
     sm: {
       crest: 'w-8 h-8',
-      title: 'text-sm sm:text-base',
-      subtitle: 'text-[10px]',
-      badge: 'text-[9px] px-2 py-0.5'
+      title: 'text-base sm:text-lg',
     },
     md: {
-      crest: 'w-10 h-10 sm:w-11 sm:h-11',
-      title: 'text-base sm:text-lg',
-      subtitle: 'text-[11px]',
-      badge: 'text-[9px] px-2.5 py-0.5'
+      crest: 'w-10 h-10',
+      title: 'text-lg sm:text-xl',
     },
     lg: {
-      crest: 'w-13 h-13 sm:w-14 sm:h-14',
-      title: 'text-xl sm:text-2xl',
-      subtitle: 'text-xs',
-      badge: 'text-[10px] px-3 py-1'
+      crest: 'w-12 h-12',
+      title: 'text-2xl',
     },
     xl: {
-      crest: 'w-16 h-16 sm:w-20 sm:h-20',
-      title: 'text-2xl sm:text-3xl',
-      subtitle: 'text-sm',
-      badge: 'text-xs px-3.5 py-1'
+      crest: 'w-16 h-16',
+      title: 'text-3xl',
     }
   };
 
@@ -48,76 +39,25 @@ export const BrandLogo: React.FC<BrandLogoProps> = ({
     <div
       onClick={onClick}
       className={`flex items-center gap-2.5 sm:gap-3 select-none ${onClick ? 'cursor-pointer group' : ''} ${className}`}
-      title="MS Masale - Artisanal Spices & Chutneys"
+      title="MS Masale"
     >
-      {/* Minimal Floating Crest Emblem */}
-      <div className="relative shrink-0">
-        {/* Soft Ambient Floating Glow */}
-        <div className="absolute -inset-0.5 rounded-2xl bg-gradient-to-r from-red-500/30 to-amber-500/30 opacity-40 blur-xs group-hover:opacity-80 transition-opacity" />
-
-        {/* Minimal Monogram Container */}
-        <div
-          className={`${currentSize.crest} relative rounded-2xl bg-gradient-to-br from-stone-900 via-[#801414] to-stone-950 text-white flex items-center justify-center shadow-md border border-stone-700/40 group-hover:scale-105 transition-all duration-300 overflow-hidden`}
-        >
-          {/* Concentric subtle circular rings */}
-          <svg
-            className="absolute inset-0 w-full h-full opacity-15"
-            viewBox="0 0 100 100"
-            fill="none"
-          >
-            <circle cx="50" cy="50" r="44" stroke="currentColor" strokeWidth="1.5" strokeDasharray="3 3" />
-            <circle cx="50" cy="50" r="38" stroke="currentColor" strokeWidth="1" />
-          </svg>
-
-          {/* Minimal 'MS' Monogram */}
-          <div className="relative z-10 flex flex-col items-center justify-center">
-            <span className="font-serif font-black tracking-tight leading-none text-transparent bg-clip-text bg-gradient-to-b from-amber-100 via-amber-200 to-amber-400 text-[13px] sm:text-[15px]">
-              MS
-            </span>
-            <span className="text-[7px] uppercase tracking-widest text-amber-300/80 font-bold -mt-0.5">
-              Spice
-            </span>
-          </div>
-        </div>
+      {/* Classic Crest Emblem */}
+      <div
+        className={`${currentSize.crest} relative rounded-xl bg-gradient-to-br from-amber-500 via-orange-600 to-rose-600 text-white flex items-center justify-center shadow-xs border border-orange-400/40 shrink-0 font-serif font-black tracking-tight leading-none text-[15px] sm:text-[17px]`}
+      >
+        MS
       </div>
 
-      {/* Brand Name & Minimal Tagline */}
-      <div className="flex flex-col justify-center">
-        <div className="flex items-center gap-2">
-          {/* Main Brand Title: MS Masale */}
-          <span
-            className={`${currentSize.title} font-black tracking-tight flex items-center gap-1.5 leading-none`}
-          >
-            <span
-              className={
-                inverted
-                  ? 'text-white'
-                  : 'text-stone-900'
-              }
-            >
-              MS Masale
-            </span>
-          </span>
-
-          {/* Minimal Artisanal Badge */}
-          <span
-            className={`${currentSize.badge} rounded-full font-medium tracking-wide ${
-              inverted
-                ? 'bg-stone-800 text-stone-200 border border-stone-700'
-                : 'bg-stone-100 text-stone-700 border border-stone-200/80'
-            }`}
-          >
-            Artisanal
-          </span>
-        </div>
-
-        {showTagline && (
-          <div className={`${currentSize.subtitle} ${inverted ? 'text-stone-400' : 'text-stone-500'} font-normal tracking-normal mt-0.5`}>
-            Stone-Crushed Heritage Spices
-          </div>
-        )}
+      {/* Brand Name: Strictly MS Masale */}
+      <div className="flex items-center">
+        <span
+          className={`${currentSize.title} font-serif font-black tracking-tight leading-none ${
+            inverted ? 'text-white' : 'text-stone-900'
+          }`}
+        >
+          MS Masale
+        </span>
       </div>
     </div>
   );
 };
-

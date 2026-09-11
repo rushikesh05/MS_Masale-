@@ -1,6 +1,6 @@
 {
   "name": "MS Masale",
-  "description": "MS Masale - Artisanal Stone-Crushed Maharashtrian Chutneys & Heritage Spices with Custom Recipe Studio, Fleet Dispatch Tracking, and B2B Wholesale Supply.",
-  "requestFramePermissions": ["geolocation", "microphone"],
+  "description": "MS Masale - Traditional Maharashtrian Spices, Masalas, and Condiments. Contact: 8591254237.",
+  "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

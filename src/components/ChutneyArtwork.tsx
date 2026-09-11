@@ -32,8 +32,8 @@ export const ChutneyArtwork: React.FC<ChutneyArtworkProps> = ({
           glowColor: '#ef4444',
           labelMarathi: 'अस्सल कोल्हापुरी कांदा-लसूण चटणी',
           labelEn: 'KOLHAPURI KANDA-LASUN CHUTNEY',
-          subLabelMr: 'कोल्हापूरचे मुख्य वैशिष्ट्य • दगडी खलबत्त्यात कुटलेली',
-          subLabelEn: 'FLAGSHIP KOLHAPURI RECIPE • STONE POUNDED',
+          subLabelMr: 'कोल्हापूरचे मुख्य वैशिष्ट्य • अस्सल पारंपरिक पद्धत',
+          subLabelEn: 'FLAGSHIP KOLHAPURI RECIPE • PURE & AUTHENTIC',
           badgeText: 'KOLHAPUR #1',
           heatLevel: '🌶️🌶️🌶️🌶️ (Fiery 4/5)',
           textureType: 'Coarse Hand-Pounded Powder',
@@ -94,8 +94,8 @@ export const ChutneyArtwork: React.FC<ChutneyArtworkProps> = ({
           glowColor: '#22c55e',
           labelMarathi: 'अस्सल कोल्हापुरी लवंगी मिरची ठेचा',
           labelEn: 'KOLHAPURI GREEN CHILLI THECHA',
-          subLabelMr: 'दगडी खलबत्त्यात कुटलेला गावरान लवंगी ठेचा',
-          subLabelEn: 'STONE MORTAR POUNDED • DESI GARLIC & PEANUTS',
+          subLabelMr: 'गावरान लवंगी मिरची व लसूण ठेचा',
+          subLabelEn: 'TRADITIONAL RECIPE • DESI GARLIC & PEANUTS',
           badgeText: 'RUSTIC THECHA',
           heatLevel: '🌶️🌶️🌶️🌶️🌶️ (Super Fiery 5/5)',
           textureType: 'Coarse Mortar Crushed Mash',
@@ -455,7 +455,7 @@ export const ChutneyArtwork: React.FC<ChutneyArtworkProps> = ({
             {/* Heritage Seal Box */}
             <rect x="12" y="56" width="100" height="18" rx="3" fill="#fef3c7" stroke="#f59e0b" strokeWidth="0.5" />
             <text x="62" y="65" textAnchor="middle" fill="#92400e" fontSize="4.5" fontWeight="800">
-              100% STONE POUNDED • NO CHEMICALS
+              100% PURE INGREDIENTS • NO PRESERVATIVES
             </text>
             <text x="62" y="71" textAnchor="middle" fill="#78350f" fontSize="4" fontWeight="700">
               {isMarathi ? 'अस्सल पारंपरिक पद्धत' : 'Authentic Desi Taste & Aroma'}

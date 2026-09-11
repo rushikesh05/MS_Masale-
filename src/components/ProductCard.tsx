@@ -41,13 +41,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
   return (
     <motion.div
-      whileHover={{ y: -7 }}
+      whileHover={{ y: -6 }}
       transition={{ type: "spring", stiffness: 320, damping: 22 }}
       onClick={() => setSelectedProductDetail(product)}
-      className="bg-white rounded-3xl overflow-hidden border border-stone-200/80 shadow-[0_4px_18px_rgba(0,0,0,0.04)] hover:shadow-[0_20px_35px_-10px_rgba(217,119,6,0.18)] hover:border-amber-400/50 transition-all duration-300 flex flex-col justify-between cursor-pointer group relative"
+      className="bg-gradient-to-b from-white via-white to-amber-50/30 rounded-3xl overflow-hidden border border-amber-200/70 shadow-[0_4px_18px_rgba(217,119,6,0.05)] hover:shadow-[0_22px_42px_-10px_rgba(217,119,6,0.22),0_8px_16px_-4px_rgba(0,0,0,0.04)] hover:border-amber-400/90 transition-all duration-300 flex flex-col justify-between cursor-pointer group group/card relative"
     >
-      {/* Product Image / Artisan Jar Visual & Badges */}
-      <div className="relative h-52 sm:h-56 bg-stone-50 overflow-hidden">
+      {/* Product Thumbnail with subtle zoom & shadow expansion */}
+      <div className="relative h-52 sm:h-56 bg-stone-100 overflow-hidden transition-all duration-500 shadow-xs group-hover/card:shadow-[0_10px_25px_-5px_rgba(217,119,6,0.24)] border-b border-amber-100/90">
         <ProductVisual 
           product={product} 
           isMarathi={false} 
@@ -58,13 +58,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         {/* Top Badges */}
         <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-10 pointer-events-none">
           {product.id === 'prod-kanda-lasun' ? (
-            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-black shadow-sm flex items-center gap-1 bg-gradient-to-r from-rose-600 to-amber-600 text-white tracking-wide">
-              <Zap className="w-3 h-3 fill-amber-300 text-amber-300" />
+            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-black shadow-xs flex items-center gap-1 bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 text-white tracking-wide">
+              <Zap className="w-3 h-3 fill-amber-200 text-amber-200" />
               <span>★ Kolhapur Flagship #1</span>
             </span>
           ) : product.isBestSeller ? (
-            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold shadow-xs flex items-center gap-1 bg-stone-900 text-white">
-              <Zap className="w-3 h-3 fill-amber-400 text-amber-400" />
+            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold shadow-xs flex items-center gap-1 bg-gradient-to-r from-amber-500 to-orange-600 text-white">
+              <Zap className="w-3 h-3 fill-amber-200 text-amber-200" />
               <span>Best Seller</span>
             </span>
           ) : null}
@@ -124,7 +124,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           </p>
         </div>
 
-        <div className="mt-4 pt-3 border-t border-stone-100">
+        <div className="mt-4 pt-3 border-t border-amber-100">
           {/* Size Pills Selector */}
           <div className="flex items-center gap-1.5 mb-3" onClick={(e) => e.stopPropagation()}>
             {product.sizes.map(s => (
@@ -133,8 +133,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                 onClick={() => setSelectedSize(s.size)}
                 className={`flex-1 py-1 text-xs font-medium rounded-full border transition-all cursor-pointer ${
                   selectedSize === s.size
-                    ? 'border-stone-900 bg-stone-900 text-white shadow-xs'
-                    : 'border-stone-200 bg-stone-50 text-stone-600 hover:bg-stone-100'
+                    ? 'border-amber-500 bg-amber-500 text-white shadow-xs font-bold'
+                    : 'border-amber-200/80 bg-white text-stone-700 hover:bg-amber-50/50'
                 }`}
               >
                 {s.size}
@@ -186,11 +186,11 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
                         backgroundColor: '#059669',
                         boxShadow: '0 0 16px rgba(16,185,129,0.5)'
                       }
-                    : { scale: 1, backgroundColor: '#C2410C' }
+                    : { scale: 1, backgroundColor: '#D97706' }
                 }
                 transition={{ duration: 0.45, ease: "easeOut" }}
                 onClick={handleQuickAdd}
-                className="py-2 px-3.5 sm:px-4 rounded-full text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer text-white relative overflow-hidden hover:brightness-110"
+                className="py-2 px-3.5 sm:px-4 rounded-xl text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer text-white relative overflow-hidden hover:brightness-110"
               >
                 {isPopping ? (
                   <>

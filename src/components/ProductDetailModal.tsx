@@ -66,7 +66,7 @@ export const ProductDetailModal: React.FC = () => {
               <div>
                 {/* Badge & Rating */}
                 <div className="flex items-center justify-between gap-2 mb-2">
-                  <span className="px-2.5 py-0.5 rounded-full bg-[#FFEAE5] text-[#C84B31] text-xs font-bold">
+                  <span className="px-2.5 py-0.5 rounded-full bg-gradient-to-r from-amber-100 to-orange-100 text-amber-900 border border-amber-200/60 text-xs font-bold">
                     {isMr ? product.badgeMr : product.badgeEn}
                   </span>
                   <div className="flex items-center gap-1 text-amber-500 text-xs font-bold">
@@ -87,7 +87,7 @@ export const ProductDetailModal: React.FC = () => {
                 </p>
 
                 {/* Spice Meter */}
-                <div className="flex items-center gap-2 my-3 p-2.5 rounded-xl bg-[#FAF6F2] border border-[#EFE4D8]">
+                <div className="flex items-center gap-2 my-3 p-2.5 rounded-xl bg-gradient-to-r from-amber-50/60 to-orange-50/60 border border-amber-200/70">
                   <span className="text-xs font-bold text-[#2D2424]">
                     {isMr ? 'तिखटपणा:' : 'Spice Heat:'}
                   </span>
@@ -227,12 +227,12 @@ export const ProductDetailModal: React.FC = () => {
                         onClick={() => setSelectedSize(s.size)}
                         className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer ${
                           selectedSize === s.size
-                            ? 'border-[#C84B31] bg-[#FFF2EE] text-[#C84B31] ring-2 ring-[#C84B31]/20 font-bold'
-                            : 'border-[#EFE4D8] bg-white text-[#574B4B] hover:bg-[#FAF8F5]'
+                            ? 'border-amber-500 bg-amber-50 text-amber-900 ring-2 ring-amber-500/20 font-bold'
+                            : 'border-amber-200/80 bg-white text-stone-700 hover:bg-amber-50/40'
                         }`}
                       >
                         <div className="text-sm font-extrabold">{s.size}</div>
-                        <div className="text-xs font-bold text-[#2D2424] mt-0.5">₹{s.price}</div>
+                        <div className="text-xs font-bold text-stone-900 mt-0.5">₹{s.price}</div>
                       </button>
                     ))}
                   </div>
@@ -240,19 +240,19 @@ export const ProductDetailModal: React.FC = () => {
               </div>
 
               {/* Footer Actions: Quantity and Add To Cart */}
-              <div className="pt-4 border-t border-[#F5EDE4] flex items-center justify-between gap-4">
+              <div className="pt-4 border-t border-amber-200/60 flex items-center justify-between gap-4">
                 {/* Quantity */}
-                <div className="flex items-center border border-[#EADFD5] rounded-xl bg-[#FAF8F5] overflow-hidden">
+                <div className="flex items-center border border-amber-200/80 rounded-xl bg-white overflow-hidden">
                   <button
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="px-3 py-2 text-sm font-bold hover:bg-[#EAE0D5] text-[#2D2424] transition-colors cursor-pointer"
+                    className="px-3 py-2 text-sm font-bold hover:bg-amber-50 text-stone-900 transition-colors cursor-pointer"
                   >
                     -
                   </button>
-                  <span className="px-3 text-sm font-extrabold text-[#2D2424]">{quantity}</span>
+                  <span className="px-3 text-sm font-extrabold text-stone-900">{quantity}</span>
                   <button
                     onClick={() => setQuantity(quantity + 1)}
-                    className="px-3 py-2 text-sm font-bold hover:bg-[#EAE0D5] text-[#2D2424] transition-colors cursor-pointer"
+                    className="px-3 py-2 text-sm font-bold hover:bg-amber-50 text-stone-900 transition-colors cursor-pointer"
                   >
                     +
                   </button>
@@ -267,7 +267,7 @@ export const ProductDetailModal: React.FC = () => {
                       : { scale: 1 }
                   }
                   onClick={handleAdd}
-                  className="flex-1 py-3 px-4 rounded-xl bg-[#C84B31] hover:bg-[#A83B23] text-white font-extrabold text-sm sm:text-base transition-all shadow-md shadow-[#C84B31]/25 flex items-center justify-center gap-2 cursor-pointer relative overflow-hidden"
+                  className="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-extrabold text-sm sm:text-base transition-all shadow-md shadow-orange-500/20 flex items-center justify-center gap-2 cursor-pointer relative overflow-hidden"
                 >
                   {isAdding ? (
                     <>
@@ -276,7 +276,7 @@ export const ProductDetailModal: React.FC = () => {
                     </>
                   ) : (
                     <>
-                      <ShoppingBag className="w-4 h-4 text-amber-300" />
+                      <ShoppingBag className="w-4 h-4 text-amber-100" />
                       <span>{isMr ? `कार्टमध्ये जोडा (₹${activeSizeObj.price * quantity})` : `Add to Cart (₹${activeSizeObj.price * quantity})`}</span>
                     </>
                   )}

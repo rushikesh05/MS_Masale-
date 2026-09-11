@@ -130,7 +130,7 @@ const TOP_SPICE_BLENDS = [
     revenue: 211200,
     color: '#D83A56',
     sharePct: 14,
-    flavorNotes: 'Lavangi red chilli, roasted onion, stone pounded'
+    flavorNotes: 'Lavangi red chilli, roasted onion'
   },
   { 
     id: 'jawas',

@@ -44,7 +44,7 @@ export const CheckoutModal: React.FC = () => {
   // Address form
   const [address, setAddress] = useState<CustomerAddress>({
     fullName: 'सागर रामचंद्र गायकवाड (Sagar Gaikwad)',
-    phone: '+91 98234 56789',
+    phone: '8591254237',
     email: 'sagar.gaikwad@example.com',
     addressLine1: 'फ्लॅट ४०२, स्वामिनी हाइट्स, बाणेर रोड',
     addressLine2: 'डी मार्ट जवळ',
@@ -151,10 +151,10 @@ export const CheckoutModal: React.FC = () => {
           className="bg-white rounded-3xl max-w-2xl w-full overflow-hidden shadow-2xl border border-[#EFE4D8] my-8 relative"
         >
           {/* Header */}
-          <div className="p-5 border-b border-[#F5EDE4] flex items-center justify-between bg-[#FFFDFB]">
+          <div className="p-5 border-b border-amber-200/70 flex items-center justify-between bg-gradient-to-r from-amber-50/80 to-orange-50/80">
             <div className="flex items-center gap-2">
               <span className="text-xl">🌶️</span>
-              <h3 className="font-extrabold text-lg text-[#2D2424] font-brand">
+              <h3 className="font-extrabold text-lg text-stone-900 font-brand">
                 {step === 'address' && (isMr ? 'डिलिव्हरी पत्ता (Shipping Details)' : 'Delivery Address')}
                 {step === 'payment' && (isMr ? 'पेमेंट पद्धत (Select Payment)' : 'Payment Method')}
                 {step === 'success' && (isMr ? 'ऑर्डर निश्चित झाली! (Order Placed)' : 'Order Confirmed!')}
@@ -164,7 +164,7 @@ export const CheckoutModal: React.FC = () => {
             {step !== 'success' && (
               <button
                 onClick={() => setIsCheckoutOpen(false)}
-                className="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-500 transition-colors cursor-pointer"
+                className="w-8 h-8 rounded-full hover:bg-stone-200/60 flex items-center justify-center text-stone-500 transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -247,14 +247,14 @@ export const CheckoutModal: React.FC = () => {
               </div>
 
               {/* Order Summary Preview */}
-              <div className="p-3.5 rounded-xl bg-[#FAF8F5] border border-[#EFE4D8] text-xs flex justify-between items-center">
+              <div className="p-3.5 rounded-xl bg-gradient-to-r from-amber-50/70 to-orange-50/70 border border-amber-200/80 text-xs flex justify-between items-center">
                 <div>
-                  <span className="text-gray-500">{isMr ? 'एकूण आयटम्स:' : 'Items:'} {cart.length}</span>
-                  <span className="font-extrabold text-[#C84B31] text-sm block">₹{totalAmount}</span>
+                  <span className="text-stone-600">{isMr ? 'एकूण आयटम्स:' : 'Items:'} {cart.length}</span>
+                  <span className="font-extrabold text-amber-900 text-sm block">₹{totalAmount}</span>
                 </div>
                 <button
                   onClick={() => setStep('payment')}
-                  className="px-5 py-2.5 bg-[#C84B31] hover:bg-[#A83B23] text-white font-bold text-xs sm:text-sm rounded-xl transition-all shadow-md flex items-center gap-1.5 cursor-pointer"
+                  className="px-5 py-2.5 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold text-xs sm:text-sm rounded-xl transition-all shadow-md shadow-orange-500/20 flex items-center gap-1.5 cursor-pointer"
                 >
                   <span>{isMr ? 'पेमेंटकडे जा' : 'Continue to Payment'}</span>
                   <ArrowRight className="w-4 h-4" />
@@ -272,31 +272,31 @@ export const CheckoutModal: React.FC = () => {
                   onClick={() => setPaymentMethod('upi')}
                   className={`p-4 rounded-2xl border transition-all cursor-pointer ${
                     paymentMethod === 'upi'
-                      ? 'border-[#C84B31] bg-[#FFF9F6] ring-2 ring-[#C84B31]/20'
-                      : 'border-[#EFE4D8] bg-white hover:bg-[#FAF8F5]'
+                      ? 'border-amber-500 bg-amber-50/70 ring-2 ring-amber-500/20'
+                      : 'border-amber-200/70 bg-white hover:bg-amber-50/40'
                   }`}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-green-50 text-green-700 flex items-center justify-center font-extrabold text-xs border border-green-200">
+                      <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center font-extrabold text-xs border border-emerald-200">
                         UPI
                       </div>
                       <div>
-                        <div className="font-extrabold text-sm text-[#2D2424]">
+                        <div className="font-extrabold text-sm text-stone-900">
                           {isMr ? 'झटपट UPI (GPay, PhonePe, Paytm, QR)' : 'Instant UPI Transfer'}
                         </div>
-                        <div className="text-xs text-[#7A6E6E]">
+                        <div className="text-xs text-stone-500">
                           {isMr ? 'शून्य ट्रॅन्झॅक्शन फी, त्वरित खात्री' : 'Zero transaction fees, instant confirmation'}
                         </div>
                       </div>
                     </div>
-                    <span className="text-xs px-2 py-0.5 rounded bg-green-100 text-green-800 font-bold">
+                    <span className="text-xs px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold">
                       Instant
                     </span>
                   </div>
 
                   {paymentMethod === 'upi' && (
-                    <div className="mt-4 pt-3 border-t border-[#F5EDE4] space-y-3">
+                    <div className="mt-4 pt-3 border-t border-amber-200/60 space-y-3">
                       <div className="grid grid-cols-4 gap-2">
                         {[
                           { id: 'gpay', name: 'Google Pay', icon: '🟢' },
@@ -312,8 +312,8 @@ export const CheckoutModal: React.FC = () => {
                             }}
                             className={`p-2 rounded-lg border text-center text-xs font-semibold transition-all ${
                               selectedUpiApp === app.id
-                                ? 'border-[#C84B31] bg-white font-bold text-[#C84B31]'
-                                : 'border-gray-200 bg-white/70 text-gray-600'
+                                ? 'border-amber-500 bg-amber-50 font-bold text-amber-900 shadow-2xs'
+                                : 'border-stone-200 bg-white text-stone-600'
                             }`}
                           >
                             <span className="block text-sm">{app.icon}</span>
@@ -324,10 +324,10 @@ export const CheckoutModal: React.FC = () => {
 
                       {/* Mock UPI QR Preview */}
                       {selectedUpiApp === 'qr' && (
-                        <div className="p-3 bg-white rounded-xl border border-gray-200 text-center max-w-[200px] mx-auto space-y-1">
-                          <QrCode className="w-24 h-24 mx-auto text-[#2D2424]" />
-                          <span className="text-[10px] font-mono font-bold text-gray-700 block">UPI: assalgavran@icici</span>
-                          <span className="text-[9px] text-gray-500">Scan with any UPI App</span>
+                        <div className="p-3 bg-white rounded-xl border border-amber-200 text-center max-w-[200px] mx-auto space-y-1">
+                          <QrCode className="w-24 h-24 mx-auto text-stone-800" />
+                          <span className="text-[10px] font-mono font-bold text-stone-700 block">UPI: assalgavran@icici</span>
+                          <span className="text-[9px] text-stone-500">Scan with any UPI App</span>
                         </div>
                       )}
                     </div>
@@ -339,8 +339,8 @@ export const CheckoutModal: React.FC = () => {
                   onClick={() => setPaymentMethod('razorpay_cards')}
                   className={`p-4 rounded-2xl border transition-all cursor-pointer ${
                     paymentMethod === 'razorpay_cards'
-                      ? 'border-[#C84B31] bg-[#FFF9F6] ring-2 ring-[#C84B31]/20'
-                      : 'border-[#EFE4D8] bg-white hover:bg-[#FAF8F5]'
+                      ? 'border-amber-500 bg-amber-50/70 ring-2 ring-amber-500/20'
+                      : 'border-amber-200/70 bg-white hover:bg-amber-50/40'
                   }`}
                 >
                   <div className="flex items-center gap-3">
@@ -348,10 +348,10 @@ export const CheckoutModal: React.FC = () => {
                       <CreditCard className="w-5 h-5" />
                     </div>
                     <div>
-                      <div className="font-extrabold text-sm text-[#2D2424]">
+                      <div className="font-extrabold text-sm text-stone-900">
                         {isMr ? 'क्रेडिट / डेबिट कार्ड व नेट बँकिंग' : 'Credit / Debit Cards & Netbanking'}
                       </div>
-                      <div className="text-xs text-[#7A6E6E]">
+                      <div className="text-xs text-stone-500">
                         Visa, MasterCard, RuPay, Netbanking
                       </div>
                     </div>
@@ -363,19 +363,19 @@ export const CheckoutModal: React.FC = () => {
                   onClick={() => setPaymentMethod('cod')}
                   className={`p-4 rounded-2xl border transition-all cursor-pointer ${
                     paymentMethod === 'cod'
-                      ? 'border-[#C84B31] bg-[#FFF9F6] ring-2 ring-[#C84B31]/20'
-                      : 'border-[#EFE4D8] bg-white hover:bg-[#FAF8F5]'
+                      ? 'border-amber-500 bg-amber-50/70 ring-2 ring-amber-500/20'
+                      : 'border-amber-200/70 bg-white hover:bg-amber-50/40'
                   }`}
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center font-extrabold text-xs border border-amber-200">
+                    <div className="w-10 h-10 rounded-xl bg-amber-100/70 text-amber-800 flex items-center justify-center font-extrabold text-xs border border-amber-200">
                       <Truck className="w-5 h-5" />
                     </div>
                     <div>
-                      <div className="font-extrabold text-sm text-[#2D2424]">
+                      <div className="font-extrabold text-sm text-stone-900">
                         {isMr ? 'कॅश ऑन डिलिव्हरी (COD)' : 'Cash on Delivery (COD)'}
                       </div>
-                      <div className="text-xs text-[#7A6E6E]">
+                      <div className="text-xs text-stone-500">
                         {isMr ? 'जार हातात मिळाल्यावर पैसे द्या' : 'Pay in cash/UPI upon jar delivery'}
                       </div>
                     </div>
@@ -384,10 +384,10 @@ export const CheckoutModal: React.FC = () => {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex items-center justify-between pt-4 border-t border-[#F5EDE4]">
+              <div className="flex items-center justify-between pt-4 border-t border-amber-200/60">
                 <button
                   onClick={() => setStep('address')}
-                  className="px-4 py-2 rounded-xl text-xs font-bold text-gray-600 bg-gray-100 hover:bg-gray-200 transition-colors cursor-pointer"
+                  className="px-4 py-2 rounded-xl text-xs font-bold text-stone-600 bg-stone-100 hover:bg-stone-200 transition-colors cursor-pointer"
                 >
                   {isMr ? 'मागे जा' : 'Back'}
                 </button>
@@ -395,7 +395,7 @@ export const CheckoutModal: React.FC = () => {
                 <button
                   onClick={handlePlaceOrder}
                   disabled={isSubmitting}
-                  className="px-6 py-3 bg-green-700 hover:bg-green-800 text-white font-extrabold text-sm rounded-xl transition-all shadow-md shadow-green-700/25 flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                  className="px-6 py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-extrabold text-sm rounded-xl transition-all shadow-md shadow-emerald-600/25 flex items-center gap-2 cursor-pointer disabled:opacity-50"
                 >
                   <ShieldCheck className="w-4 h-4" />
                   <span>
@@ -411,7 +411,7 @@ export const CheckoutModal: React.FC = () => {
           {/* STEP 3: Order Placed Success */}
           {step === 'success' && createdOrder && (
             <div className="p-8 text-center space-y-5">
-              <div className="w-16 h-16 rounded-full bg-green-100 text-green-700 flex items-center justify-center mx-auto shadow-sm">
+              <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto shadow-xs">
                 <CheckCircle className="w-9 h-9" />
               </div>
 
@@ -419,31 +419,31 @@ export const CheckoutModal: React.FC = () => {
                 <span className="text-xs px-3 py-1 rounded-full bg-amber-100 text-amber-900 font-bold uppercase tracking-wider">
                   {isMr ? 'ऑर्डर आयडी:' : 'Order ID:'} #{createdOrder.id}
                 </span>
-                <h3 className="text-2xl font-extrabold text-[#2D2424] font-brand mt-3">
+                <h3 className="text-2xl font-extrabold text-stone-900 font-brand mt-3">
                   {isMr ? 'धन्यवाद! तुमची ऑर्डर नोंदवली गेली आहे' : 'Thank You! Your Order has been placed'}
                 </h3>
-                <p className="text-xs sm:text-sm text-[#7A6E6E] mt-1 max-w-md mx-auto">
+                <p className="text-xs sm:text-sm text-stone-600 mt-1 max-w-md mx-auto">
                   {isMr
                     ? 'तुमच्या आवडीनुसार खलबत्त्यात ताजी कुटून आम्ही जार तयार करत आहोत. व्हॉट्सॲपवर तुम्हाला तपशील पाठवले आहेत.'
-                    : 'We are blending your artisanal chutney fresh in our workshop. WhatsApp confirmation receipt generated!'}
+                    : 'We are blending your artisanal spices fresh in our workshop. WhatsApp confirmation receipt generated!'}
                 </p>
               </div>
 
               {/* Delivery & OTP Card */}
-              <div className="p-4 rounded-2xl bg-[#FFF9F6] border border-[#F5C2B8] text-left text-xs space-y-2 max-w-md mx-auto">
+              <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-50/90 via-orange-50/70 to-rose-50/80 border border-amber-200 text-left text-xs space-y-2 max-w-md mx-auto shadow-2xs">
                 <div className="flex justify-between items-center">
-                  <span className="font-semibold text-gray-600">{isMr ? 'डिलिव्हरी पार्टनर:' : 'Delivery Partner:'}</span>
-                  <span className="font-bold text-[#2D2424]">{createdOrder.assignedDeliveryPerson?.name}</span>
+                  <span className="font-semibold text-stone-600">{isMr ? 'डिलिव्हरी पार्टनर:' : 'Delivery Partner:'}</span>
+                  <span className="font-bold text-stone-900">{createdOrder.assignedDeliveryPerson?.name}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="font-semibold text-gray-600">{isMr ? 'डिलिव्हरी सिक्युरिटी OTP:' : 'Delivery Verification OTP:'}</span>
-                  <span className="text-sm font-mono font-extrabold text-[#C84B31] bg-white px-2 py-0.5 rounded border border-[#EADFD5]">
+                  <span className="font-semibold text-stone-600">{isMr ? 'डिलिव्हरी सिक्युरिटी OTP:' : 'Delivery Verification OTP:'}</span>
+                  <span className="text-sm font-mono font-extrabold text-amber-900 bg-white px-2 py-0.5 rounded border border-amber-200 shadow-2xs">
                     {createdOrder.deliveryOtp}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="font-semibold text-gray-600">{isMr ? 'अपेक्षित वितरण:' : 'Est. Delivery:'}</span>
-                  <span className="font-bold text-green-700">{createdOrder.estimatedDeliveryDate}</span>
+                  <span className="font-semibold text-stone-600">{isMr ? 'अपेक्षित वितरण:' : 'Est. Delivery:'}</span>
+                  <span className="font-bold text-emerald-700">{createdOrder.estimatedDeliveryDate}</span>
                 </div>
               </div>
 
@@ -455,7 +455,7 @@ export const CheckoutModal: React.FC = () => {
                       openInvoiceModal(createdOrder);
                     }
                   }}
-                  className="px-5 py-3 rounded-2xl bg-gradient-to-r from-[#C84B31] to-[#A0331C] text-white text-xs font-extrabold shadow-md hover:shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                  className="px-5 py-3 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white text-xs font-extrabold shadow-md shadow-orange-500/20 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <FileText className="w-4 h-4" />
                   <span>{isMr ? '📄 कर बीजक (Tax Invoice) डाउनलोड करा' : '📄 Download Tax Invoice'}</span>

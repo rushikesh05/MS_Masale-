@@ -111,10 +111,10 @@ export const LiveDeliveryTrackerModal: React.FC<Props> = ({ order, language, onC
     },
     {
       id: 'blending_in_workshop',
-      titleMr: 'खलबत्त्यात कुटणे (Preparation)',
-      titleEn: 'Stone-Pounding',
-      descMr: 'पारंपरिक दगडी खलबत्त्यात ताजी कुटाई',
-      descEn: 'Handcrafted in stone mortar',
+      titleMr: 'ताजी तयारी (Preparation)',
+      titleEn: 'Fresh Preparation',
+      descMr: 'पारंपरिक पद्धतीने ताजी तयारी',
+      descEn: 'Handcrafted with authentic recipe',
       completed: ['blending_in_workshop', 'packed_in_airtight_jar', 'out_for_delivery', 'delivered'].includes(order.orderStatus),
       active: order.orderStatus === 'blending_in_workshop'
     },

@@ -1,34 +1,27 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
-  Sparkles, 
-  ChefHat, 
-  ShieldCheck, 
-  Truck, 
-  Leaf, 
-  ArrowRight,
-  Award,
+  Phone,
+  MessageSquare,
+  Search,
+  X,
   RefreshCw,
   FileText,
-  Building2,
   Navigation,
   ShoppingBag,
   Flame,
   Star,
-  Layers,
-  ChevronUp
+  ChevronUp,
+  ShieldCheck,
+  Truck,
+  CheckCircle2
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useAuth } from '../context/AuthContext';
 import { ProductCard } from './ProductCard';
-import { CustomChutneyBuilder } from './CustomChutneyBuilder';
-import { AISommelier } from './AISommelier';
 import { LiveDeliveryTrackerModal } from './LiveDeliveryTrackerModal';
-import { FlavorProfileDashboard } from './FlavorProfileDashboard';
-import { VoiceSearchBar } from './VoiceSearchBar';
-import { Order, ProductCategory } from '../types';
+import { Order } from '../types';
 import { ProductVisual } from './ProductVisual';
-import { FloatingTextsVisuals } from './FloatingTextsVisuals';
 
 export const CustomerPortal: React.FC = () => {
   const { 
@@ -36,37 +29,33 @@ export const CustomerPortal: React.FC = () => {
     openWhatsAppAlert, 
     openInvoiceModal, 
     refreshOrders, 
-    setIsBulkRequestModalOpen,
-    cartCount,
-    cartSubtotal,
-    setIsCartOpen,
-    setSelectedProductDetail,
-    products,
-    categories: dynamicCategories
+    cartCount, 
+    cartSubtotal, 
+    setIsCartOpen, 
+    setSelectedProductDetail, 
+    products, 
+    categories: dynamicCategories 
   } = useApp();
-  const { currentUser, setIsAuthModalOpen, setAuthMode, setRole } = useAuth();
+  const { currentUser, setIsAuthModalOpen, setAuthMode } = useAuth();
 
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [activeSection, setActiveSection] = useState<'catalog' | 'builder' | 'sommelier' | 'flavor-profile' | 'orders'>('catalog');
+  const [activeSection, setActiveSection] = useState<'catalog' | 'orders'>('catalog');
   const [selectedTrackingOrder, setSelectedTrackingOrder] = useState<Order | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [floatingAmbiance, setFloatingAmbiance] = useState<'amber' | 'crimson' | 'emerald'>('amber');
 
-  // Merged categories with prominent "Pure Masales (Buy Separately)"
+  // Classic, simple category list
   const categories = [
-    { id: 'all', en: 'All Items • सर्व उत्पादने' },
-    { id: 'masala', en: '🌶️ Pure Masales • अस्सल मसाले (Buy Separately)' },
-    { id: 'pickles', en: 'Traditional Pickles (लोणची)' },
-    { id: 'thecha', en: 'Thecha & Relishes (ठेचा)' },
-    { id: 'dry-chutneys', en: 'Dry Chutneys (कोरड्या चटण्या)' },
-    { id: 'metkut', en: 'Heritage Metkut (मेतकूट)' },
-    { id: 'kolhapuri', en: 'Kolhapur Flagship' },
-    { id: 'bestsellers', en: 'Best Sellers' },
-    { id: 'healthy', en: 'High Fiber & Seeds' },
+    { id: 'all', name: 'All Products (सर्व उत्पादने)' },
+    { id: 'masala', name: 'Masales (मसाले)' },
+    { id: 'dry-chutneys', name: 'Chutneys (चटण्या)' },
+    { id: 'pickles', name: 'Pickles (लोणची)' },
+    { id: 'thecha', name: 'Thecha (ठेचा)' },
+    { id: 'metkut', name: 'Metkut (मेतकूट)' },
+    { id: 'kolhapuri', name: 'Kolhapuri Special' },
     ...dynamicCategories
       .filter(dc => !['all', 'masala', 'pickles', 'thecha', 'dry-chutneys', 'metkut', 'kolhapuri', 'bestsellers', 'healthy', 'chutney', 'pickle', 'specialty'].includes(dc.id))
-      .map(dc => ({ id: dc.id, en: `${dc.nameEn} (${dc.nameMr})` }))
+      .map(dc => ({ id: dc.id, name: `${dc.nameEn} (${dc.nameMr})` }))
   ];
 
   const filteredProducts = products.filter(p => {
@@ -84,10 +73,6 @@ export const CustomerPortal: React.FC = () => {
       matchesCategory = (p.category === 'chutney' || !p.category) && !p.id.includes('thecha') && !p.id.includes('masala');
     } else if (selectedCategory === 'metkut') {
       matchesCategory = p.id.includes('metkut');
-    } else if (selectedCategory === 'bestsellers') {
-      matchesCategory = Boolean(p.isBestSeller);
-    } else if (selectedCategory === 'healthy') {
-      matchesCategory = p.id.includes('javas') || p.id.includes('til') || p.id.includes('karale');
     } else if (selectedCategory !== 'all') {
       matchesCategory = p.category === selectedCategory;
     }
@@ -102,10 +87,8 @@ export const CustomerPortal: React.FC = () => {
     const matchesTagline = (p.taglineEn || '').toLowerCase().includes(q) || (p.taglineMr || '').toLowerCase().includes(q);
     const matchesDesc = (p.descriptionEn || '').toLowerCase().includes(q) || (p.descriptionMr || '').toLowerCase().includes(q);
     const matchesIngredients = (p.ingredientsEn || []).some(i => i.toLowerCase().includes(q)) || (p.ingredientsMr || []).some(i => i.toLowerCase().includes(q));
-    const matchesRegion = p.regionOriginEn && p.regionOriginEn.toLowerCase().includes(q);
-    const matchesBadge = (p.badgeEn && p.badgeEn.toLowerCase().includes(q)) || (p.badgeMr && p.badgeMr.toLowerCase().includes(q));
 
-    return matchesName || matchesTagline || matchesDesc || matchesIngredients || matchesRegion || matchesBadge;
+    return matchesName || matchesTagline || matchesDesc || matchesIngredients;
   });
 
   const handleRefresh = async () => {
@@ -114,81 +97,35 @@ export const CustomerPortal: React.FC = () => {
     setTimeout(() => setIsRefreshing(false), 500);
   };
 
-  const gridContainerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.07,
-        delayChildren: 0.04,
-      },
-    },
-  };
-
-  const cardItemVariants = {
-    hidden: { 
-      opacity: 0, 
-      y: 20,
-      scale: 0.97,
-    },
-    visible: {
-      opacity: 1,
-      y: 0,
-      scale: 1,
-      transition: {
-        type: 'spring',
-        stiffness: 280,
-        damping: 24,
-        mass: 0.8,
-      },
-    },
-  };
+  const kandaProduct = products.find(p => p.id === 'prod-kanda-lasun') || products[0];
 
   return (
-    <div className="space-y-8 sm:space-y-10 pb-16">
-      {/* 1. Hero Brand Presentation Banner - High-End Artisanal & Uncluttered */}
-      <section className="relative overflow-hidden text-stone-100 rounded-3xl p-6 sm:p-10 lg:p-12 shadow-[0_12px_40px_rgba(0,0,0,0.12)] mx-4 sm:mx-6 lg:mx-8 bg-gradient-to-br from-[#1C1816] via-[#241F1C] to-[#1A1614] border border-[#332A25] transition-all">
-        {/* Soft Warm Ambient Glow */}
-        <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full blur-3xl pointer-events-none bg-amber-500/10" />
-        <div className="absolute -bottom-24 -left-12 w-80 h-80 rounded-full blur-3xl pointer-events-none bg-[#C2410C]/10" />
-
-        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
-          {/* Left Column: Brand Story & Clear Primary CTAs */}
-          <div className="lg:col-span-7 space-y-4 sm:space-y-5">
-            <div className="flex flex-wrap items-center gap-2.5">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-semibold bg-[#C2410C]/20 text-[#FDBA74] border border-[#C2410C]/40">
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>100% Traditional Stone-Pounded Condiments</span>
-              </div>
-
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-stone-800/80 text-stone-300 border border-stone-700/60 text-xs font-medium">
-                <span>Heritage Recipes</span>
-                <span className="text-stone-500">•</span>
-                <span>Zero High-Heat Milling</span>
-              </span>
-            </div>
-
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold font-serif text-white tracking-tight leading-tight">
+    <div className="space-y-8 pb-16">
+      {/* 1. Light Gradient Hero Banner */}
+      <section className="mx-4 sm:mx-6 lg:mx-8 rounded-2xl p-6 sm:p-10 bg-gradient-to-br from-amber-100/90 via-orange-50/95 to-rose-100/80 text-stone-900 shadow-sm border border-amber-200/80">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+          
+          {/* Left Column: Strictly MS Masale, Contact & Fast Actions */}
+          <div className="lg:col-span-7 space-y-4">
+            {/* Title: Strictly MS Masale without brand tagline */}
+            <h1 className="text-3xl sm:text-5xl font-black font-serif text-stone-900 tracking-tight">
               MS Masale
-              <span className="block text-xl sm:text-2xl lg:text-3xl mt-2 font-sans font-bold text-amber-400">
-                Stone-Crushed Artisanal Chutneys & Spices
-              </span>
             </h1>
 
-            <p className="text-xs sm:text-sm text-stone-300 max-w-xl leading-relaxed">
-              Legendary Kolhapuri Kanda-Lasun chutney, Solapuri shengdana, fiery green thecha, flaxseed chutney, and pure stone-crushed cooking masalas. Hand-pounded in stone mortars and sealed fresh in airtight glass jars.
+            <p className="text-sm sm:text-base text-stone-700 max-w-xl leading-relaxed">
+              Authentic Maharashtrian spices, masalas, and condiments made with pure ingredients and traditional recipes. Delivered fresh to your home.
             </p>
 
+            {/* Direct Contact & Action Buttons */}
             <div className="pt-2 flex flex-wrap items-center gap-3">
               <button
                 onClick={() => {
                   setActiveSection('catalog');
                   setSelectedCategory('all');
                 }}
-                className="px-6 py-3 font-bold text-xs sm:text-sm rounded-full transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-2 cursor-pointer bg-[#C2410C] hover:bg-[#9A3412] text-white"
+                className="px-6 py-3 font-bold text-xs sm:text-sm rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white transition-all shadow-xs cursor-pointer"
               >
-                <span>Explore All Condiments</span>
-                <ArrowRight className="w-4 h-4" />
+                Order Online
               </button>
 
               <button
@@ -196,192 +133,162 @@ export const CustomerPortal: React.FC = () => {
                   setActiveSection('catalog');
                   setSelectedCategory('masala');
                 }}
-                className="px-5 py-3 bg-stone-900/90 hover:bg-stone-800 text-amber-300 font-semibold text-xs sm:text-sm rounded-full border border-amber-500/40 transition-all hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-2 cursor-pointer"
+                className="px-5 py-3 font-bold text-xs sm:text-sm rounded-xl bg-white hover:bg-amber-50/80 text-stone-900 border border-amber-300/80 transition-all shadow-2xs cursor-pointer flex items-center gap-2"
               >
-                <Flame className="w-4 h-4 text-amber-400" />
-                <span>🌶️ Buy Pure Masales (मसाले)</span>
+                <Flame className="w-4 h-4 text-amber-600" />
+                <span>Masales (मसाले)</span>
               </button>
 
-              <button
-                onClick={() => setActiveSection('builder')}
-                className="px-4 py-3 bg-stone-900/60 hover:bg-stone-800 text-stone-300 font-medium text-xs sm:text-sm rounded-full border border-stone-700/60 transition-all flex items-center gap-1.5 cursor-pointer"
+              {/* Direct Phone Call Button */}
+              <a
+                href="tel:8591254237"
+                className="px-5 py-3 font-bold text-xs sm:text-sm rounded-xl bg-white hover:bg-amber-50/80 text-amber-900 border border-amber-200/80 transition-all shadow-2xs flex items-center gap-2"
               >
-                <ChefHat className="w-4 h-4 text-stone-400" />
-                <span className="hidden sm:inline">Custom Blend Studio</span>
-              </button>
+                <Phone className="w-4 h-4 text-amber-600" />
+                <span>Call: 8591254237</span>
+              </a>
+
+              {/* Direct WhatsApp Button */}
+              <a
+                href="https://wa.me/918591254237?text=Hello%20MS%20Masale,%20I%20want%20to%20order"
+                target="_blank"
+                rel="noreferrer"
+                className="px-4 py-3 font-bold text-xs sm:text-sm rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white transition-all shadow-xs flex items-center gap-2"
+              >
+                <MessageSquare className="w-4 h-4 text-emerald-100" />
+                <span>WhatsApp: 8591254237</span>
+              </a>
+            </div>
+
+            {/* Simple Contact Banner Badge */}
+            <div className="pt-1 text-xs text-stone-700 flex items-center gap-2">
+              <span className="font-semibold">Helpline & Orders:</span>
+              <a href="tel:8591254237" className="font-mono font-bold text-amber-900 underline">
+                8591254237
+              </a>
+              <span className="text-stone-500">• Fast Delivery Across Maharashtra</span>
             </div>
           </div>
 
-          {/* Right Column: High-Quality Product Showcase with Clean Badges */}
-          <div className="lg:col-span-5 relative hidden sm:flex items-center justify-center p-4">
+          {/* Right Column: Clean Product Showcase Image */}
+          <div className="lg:col-span-5 hidden sm:flex items-center justify-center">
             <div 
               onClick={() => {
-                const kandaProduct = products.find(p => p.id === 'prod-kanda-lasun') || products[0];
                 if (kandaProduct) setSelectedProductDetail(kandaProduct);
               }}
-              className="relative w-full max-w-sm aspect-4/3 rounded-3xl overflow-hidden border border-[#3E342D] shadow-[0_16px_40px_rgba(0,0,0,0.45)] group cursor-pointer"
+              className="w-full max-w-sm aspect-4/3 rounded-2xl overflow-hidden border border-amber-200/90 shadow-md hover:shadow-xl hover:shadow-amber-500/20 hover:border-amber-400 transition-all duration-500 cursor-pointer bg-white group group/hero"
             >
-              {products.length > 0 && (
+              {kandaProduct && (
                 <ProductVisual
-                  product={products.find(p => p.id === 'prod-kanda-lasun') || products[0]}
-                  isMarathi={false}
-                  allowToggle={true}
+                  product={kandaProduct}
+                  imageUrl={kandaProduct.imageUrl}
+                  name={kandaProduct.nameEn}
+                  className="w-full h-full object-cover"
                 />
               )}
-            </div>
-
-            {/* Single Clean Floating Badge */}
-            <div className="absolute -bottom-2 -left-2 z-20 pointer-events-none">
-              <div className="px-3.5 py-1.5 rounded-full bg-[#1C1816]/95 backdrop-blur-md border border-amber-500/40 text-amber-200 text-xs font-semibold shadow-lg flex items-center gap-1.5">
-                <Flame className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-                <span>Stone-Mortar Batch #428 • 100% Wood-Pressed Oil</span>
-              </div>
-            </div>
-
-            <div className="absolute -top-2 -right-2 z-20 pointer-events-none">
-              <div className="px-3 py-1.5 rounded-full bg-[#1C1816]/95 backdrop-blur-md border border-stone-700 text-stone-200 text-xs font-semibold shadow-lg flex items-center gap-1.5">
-                <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-                <span>4.96/5 (1.2k+ Reviews)</span>
-              </div>
             </div>
           </div>
         </div>
 
-        {/* Minimal Feature Badges Row */}
-        <div className="relative z-10 grid grid-cols-2 md:grid-cols-4 gap-4 mt-8 pt-6 border-t border-stone-800/80 text-xs">
+        {/* 3 Simple Pillars */}
+        <div className="mt-8 pt-6 border-t border-amber-200/80 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs text-stone-700">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-amber-500/15 flex items-center justify-center text-amber-400 shrink-0">
-              <Award className="w-4 h-4" />
-            </div>
+            <ShieldCheck className="w-5 h-5 text-amber-600 shrink-0" />
             <div>
-              <div className="font-semibold text-stone-100">Stone Mortar Ground</div>
-              <div className="text-[10px] text-stone-400">Zero High-Heat Grinders</div>
+              <div className="font-bold text-stone-900">100% Pure & Traditional</div>
+              <div className="text-[11px] text-stone-600">No chemical preservatives</div>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-emerald-500/15 flex items-center justify-center text-emerald-400 shrink-0">
-              <Leaf className="w-4 h-4" />
-            </div>
+            <Truck className="w-5 h-5 text-amber-600 shrink-0" />
             <div>
-              <div className="font-semibold text-stone-100">100% Pure & Natural</div>
-              <div className="text-[10px] text-stone-400">Zero Chemical Preservatives</div>
+              <div className="font-bold text-stone-900">Express Maharashtra Delivery</div>
+              <div className="text-[11px] text-stone-600">Packed fresh upon order</div>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-rose-500/15 flex items-center justify-center text-rose-400 shrink-0">
-              <ShieldCheck className="w-4 h-4" />
-            </div>
+            <Phone className="w-5 h-5 text-amber-600 shrink-0" />
             <div>
-              <div className="font-semibold text-stone-100">Airtight Glass Jars</div>
-              <div className="text-[10px] text-stone-400">Preserves Fresh Aroma</div>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-blue-500/15 flex items-center justify-center text-blue-400 shrink-0">
-              <Truck className="w-4 h-4" />
-            </div>
-            <div>
-              <div className="font-semibold text-stone-100">Express Maharashtra Delivery</div>
-              <div className="text-[10px] text-stone-400">Packed & Dispatched in 24 Hrs</div>
+              <div className="font-bold text-stone-900">Direct Phone Ordering</div>
+              <div className="text-[11px] text-stone-600">Call or WhatsApp: 8591254237</div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Floating Texts Visuals & Live Streaming Highlights */}
-      <FloatingTextsVisuals 
-        onTagClick={(tag) => {
-          setSearchQuery(tag);
-          setSelectedCategory('all');
-        }} 
-      />
-
-      {/* 2. Floating Navigation Segmented Bar */}
+      {/* 2. Navigation Tabs (Light Gradient) */}
       <div className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-2 scrollbar-none p-1.5 rounded-full bg-white border border-stone-200/80 shadow-2xs w-fit">
+        <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none p-1.5 rounded-xl bg-gradient-to-r from-white via-amber-50/60 to-orange-50/50 border border-amber-200/70 shadow-2xs w-fit">
           <button
             onClick={() => {
               setActiveSection('catalog');
-              if (selectedCategory === 'masala') setSelectedCategory('all');
+              setSelectedCategory('all');
             }}
-            className={`px-4 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
-              activeSection === 'catalog' && selectedCategory !== 'masala'
-                ? 'bg-stone-900 text-white shadow-xs'
-                : 'text-stone-600 hover:text-stone-900 hover:bg-stone-100'
+            className={`px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+              activeSection === 'catalog' && selectedCategory === 'all'
+                ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-xs'
+                : 'text-stone-700 hover:text-stone-950 hover:bg-amber-100/60'
             }`}
           >
-            All Condiments & Pickles
+            All Products
           </button>
 
           <button
-            id="tab-pure-masalas"
             onClick={() => {
               setActiveSection('catalog');
               setSelectedCategory('masala');
-              setSearchQuery('');
             }}
-            className={`px-4 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
+            className={`px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
               activeSection === 'catalog' && selectedCategory === 'masala'
-                ? 'bg-[#C2410C] text-white shadow-xs'
-                : 'text-[#C2410C] hover:bg-orange-50 bg-white border border-orange-200/80'
+                ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-xs'
+                : 'text-stone-700 hover:text-stone-950 hover:bg-amber-100/60'
             }`}
           >
-            <Flame className="w-3.5 h-3.5" />
-            <span>🌶️ Pure Masales (मसाले)</span>
+            <Flame className="w-3.5 h-3.5 text-amber-600" />
+            <span>Masales (मसाले)</span>
           </button>
 
           <button
-            onClick={() => setActiveSection('builder')}
-            className={`px-4 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
-              activeSection === 'builder'
-                ? 'bg-stone-900 text-white shadow-xs'
-                : 'text-stone-600 hover:text-stone-900 hover:bg-stone-100'
+            onClick={() => {
+              setActiveSection('catalog');
+              setSelectedCategory('dry-chutneys');
+            }}
+            className={`px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+              activeSection === 'catalog' && selectedCategory === 'dry-chutneys'
+                ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-xs'
+                : 'text-stone-700 hover:text-stone-950 hover:bg-amber-100/60'
             }`}
           >
-            Custom Spice Studio
+            Chutneys (चटण्या)
           </button>
 
           <button
-            onClick={() => setActiveSection('sommelier')}
-            className={`px-4 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
-              activeSection === 'sommelier'
-                ? 'bg-stone-900 text-white shadow-xs'
-                : 'text-stone-600 hover:text-stone-900 hover:bg-stone-100'
+            onClick={() => {
+              setActiveSection('catalog');
+              setSelectedCategory('pickles');
+            }}
+            className={`px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all cursor-pointer ${
+              activeSection === 'catalog' && selectedCategory === 'pickles'
+                ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-xs'
+                : 'text-stone-700 hover:text-stone-950 hover:bg-amber-100/60'
             }`}
           >
-            AI Sommelier
-          </button>
-
-          <button
-            id="tab-flavor-profile"
-            onClick={() => setActiveSection('flavor-profile')}
-            className={`px-4 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
-              activeSection === 'flavor-profile'
-                ? 'bg-stone-900 text-white shadow-xs'
-                : 'text-stone-600 hover:text-stone-900 hover:bg-stone-100'
-            }`}
-          >
-            Flavor DNA
+            Pickles (लोणची)
           </button>
 
           <button
             onClick={() => setActiveSection('orders')}
-            className={`px-4 py-2 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer relative ${
+            className={`px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all cursor-pointer relative ${
               activeSection === 'orders'
-                ? 'bg-stone-900 text-white shadow-xs'
-                : 'text-stone-600 hover:text-stone-900 hover:bg-stone-100'
+                ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-xs'
+                : 'text-stone-700 hover:text-stone-950 hover:bg-amber-100/60'
             }`}
           >
             <span>My Orders</span>
             {orders.length > 0 && (
-              <span className={`ml-1.5 text-[10px] px-1.5 py-0.5 rounded-full font-bold ${
-                activeSection === 'orders' 
-                  ? 'bg-amber-400 text-stone-950' 
-                  : 'bg-stone-200 text-stone-800'
-              }`}>
+              <span className="ml-1.5 px-1.5 py-0.2 rounded-full text-[10px] font-black bg-amber-400 text-stone-950">
                 {orders.length}
               </span>
             )}
@@ -389,346 +296,257 @@ export const CustomerPortal: React.FC = () => {
         </div>
       </div>
 
-      {/* VIEW: 1. Ready Chutney Catalog */}
+      {/* 3. Main Content: Catalog or Orders */}
       {activeSection === 'catalog' && (
         <section id="catalog-grid-section" className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-6">
           
-          {/* Minimal Floating Search Bar */}
-          <div className="bg-white p-4 sm:p-5 rounded-2xl border border-stone-200/80 shadow-2xs">
-            <VoiceSearchBar
-              searchQuery={searchQuery}
-              onSearchChange={setSearchQuery}
-              isMarathi={false}
-              totalResultsCount={filteredProducts.length}
-              onClear={() => setSearchQuery('')}
+          {/* Light Gradient Search Bar */}
+          <div className="bg-gradient-to-r from-white via-[#FFFDF9] to-amber-50/40 p-3 sm:p-4 rounded-xl border border-amber-200/70 shadow-xs flex items-center gap-3">
+            <Search className="w-5 h-5 text-stone-400 shrink-0 ml-1" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search masala, chutney, pickle, metkut..."
+              className="flex-1 text-sm bg-transparent border-none outline-none text-stone-900 placeholder:text-stone-400"
             />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="p-1 rounded-full hover:bg-stone-100 text-stone-400 hover:text-stone-700"
+                title="Clear search"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
           </div>
 
+          {/* Section Heading & Category Filter Pills */}
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pt-1">
             <div>
-              <h2 className="text-2xl font-bold text-stone-900 font-serif flex items-center gap-2">
-                <span>{selectedCategory === 'masala' ? 'Pure Stone-Crushed Masalas (मसाले)' : 'Artisanal Chutneys, Pickles & Spices'}</span>
-                {searchQuery && (
-                  <span className="text-xs font-normal text-amber-800 bg-amber-100 px-2.5 py-0.5 rounded-full">
-                    "{searchQuery}"
-                  </span>
-                )}
+              <h2 className="text-2xl font-bold text-stone-900 font-serif">
+                {selectedCategory === 'masala' ? 'Masales (मसाले)' : 
+                 selectedCategory === 'pickles' ? 'Traditional Pickles (लोणची)' : 
+                 selectedCategory === 'dry-chutneys' ? 'Chutneys (चटण्या)' : 
+                 'All Products'}
               </h2>
               <p className="text-xs text-stone-500 mt-0.5">
-                Authentic Maharashtrian stone-pounded recipes & heirloom spices in airtight jars.
+                Authentic Maharashtrian recipes packed in sealed jars. For phone orders call: <strong className="text-stone-800">8591254237</strong>
               </p>
             </div>
 
-            {/* Category Filter Pills - Clean & Balanced */}
+            {/* Category Filter Pills */}
             <div className="flex flex-wrap gap-1.5">
               {categories.map(cat => (
                 <button
                   key={cat.id}
                   onClick={() => setSelectedCategory(cat.id)}
-                  className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                     selectedCategory === cat.id
-                      ? cat.id === 'masala'
-                        ? 'bg-[#C2410C] text-white shadow-xs'
-                        : 'bg-stone-900 text-white shadow-xs'
-                      : 'bg-stone-100 text-stone-600 hover:bg-stone-200 hover:text-stone-900'
+                      ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-xs'
+                      : 'bg-white text-stone-700 border border-amber-200/80 hover:bg-amber-50/70 hover:border-amber-300'
                   }`}
                 >
-                  {cat.en}
+                  {cat.name}
                 </button>
               ))}
             </div>
           </div>
 
-          {/* Clean Masala Notice when Masala Category is Active */}
+          {/* Notice when Masala Category is Active */}
           {selectedCategory === 'masala' && (
-            <div className="p-4 sm:p-5 rounded-2xl bg-[#FFF7ED] border border-[#FDBA74]/70 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-stone-800 shadow-2xs">
+            <div className="p-4 rounded-xl bg-gradient-to-r from-amber-50/90 via-orange-50/70 to-rose-50/80 border border-amber-200 flex items-center justify-between gap-3 text-stone-800 shadow-2xs">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-[#C2410C]/10 text-[#C2410C] flex items-center justify-center shrink-0">
-                  <Flame className="w-5 h-5 text-[#C2410C]" />
-                </div>
-                <div>
-                  <div className="font-bold text-sm text-stone-900 font-serif flex items-center gap-2">
-                    <span>अस्सल घरगुती खडे व बारीक मसाले • Pure Stone-Crushed Spices</span>
-                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#C2410C] text-white">Separate Packs</span>
-                  </div>
-                  <div className="text-xs text-stone-600 mt-0.5">
-                    Available in 100g trial pouches, 250g jars, 500g, or 1kg kitchen packs. No chutney required.
-                  </div>
+                <Flame className="w-5 h-5 text-amber-600 shrink-0" />
+                <div className="text-xs">
+                  <strong className="text-stone-900 font-serif text-sm block">मसाले (Pure Masales)</strong>
+                  Order signature cooking spices separately in 100g, 250g, 500g, or 1kg packs.
                 </div>
               </div>
               <button
                 onClick={() => setSelectedCategory('all')}
-                className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-white border border-stone-200 hover:bg-stone-50 text-stone-700 cursor-pointer shadow-2xs shrink-0"
+                className="px-3 py-1 text-xs font-semibold bg-white border border-amber-200 hover:bg-amber-50 text-stone-700 rounded-lg cursor-pointer shrink-0 shadow-2xs"
               >
-                Show All Items
+                Show All
               </button>
             </div>
           )}
 
-          {/* Product Cards Grid with Staggered Fluid Motion */}
+          {/* Product Cards Grid */}
           {filteredProducts.length > 0 ? (
-            <motion.div 
-              key={`${selectedCategory}-${searchQuery}`}
-              variants={gridContainerVariants}
-              initial="hidden"
-              animate="visible"
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-            >
-              {filteredProducts.map((product, idx) => (
-                <motion.div 
-                  key={product.id} 
-                  variants={cardItemVariants}
-                  custom={idx}
-                  layout
-                  className="h-full"
-                >
-                  <ProductCard product={product} />
-                </motion.div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 sm:gap-6">
+              {filteredProducts.map(product => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  onSelectProduct={(p) => setSelectedProductDetail(p)}
+                />
               ))}
-            </motion.div>
+            </div>
           ) : (
-            <div className="py-12 px-6 rounded-2xl bg-white border border-stone-200 text-center space-y-4 shadow-xs">
-              <div className="w-14 h-14 rounded-full bg-stone-100 text-stone-500 mx-auto flex items-center justify-center text-xl font-bold">
-                🔍
-              </div>
-              <div className="space-y-1">
-                <h3 className="text-base font-bold text-stone-900">
-                  No products found matching "{searchQuery}"
-                </h3>
-                <p className="text-xs text-stone-500 max-w-md mx-auto">
-                  Try searching for ingredients: peanut, thecha, garlic, coconut, or flaxseed.
-                </p>
-              </div>
-              <div className="pt-2 flex justify-center gap-2">
-                <button
-                  onClick={() => {
-                    setSearchQuery('');
-                    setSelectedCategory('all');
-                  }}
-                  className="px-4 py-2 rounded-full bg-stone-900 text-white text-xs font-semibold hover:bg-stone-800 transition-colors cursor-pointer shadow-xs"
-                >
-                  View All Products
-                </button>
-              </div>
+            <div className="py-16 text-center space-y-3 bg-white rounded-2xl border border-stone-200 p-8">
+              <div className="text-4xl">🌶️</div>
+              <h3 className="font-serif font-bold text-lg text-stone-800">
+                No products found
+              </h3>
+              <p className="text-xs text-stone-500 max-w-sm mx-auto">
+                No items match your search. Try another query or browse all items.
+              </p>
+              <button
+                onClick={() => {
+                  setSearchQuery('');
+                  setSelectedCategory('all');
+                }}
+                className="px-4 py-2 rounded-lg bg-gradient-to-r from-amber-500 to-orange-600 text-white text-xs font-bold hover:from-amber-600 hover:to-orange-700 transition-all cursor-pointer shadow-xs"
+              >
+                View All Products
+              </button>
             </div>
           )}
 
-          {/* B2B Wholesale Section - Cleanly positioned below products to avoid congestion */}
-          <div className="p-6 rounded-2xl bg-[#1C1816] text-stone-100 border border-[#302722] shadow-sm flex flex-col md:flex-row items-center justify-between gap-5">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0">
-                <Building2 className="w-6 h-6" />
-              </div>
-              <div className="space-y-1">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-400 text-stone-950">
-                    B2B Wholesale Supply
-                  </span>
-                  <span className="text-xs font-semibold text-amber-300">
-                    Bulk Supply from 5 KG to 500 KG
-                  </span>
-                </div>
-                <h3 className="text-sm sm:text-base font-bold text-white">
-                  Need authentic stone-ground batches for restaurants, caterers, or retail?
-                </h3>
-                <p className="text-xs text-stone-400">
-                  Stone-crushed recipes, commercial food-grade packaging, and tiered wholesale pricing.
-                </p>
-              </div>
-            </div>
-
-            <button
-              onClick={() => setIsBulkRequestModalOpen(true)}
-              className="w-full md:w-auto px-5 py-2.5 rounded-full bg-amber-400 hover:bg-amber-300 text-stone-950 font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm shrink-0"
-            >
-              <span>Submit Wholesale Request</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          </div>
-
-          {/* Promo Banner for Custom Spice Studio */}
-          <div className="mt-10 p-6 sm:p-8 rounded-2xl bg-stone-50 border border-stone-200 flex flex-col md:flex-row justify-between items-center gap-6 shadow-xs">
-            <div className="space-y-1.5">
-              <span className="px-3 py-0.5 rounded-full bg-stone-200 text-stone-800 text-[11px] font-semibold">
-                Bespoke Custom Blend
-              </span>
-              <h3 className="text-xl font-bold text-stone-900 font-serif">
-                Want your exact spice ratio? Design your own custom jar!
+          {/* Light Gradient Contact Banner at Bottom */}
+          <div className="mt-8 p-6 rounded-2xl bg-gradient-to-r from-amber-100/80 via-orange-50/90 to-rose-100/70 border border-amber-200/80 shadow-xs flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div>
+              <h3 className="font-serif font-bold text-base text-stone-900">
+                Need Help or Want to Order Directly by Phone?
               </h3>
-              <p className="text-xs text-stone-600 max-w-xl leading-relaxed">
-                Customize peanut-to-coconut ratios, choose spice heat levels, and personalize your own custom label.
+              <p className="text-xs text-stone-700 mt-0.5">
+                We take phone and WhatsApp orders directly across Maharashtra.
               </p>
             </div>
-            <button
-              onClick={() => setActiveSection('builder')}
-              className="px-5 py-3 bg-stone-900 hover:bg-stone-800 text-white font-semibold text-xs sm:text-sm rounded-full transition-all shadow-sm shrink-0 flex items-center gap-2 cursor-pointer"
-            >
-              <span>Launch Custom Studio</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
+            <div className="flex items-center gap-3">
+              <a
+                href="tel:8591254237"
+                className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold text-xs flex items-center gap-2 transition-all shadow-xs"
+              >
+                <Phone className="w-4 h-4" />
+                <span>Call 8591254237</span>
+              </a>
+              <a
+                href="https://wa.me/918591254237?text=Hello%20MS%20Masale,%20I%20want%20to%20place%20an%20order"
+                target="_blank"
+                rel="noreferrer"
+                className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-xs flex items-center gap-2 transition-all shadow-xs"
+              >
+                <MessageSquare className="w-4 h-4" />
+                <span>WhatsApp</span>
+              </a>
+            </div>
           </div>
         </section>
       )}
 
-      {/* VIEW: 2. Custom Chutney Builder Studio */}
-      {activeSection === 'builder' && (
-        <section id="custom-builder-section">
-          <CustomChutneyBuilder />
-        </section>
-      )}
-
-      {/* VIEW: 3. AI Chutney Sommelier */}
-      {activeSection === 'sommelier' && (
-        <section>
-          <AISommelier />
-        </section>
-      )}
-
-      {/* VIEW: 4. Flavor Profile & Analytics Dashboard */}
-      {activeSection === 'flavor-profile' && (
-        <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-          <FlavorProfileDashboard
-            onNavigateToBuilder={() => setActiveSection('builder')}
-            onNavigateToCatalog={() => setActiveSection('catalog')}
-          />
-        </section>
-      )}
-
-      {/* VIEW: 5. Customer Active Orders Tracking */}
+      {/* 4. Orders & Tracking Section */}
       {activeSection === 'orders' && (
-        <section className="px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto space-y-6">
+        <section id="customer-orders-section" className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-6">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
             <div>
               <h2 className="text-2xl font-bold text-stone-900 font-serif">
-                Your Orders & Live Tracking
+                Your Orders & Tracking
               </h2>
               <p className="text-xs text-stone-500 mt-0.5">
-                Track your freshly ground jars from workshop preparation to doorstep delivery.
+                Track your orders from packaging to doorstep delivery. Helpline: 8591254237
               </p>
             </div>
 
             <button
               onClick={handleRefresh}
-              className="px-3.5 py-1.5 rounded-full border border-stone-200 bg-white hover:bg-stone-50 text-stone-700 text-xs font-semibold flex items-center gap-1.5 shadow-2xs cursor-pointer"
+              className="px-3.5 py-1.5 rounded-lg border border-stone-200 bg-white hover:bg-stone-50 text-stone-700 text-xs font-semibold flex items-center gap-1.5 shadow-2xs cursor-pointer"
             >
               <RefreshCw className={`w-3.5 h-3.5 text-stone-600 ${isRefreshing ? 'animate-spin' : ''}`} />
-              <span>Sync Live Status</span>
+              <span>Refresh Status</span>
             </button>
           </div>
 
-          <div className="space-y-4">
-            {orders.map(order => (
-              <div
-                key={order.id}
-                className="bg-white rounded-2xl p-6 border border-stone-200/90 shadow-sm space-y-4 hover:shadow-md transition-shadow"
+          {orders.length === 0 ? (
+            <div className="bg-white rounded-2xl p-10 text-center border border-stone-200 space-y-3">
+              <ShoppingBag className="w-12 h-12 text-stone-300 mx-auto" />
+              <h3 className="font-serif font-bold text-stone-800 text-base">No orders placed yet</h3>
+              <p className="text-xs text-stone-500">Explore our products and place your first order.</p>
+              <button
+                onClick={() => setActiveSection('catalog')}
+                className="px-4 py-2 rounded-lg bg-gradient-to-r from-amber-500 to-orange-600 text-white text-xs font-bold hover:from-amber-600 hover:to-orange-700 transition-all shadow-xs cursor-pointer"
               >
-                {/* Header */}
-                <div className="flex flex-wrap justify-between items-center gap-2 border-b border-stone-100 pb-3">
-                  <div>
-                    <span className="text-xs font-bold text-amber-700 font-mono">#{order.id}</span>
-                    <span className="text-xs text-stone-500 ml-2">
-                      Date: {new Date(order.createdAt).toLocaleDateString()}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <span className={`text-xs px-2.5 py-1 rounded-full font-semibold uppercase ${
-                      order.orderStatus === 'delivered'
-                        ? 'bg-emerald-100 text-emerald-800'
-                        : order.orderStatus === 'out_for_delivery'
-                        ? 'bg-amber-100 text-amber-900 animate-pulse'
-                        : 'bg-stone-100 text-stone-800'
-                    }`}>
-                      {order.orderStatus.replace(/_/g, ' ')}
-                    </span>
-                    <span className="text-xs font-bold text-stone-900">₹{order.totalAmount}</span>
-                  </div>
-                </div>
-
-                {/* Tracking Stepper */}
-                <div className="grid grid-cols-4 gap-2 text-center text-xs py-2">
-                  <div className="space-y-1">
-                    <div className="w-7 h-7 rounded-full bg-emerald-600 text-white flex items-center justify-center mx-auto text-xs font-bold shadow-xs">
-                      ✓
-                    </div>
-                    <span className="text-[11px] font-medium text-stone-800">Placed</span>
-                  </div>
-
-                  <div className="space-y-1">
-                    <div className={`w-7 h-7 rounded-full flex items-center justify-center mx-auto text-xs font-bold ${
-                      order.orderStatus !== 'order_placed' ? 'bg-emerald-600 text-white shadow-xs' : 'bg-amber-100 text-amber-800 ring-2 ring-amber-300'
-                    }`}>
-                      {order.orderStatus !== 'order_placed' ? '✓' : '2'}
-                    </div>
-                    <span className="text-[11px] font-medium text-stone-800">Stone Ground</span>
-                  </div>
-
-                  <div className="space-y-1">
-                    <div className={`w-7 h-7 rounded-full flex items-center justify-center mx-auto text-xs font-bold ${
-                      order.orderStatus === 'packed_in_airtight_jar' || order.orderStatus === 'out_for_delivery' || order.orderStatus === 'delivered'
-                        ? 'bg-emerald-600 text-white shadow-xs' : 'bg-stone-100 text-stone-400'
-                    }`}>
-                      {order.orderStatus === 'out_for_delivery' || order.orderStatus === 'delivered' ? '✓' : '3'}
-                    </div>
-                    <span className="text-[11px] font-medium text-stone-800">Sealed Jar</span>
-                  </div>
-
-                  <div className="space-y-1">
-                    <div className={`w-7 h-7 rounded-full flex items-center justify-center mx-auto text-xs font-bold ${
-                      order.orderStatus === 'delivered' ? 'bg-emerald-600 text-white shadow-xs' : 'bg-stone-100 text-stone-400'
-                    }`}>
-                      {order.orderStatus === 'delivered' ? '✓' : '4'}
-                    </div>
-                    <span className="text-[11px] font-medium text-stone-800">Delivered</span>
-                  </div>
-                </div>
-
-                {/* Delivery details bar + Live GPS Map Trigger Button */}
-                <div className="bg-stone-50 p-4 rounded-xl border border-stone-200/80 text-xs flex flex-wrap justify-between items-center gap-3">
-                  <div className="space-y-0.5">
+                Shop Now
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {orders.map(order => (
+                <div
+                  key={order.id}
+                  className="bg-white rounded-xl p-5 sm:p-6 border border-amber-200/60 shadow-xs space-y-4"
+                >
+                  {/* Order Header */}
+                  <div className="flex flex-wrap justify-between items-center gap-2 border-b border-stone-100 pb-3">
                     <div>
-                      <span className="text-stone-500">Address: </span>
-                      <span className="font-semibold text-stone-900">{order.customer.addressLine1}, {order.customer.talukaDistrict}</span>
+                      <span className="text-xs font-bold text-amber-800 font-mono">#{order.id}</span>
+                      <span className="text-xs text-stone-500 ml-2">
+                        Date: {new Date(order.createdAt).toLocaleDateString()}
+                      </span>
                     </div>
-                    {order.assignedDeliveryPerson && (
-                      <div className="text-stone-500">
-                        Courier Partner: <strong className="text-stone-800">{order.assignedDeliveryPerson.name}</strong> ({order.assignedDeliveryPerson.phone})
-                      </div>
-                    )}
+
+                    <div className="flex items-center gap-2">
+                      <span className={`text-xs px-2.5 py-1 rounded-full font-semibold uppercase ${
+                        order.orderStatus === 'delivered'
+                          ? 'bg-emerald-100 text-emerald-800'
+                          : order.orderStatus === 'out_for_delivery'
+                          ? 'bg-amber-100 text-amber-900'
+                          : 'bg-stone-100 text-stone-800'
+                      }`}>
+                        {order.orderStatus.replace(/_/g, ' ')}
+                      </span>
+                      <span className="text-xs font-bold text-stone-900">₹{order.totalAmount}</span>
+                    </div>
                   </div>
 
-                  <div className="flex flex-wrap items-center gap-2">
-                    <button
-                      onClick={() => setSelectedTrackingOrder(order)}
-                      className="px-3.5 py-1.5 rounded-full bg-stone-900 text-white font-medium flex items-center gap-1.5 shadow-xs hover:bg-stone-800 transition-all cursor-pointer"
-                    >
-                      <Navigation className="w-3.5 h-3.5 text-amber-400" />
-                      <span>Live GPS</span>
-                    </button>
+                  {/* Delivery details bar */}
+                  <div className="bg-stone-50/80 p-4 rounded-xl border border-stone-200/80 text-xs flex flex-wrap justify-between items-center gap-3">
+                    <div className="space-y-0.5">
+                      <div>
+                        <span className="text-stone-500">Address: </span>
+                        <span className="font-semibold text-stone-900">{order.customer.addressLine1}, {order.customer.talukaDistrict}</span>
+                      </div>
+                      {order.assignedDeliveryPerson && (
+                        <div className="text-stone-500">
+                          Delivery Partner: <strong className="text-stone-800">{order.assignedDeliveryPerson.name}</strong> ({order.assignedDeliveryPerson.phone})
+                        </div>
+                      )}
+                    </div>
 
-                    <button
-                      onClick={() => openInvoiceModal(order)}
-                      className="px-3 py-1.5 rounded-full bg-white hover:bg-stone-100 text-stone-800 border border-stone-300 font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
-                    >
-                      <FileText className="w-3.5 h-3.5 text-stone-600" />
-                      <span>Tax Invoice</span>
-                    </button>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <button
+                        onClick={() => setSelectedTrackingOrder(order)}
+                        className="px-3.5 py-1.5 rounded-lg bg-stone-900 text-white font-medium flex items-center gap-1.5 shadow-xs hover:bg-stone-800 transition-colors cursor-pointer"
+                      >
+                        <Navigation className="w-3.5 h-3.5 text-amber-400" />
+                        <span>Live GPS</span>
+                      </button>
 
-                    <button
-                      onClick={() => openWhatsAppAlert()}
-                      className="px-3 py-1.5 rounded-full bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 font-medium transition-colors cursor-pointer"
-                    >
-                      WhatsApp
-                    </button>
+                      <button
+                        onClick={() => openInvoiceModal(order)}
+                        className="px-3 py-1.5 rounded-lg bg-white hover:bg-stone-100 text-stone-800 border border-stone-300 font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
+                      >
+                        <FileText className="w-3.5 h-3.5 text-stone-600" />
+                        <span>Invoice</span>
+                      </button>
 
-                    <div className="font-semibold text-stone-900 bg-white px-3 py-1.5 rounded-full border border-stone-200">
-                      OTP: <span className="font-mono text-amber-800">{order.deliveryOtp}</span>
+                      <button
+                        onClick={() => openWhatsAppAlert()}
+                        className="px-3 py-1.5 rounded-lg bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 font-medium transition-colors cursor-pointer"
+                      >
+                        WhatsApp
+                      </button>
+
+                      <div className="font-semibold text-stone-900 bg-white px-3 py-1.5 rounded-lg border border-stone-200">
+                        OTP: <span className="font-mono text-amber-800">{order.deliveryOtp}</span>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </section>
       )}
 
@@ -741,87 +559,23 @@ export const CustomerPortal: React.FC = () => {
         />
       )}
 
-      {/* Floating Bottom Quick-Action & Cart Dock */}
-      <div className="fixed bottom-5 left-1/2 -translate-x-1/2 z-40 max-w-xl w-[94%] sm:w-auto">
-        <div className="floating-dock rounded-full bg-stone-950/90 text-white border border-stone-800/80 px-4 py-2.5 flex items-center justify-between sm:justify-center gap-3 sm:gap-4 shadow-[0_16px_40px_rgba(0,0,0,0.45)]">
-          {/* Quick Jump Buttons */}
-          <div className="flex items-center gap-1">
-            <button
-              onClick={() => {
-                setActiveSection('catalog');
-                window.scrollTo({ top: 400, behavior: 'smooth' });
-              }}
-              className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
-                activeSection === 'catalog'
-                  ? 'bg-stone-800 text-amber-300'
-                  : 'text-stone-400 hover:text-stone-200'
-              }`}
-            >
-              Jars
-            </button>
-
-            <button
-              onClick={() => {
-                setActiveSection('builder');
-                window.scrollTo({ top: 400, behavior: 'smooth' });
-              }}
-              className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all flex items-center gap-1 cursor-pointer ${
-                activeSection === 'builder'
-                  ? 'bg-stone-800 text-amber-300'
-                  : 'text-stone-400 hover:text-stone-200'
-              }`}
-            >
-              <ChefHat className="w-3.5 h-3.5 text-amber-400" />
-              <span>Studio</span>
-            </button>
-
-            <button
-              onClick={() => {
-                setActiveSection('sommelier');
-                window.scrollTo({ top: 400, behavior: 'smooth' });
-              }}
-              className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all flex items-center gap-1 cursor-pointer ${
-                activeSection === 'sommelier'
-                  ? 'bg-stone-800 text-amber-300'
-                  : 'text-stone-400 hover:text-stone-200'
-              }`}
-            >
-              <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-              <span>AI Sommelier</span>
-            </button>
-          </div>
-
-          <div className="w-px h-5 bg-stone-800 hidden sm:block" />
-
-          {/* Floating Cart Launcher */}
-          {cartCount > 0 ? (
-            <button
-              onClick={() => setIsCartOpen(true)}
-              className="px-4 py-1.5 rounded-full bg-amber-400 hover:bg-amber-300 text-stone-950 font-bold text-xs flex items-center gap-2 shadow-md transition-all cursor-pointer hover:scale-105 active:scale-95 animate-pulse-subtle"
-            >
-              <div className="relative">
-                <ShoppingBag className="w-3.5 h-3.5" />
-                <span className="absolute -top-2 -right-2 w-3.5 h-3.5 rounded-full bg-stone-950 text-amber-300 text-[9px] font-black flex items-center justify-center">
-                  {cartCount}
-                </span>
-              </div>
-              <span>₹{cartSubtotal}</span>
-              <span className="opacity-60">•</span>
-              <span>Checkout</span>
-            </button>
-          ) : (
-            <button
-              onClick={() => {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              }}
-              className="p-2 rounded-full bg-stone-900 hover:bg-stone-800 text-stone-300 hover:text-white transition-colors cursor-pointer"
-              title="Back to top"
-            >
-              <ChevronUp className="w-4 h-4" />
-            </button>
-          )}
+      {/* Simple Floating Cart Button (only if cart has items) */}
+      {cartCount > 0 && (
+        <div className="fixed bottom-5 left-1/2 -translate-x-1/2 z-40">
+          <button
+            onClick={() => setIsCartOpen(true)}
+            className="px-6 py-3 rounded-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold text-sm flex items-center gap-3 shadow-lg transition-transform hover:scale-103 active:scale-98 cursor-pointer border border-amber-300/40"
+          >
+            <div className="relative">
+              <ShoppingBag className="w-5 h-5 text-amber-100" />
+              <span className="absolute -top-2 -right-2 w-4 h-4 rounded-full bg-amber-400 text-stone-950 text-[10px] font-black flex items-center justify-center">
+                {cartCount}
+              </span>
+            </div>
+            <span>View Cart • ₹{cartSubtotal}</span>
+          </button>
         </div>
-      </div>
+      )}
     </div>
   );
 };

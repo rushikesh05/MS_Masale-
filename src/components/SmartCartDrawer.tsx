@@ -49,19 +49,19 @@ export const SmartCartDrawer: React.FC = () => {
             className="w-screen max-w-md bg-white border-l border-[#EFE4D8] shadow-2xl flex flex-col justify-between"
           >
             {/* Drawer Header */}
-            <div className="p-5 border-b border-[#F5EDE4] flex items-center justify-between bg-[#FFFDFB]">
+            <div className="p-5 border-b border-amber-200/70 flex items-center justify-between bg-gradient-to-r from-amber-50/80 to-orange-50/80">
               <div className="flex items-center gap-2">
-                <ShoppingBag className="w-5 h-5 text-[#C84B31]" />
-                <h3 className="font-extrabold text-lg text-[#2D2424] font-brand">
+                <ShoppingBag className="w-5 h-5 text-amber-600" />
+                <h3 className="font-extrabold text-lg text-stone-900 font-brand">
                   {isMr ? 'तुमचे खरेदी कार्ट' : 'Your Spice Cart'}
                 </h3>
-                <span className="text-xs px-2 py-0.5 rounded-full bg-[#FFEAE5] text-[#C84B31] font-bold">
+                <span className="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 font-bold">
                   {cart.length}
                 </span>
               </div>
               <button
                 onClick={() => setIsCartOpen(false)}
-                className="w-8 h-8 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-500 transition-colors cursor-pointer"
+                className="w-8 h-8 rounded-full hover:bg-stone-200/60 flex items-center justify-center text-stone-500 transition-colors cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -88,8 +88,8 @@ export const SmartCartDrawer: React.FC = () => {
                     className="p-4 rounded-xl border border-[#EFE4D8] bg-[#FFFDFB] shadow-2xs space-y-2 relative"
                   >
                     <div className="flex gap-3 items-start">
-                      {/* Product Thumbnail / Custom Badge */}
-                      <div className="w-14 h-14 rounded-lg bg-[#FAF6F2] border border-[#EFE4D8] flex items-center justify-center shrink-0 overflow-hidden">
+                      {/* Product Thumbnail / Custom Badge with hover zoom & shadow */}
+                      <div className="w-14 h-14 rounded-lg bg-[#FAF6F2] border border-[#EFE4D8] flex items-center justify-center shrink-0 overflow-hidden shadow-2xs hover:shadow-md hover:border-amber-300 transition-all duration-300 group/thumb">
                         {item.isCustomRecipe ? (
                           <div className="text-center">
                             <span className="text-lg">🫙</span>
@@ -98,13 +98,13 @@ export const SmartCartDrawer: React.FC = () => {
                         ) : item.product ? (
                           <div className="w-full h-full overflow-hidden">
                             <img
-                              src={item.product.imageUrl}
+                              src={item.product.imageUrl || '/products/kanda-lasun.jpg'}
                               alt={isMr ? item.product.nameMr : item.product.nameEn}
                               referrerPolicy="no-referrer"
                               onError={(e) => {
                                 (e.target as HTMLImageElement).src = '/products/kanda-lasun.jpg';
                               }}
-                              className="w-full h-full object-cover"
+                              className="w-full h-full object-cover transform transition-transform duration-500 ease-out group-hover/thumb:scale-110"
                             />
                           </div>
                         ) : (
@@ -238,9 +238,9 @@ export const SmartCartDrawer: React.FC = () => {
                       )}
                     </span>
                   </div>
-                  <div className="flex justify-between text-sm font-extrabold text-[#2D2424] pt-2 border-t border-[#F5EDE4]">
+                  <div className="flex justify-between text-sm font-extrabold text-stone-900 pt-2 border-t border-[#F5EDE4]">
                     <span>{isMr ? 'एकूण देय रक्कम:' : 'Total Payable:'}</span>
-                    <span className="text-[#C84B31]">₹{finalTotal}</span>
+                    <span className="text-amber-900">₹{finalTotal}</span>
                   </div>
                 </div>
 
@@ -250,7 +250,7 @@ export const SmartCartDrawer: React.FC = () => {
                     setIsCartOpen(false);
                     setIsCheckoutOpen(true);
                   }}
-                  className="w-full py-3.5 px-4 bg-[#C84B31] hover:bg-[#A83B23] text-white font-extrabold text-sm sm:text-base rounded-xl transition-all shadow-md shadow-[#C84B31]/25 flex items-center justify-center gap-2 cursor-pointer"
+                  className="w-full py-3.5 px-4 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-extrabold text-sm sm:text-base rounded-xl transition-all shadow-md shadow-orange-500/20 flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <span>{isMr ? 'ऑर्डर पूर्ण करा (Checkout)' : 'Proceed to Checkout'}</span>
                   <ArrowRight className="w-4 h-4" />

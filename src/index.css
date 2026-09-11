@@ -5,21 +5,21 @@
     --font-heading: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
     --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
     
-    /* High-End Heritage Artisanal Spices Theme */
-    --theme-header-bg: #1C1917;
-    --theme-header-sub: #292524;
-    --theme-primary: #C2410C;
-    --theme-primary-hover: #9A3412;
-    --theme-primary-light: #FFF7ED;
-    --theme-accent: #D97706;
-    --theme-deal: #C2410C;
+    /* Light Gradient Artisanal Spices Theme */
+    --theme-header-bg: #FFFFFF;
+    --theme-header-sub: #FFF7ED;
+    --theme-primary: #D97706;
+    --theme-primary-hover: #B45309;
+    --theme-primary-light: #FFFBEB;
+    --theme-accent: #EA580C;
+    --theme-deal: #D97706;
     --theme-rating: #F59E0B;
-    --theme-bg: #FAF8F5;
+    --theme-bg: #FAF6F0;
     --theme-card: #FFFFFF;
-    --theme-border: #E8E3DA;
+    --theme-border: #F3E8D9;
     --theme-text: #1C1917;
     --theme-subtext: #57534E;
-    --theme-gradient: linear-gradient(135deg, #1C1917 0%, #2E2724 100%);
+    --theme-gradient: linear-gradient(135deg, #FFFDF9 0%, #FAF5EE 50%, #FFF1E6 100%);
   }
 
   [data-theme="kolhapuri"] {
@@ -81,10 +81,11 @@
 
   body {
     font-family: var(--font-sans);
-    background-color: var(--theme-bg);
+    background: linear-gradient(135deg, #FFFDF9 0%, #FAF5EE 50%, #FFF0E6 100%);
+    background-attachment: fixed;
     color: var(--theme-text);
     overflow-x: hidden;
-    transition: background-color 0.25s ease, color 0.25s ease;
+    transition: background 0.25s ease, color 0.25s ease;
     position: relative;
     min-height: 100vh;
   }

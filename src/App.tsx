@@ -13,8 +13,6 @@ import { CheckoutModal } from './components/CheckoutModal';
 import { MockWhatsAppModal } from './components/MockWhatsAppModal';
 import { AuthModal } from './components/AuthModal';
 import { InvoiceModal } from './components/InvoiceModal';
-import { GoogleFormsModal } from './components/GoogleFormsModal';
-import { BulkRequestModal } from './components/BulkRequestModal';
 import { motion, AnimatePresence } from 'motion/react';
 import { Sparkles, Flame } from 'lucide-react';
 
@@ -44,15 +42,14 @@ const AppSkeleton: React.FC = () => {
       </header>
 
       <main className="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-8 py-8 space-y-8">
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#2D2424] via-[#3C2A21] to-[#1E1717] p-8 sm:p-12 text-white shadow-xl">
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-amber-100/90 via-orange-50/90 to-rose-100/70 p-8 sm:p-12 text-stone-900 border border-amber-200/80 shadow-sm">
           <div className="max-w-2xl space-y-4 relative z-10">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#C84B31]/30 border border-[#C84B31]/50 text-amber-300 text-xs font-semibold animate-pulse">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>अस्सल गावरान चव • 100% Stone-Ground Authentic</span>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-200/60 border border-amber-300 text-stone-800 text-xs font-semibold">
+              <span>MS Masale</span>
             </div>
             <div className="space-y-2">
-              <div className="h-8 sm:h-11 w-4/5 bg-white/20 rounded-2xl animate-pulse" />
-              <div className="h-4 sm:h-5 w-3/5 bg-white/15 rounded-xl animate-pulse" />
+              <div className="h-8 sm:h-11 w-4/5 bg-stone-300/40 rounded-2xl animate-pulse" />
+              <div className="h-4 sm:h-5 w-3/5 bg-stone-300/30 rounded-xl animate-pulse" />
             </div>
           </div>
         </div>
@@ -75,11 +72,11 @@ const AppContent: React.FC = () => {
   const { role } = useAuth();
 
   return (
-    <div className="min-h-screen bg-transparent text-[#2D2424] flex flex-col font-sans selection:bg-[#C84B31] selection:text-white relative">
+    <div className="min-h-screen bg-gradient-to-br from-[#FFFDF9] via-[#FAF5EE] to-[#FFF1E8] text-stone-900 flex flex-col font-sans selection:bg-amber-500 selection:text-white relative">
       {/* Subtle, Organic 'Spice-Grain' SVG Grain Texture Overlay */}
       <div 
         id="spice-grain-overlay"
-        className="fixed inset-0 pointer-events-none z-0 opacity-40 mix-blend-multiply print:hidden"
+        className="fixed inset-0 pointer-events-none z-0 opacity-15 mix-blend-multiply print:hidden"
         style={{
           backgroundImage: 'url("/spice-grain.svg")',
           backgroundRepeat: 'repeat',
@@ -169,11 +166,6 @@ const AppContent: React.FC = () => {
             <CheckoutModal />
             <MockWhatsAppModal />
             <AuthModal />
-            <GoogleFormsModal
-              isOpen={isFeedbackModalOpen}
-              onClose={() => setIsFeedbackModalOpen(false)}
-            />
-            <BulkRequestModal />
             <InvoiceModal
               order={selectedInvoiceOrder}
               isOpen={isInvoiceModalOpen}

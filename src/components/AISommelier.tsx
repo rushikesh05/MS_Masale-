@@ -184,8 +184,8 @@ export const AISommelier: React.FC = () => {
             </div>
 
             {/* Right Product Card Match (4 cols) */}
-            <div className="md:col-span-4 bg-white text-[#2D2424] rounded-xl p-4 shadow-xl border border-white/20 text-center">
-              <div className="w-full h-32 overflow-hidden rounded-lg mb-2 shadow-xs">
+            <div className="md:col-span-4 bg-white text-[#2D2424] rounded-xl p-4 shadow-xl border border-white/20 text-center group group/ai">
+              <div className="w-full h-32 overflow-hidden rounded-lg mb-2 shadow-xs transition-shadow duration-300 group-hover/ai:shadow-md">
                 <ProductVisual
                   product={matchedProduct}
                   isMarathi={isMr}

@@ -3,7 +3,9 @@ import { Sparkles, MapPin, Eye, Camera } from 'lucide-react';
 import { Product } from '../types';
 
 interface ProductVisualProps {
-  product: Product;
+  product?: Product | null;
+  imageUrl?: string;
+  name?: string;
   isMarathi?: boolean;
   className?: string;
   allowToggle?: boolean;
@@ -69,6 +71,8 @@ const DEFAULT_REAL_FOOD = '/products/kanda-lasun.jpg';
 
 export const ProductVisual: React.FC<ProductVisualProps> = ({
   product,
+  imageUrl,
+  name,
   isMarathi = false,
   className = '',
   allowToggle = true,
@@ -78,11 +82,19 @@ export const ProductVisual: React.FC<ProductVisualProps> = ({
   const [viewMode, setViewMode] = useState<'culinary' | 'texture'>('culinary');
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
+  const productId = product?.id || '';
+  const fallbackUrl = productId ? (REAL_FOOD_FALLBACKS[productId] || DEFAULT_REAL_FOOD) : DEFAULT_REAL_FOOD;
+  const textureFallback = productId ? (TEXTURE_FALLBACKS[productId] || fallbackUrl) : fallbackUrl;
+  const directImage = product?.imageUrl || imageUrl || fallbackUrl;
+
   const activeSrc = viewMode === 'culinary' 
-    ? (product.imageUrl || REAL_FOOD_FALLBACKS[product.id] || DEFAULT_REAL_FOOD)
-    : (TEXTURE_FALLBACKS[product.id] || REAL_FOOD_FALLBACKS[product.id] || DEFAULT_REAL_FOOD);
+    ? directImage
+    : textureFallback;
 
   const getBadgeInfo = () => {
+    if (!product) {
+      return { emoji: '🌶️', tag: isMarathi ? 'अस्सल एमएस मसाले' : 'MS Masale Pure', region: isMarathi ? 'महाराष्ट्र' : 'Maharashtra' };
+    }
     switch (product.id) {
       case 'prod-kanda-lasun':
         return { emoji: '🧅', tag: isMarathi ? 'कोल्हापूरचे मुख्य वैशिष्ट्य' : 'Kolhapur Flagship Special', region: isMarathi ? 'कोल्हापूर' : 'Kolhapur' };
@@ -116,20 +128,21 @@ export const ProductVisual: React.FC<ProductVisualProps> = ({
   };
 
   const badge = getBadgeInfo();
+  const displayName = isMarathi ? (product?.nameMr || name || 'MS Masale') : (product?.nameEn || name || 'MS Masale');
 
   return (
-    <div className={`relative w-full h-full overflow-hidden bg-stone-900 select-none group ${className}`}>
+    <div className={`relative w-full h-full overflow-hidden bg-stone-900 select-none group/visual ${className}`}>
       {!isLoaded && (
         <div className="absolute inset-0 bg-stone-800 animate-pulse flex items-center justify-center">
           <div className="w-8 h-8 rounded-full border-2 border-amber-500/40 border-t-amber-500 animate-spin" />
         </div>
       )}
 
-      {/* 100% Non-text Authentic Food Photograph */}
+      {/* 100% Non-text Authentic Food Photograph with subtle zoom-in on hover */}
       <img
         key={activeSrc}
         src={activeSrc}
-        alt={isMarathi ? product.nameMr : product.nameEn}
+        alt={displayName}
         referrerPolicy="no-referrer"
         onLoad={() => setIsLoaded(true)}
         onError={(e) => {
@@ -138,28 +151,28 @@ export const ProductVisual: React.FC<ProductVisualProps> = ({
             target.src = DEFAULT_REAL_FOOD;
           }
         }}
-        className={`w-full h-full object-cover object-center transition-all duration-700 group-hover:scale-106 ${
+        className={`w-full h-full object-cover object-center transform transition-transform duration-500 ease-out will-change-transform group-hover:scale-108 group-hover/visual:scale-108 group-hover/card:scale-108 group-hover/hero:scale-108 group-hover/ai:scale-108 ${
           isLoaded ? 'opacity-100' : 'opacity-0'
         }`}
       />
 
       {/* Subtle Gradient Shadow for contrast */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none transition-opacity duration-500 group-hover:opacity-90 group-hover/card:opacity-90" />
 
       {/* Top Left: Authentic Category label */}
       <div className="absolute top-3 left-3 z-10 pointer-events-none">
         <span className="px-2.5 py-0.5 rounded-full bg-amber-500/95 backdrop-blur-md text-stone-950 text-[10px] font-black uppercase tracking-wider shadow-sm flex items-center gap-1">
           <Sparkles className="w-2.5 h-2.5" />
           <span>
-            {product.id === 'prod-kanda-lasun'
+            {product?.id === 'prod-kanda-lasun'
               ? (isMarathi ? '★ कोल्हापूर फ्लॅगशिप' : '★ Kolhapur Flagship')
-              : product.id === 'prod-kolhapuri-thecha'
+              : product?.id === 'prod-kolhapuri-thecha'
               ? (isMarathi ? 'अस्सल ठेचा' : 'Fresh Thecha')
-              : product.id === 'prod-metkut'
+              : product?.id === 'prod-metkut'
               ? (isMarathi ? 'अस्सल मेतकूट' : 'Heirloom Metkut')
-              : product.category === 'pickle'
+              : product?.category === 'pickle'
               ? (isMarathi ? 'पारंपरिक लोणचे' : 'Heritage Pickle')
-              : product.category === 'masala'
+              : product?.category === 'masala'
               ? (isMarathi ? 'भाजलेला मसाला' : 'Roasted Masala')
               : (isMarathi ? 'कोरडी चटणी' : 'Chutney Powder')}
           </span>

@@ -141,7 +141,7 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
       <div class="company-sub">MS Masale Foods Pvt. Ltd.</div>
       <div style="font-size: 10px; color: #78716c; margin-top: 4px;">
         MS Masale Complex, Baner-Mahalunge Road, Pune 411045, Maharashtra<br/>
-        <strong>GSTIN:</strong> 27AABCU9603R1ZM | <strong>FSSAI Lic:</strong> 11523038000492
+        <strong>GSTIN:</strong> 27AABCU9603R1ZM | <strong>FSSAI Lic:</strong> 11523038000492 | <strong>Helpline:</strong> 8591254237
       </div>
     </div>
     <div style="text-align: right;">
@@ -168,7 +168,7 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
       <div style="font-size: 10px; font-weight: bold; color: #a8a29e; text-transform: uppercase; margin-bottom: 4px;">Payment & Delivery Details:</div>
       <div><strong>Status:</strong> <span style="color: #15803d; font-weight: bold;">${order.paymentStatus || 'PAID'}</span></div>
       <div><strong>Mode:</strong> ${order.paymentMethod || 'UPI / Online'}</div>
-      <div><strong>Hub:</strong> Sahyadri Stone-Crush Center #01</div>
+      <div><strong>Hub:</strong> MS Masale Pune Fulfillment Center #01</div>
       <div><strong>Courier:</strong> ${order.assignedDeliveryPerson?.name || 'Assal Express Fleet'}</div>
     </div>
   </div>
@@ -191,7 +191,7 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
           <td>${idx + 1}</td>
           <td>
             <strong>${item.titleMr}</strong> (${item.titleEn})
-            ${item.isCustomRecipe ? '<br/><span style="font-size: 9px; color: #8c1c0b;">[100% Custom Stone-Pounded Recipe]</span>' : ''}
+            ${item.isCustomRecipe ? '<br/><span style="font-size: 9px; color: #8c1c0b;">[Signature Recipe]</span>' : ''}
           </td>
           <td>21039090</td>
           <td>${item.size}</td>
