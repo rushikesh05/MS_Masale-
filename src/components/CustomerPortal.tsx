@@ -14,14 +14,22 @@ import {
   ChevronUp,
   ShieldCheck,
   Truck,
-  CheckCircle2
+  CheckCircle2,
+  Sparkles
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useAuth } from '../context/AuthContext';
 import { ProductCard } from './ProductCard';
 import { LiveDeliveryTrackerModal } from './LiveDeliveryTrackerModal';
-import { Order } from '../types';
+import { Order, Product } from '../types';
 import { ProductVisual } from './ProductVisual';
+import { 
+  CategorySortFilterControl, 
+  SortOption, 
+  PriceFilterOption, 
+  HeatFilterOption, 
+  PopularityFilterOption 
+} from './CategorySortFilterControl';
 
 export const CustomerPortal: React.FC = () => {
   const { 
@@ -44,52 +52,103 @@ export const CustomerPortal: React.FC = () => {
   const [selectedTrackingOrder, setSelectedTrackingOrder] = useState<Order | null>(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
-  // Classic, simple category list
+  // Dynamic sorting and filtering states
+  const [sortBy, setSortBy] = useState<SortOption>('popular');
+  const [priceFilter, setPriceFilter] = useState<PriceFilterOption>('all');
+  const [popularityFilter, setPopularityFilter] = useState<PopularityFilterOption>('all');
+
+  // Classic, simple category list with primary categories for Chutneys and Achar / Lonach
   const categories = [
     { id: 'all', name: 'All Products (सर्व उत्पादने)' },
+    { id: 'chutneys', name: 'Chutneys (चटण्या)' },
+    { id: 'achar-lonach', name: 'Achar / Lonach (लोणचं / आचार)' },
     { id: 'masala', name: 'Masales (मसाले)' },
-    { id: 'dry-chutneys', name: 'Chutneys (चटण्या)' },
-    { id: 'pickles', name: 'Pickles (लोणची)' },
     { id: 'thecha', name: 'Thecha (ठेचा)' },
     { id: 'metkut', name: 'Metkut (मेतकूट)' },
-    { id: 'kolhapuri', name: 'Kolhapuri Special' },
     ...dynamicCategories
-      .filter(dc => !['all', 'masala', 'pickles', 'thecha', 'dry-chutneys', 'metkut', 'kolhapuri', 'bestsellers', 'healthy', 'chutney', 'pickle', 'specialty'].includes(dc.id))
+      .filter(dc => !['all', 'masala', 'pickles', 'achar-lonach', 'thecha', 'dry-chutneys', 'chutneys', 'metkut', 'bestsellers', 'healthy', 'chutney', 'pickle', 'specialty'].includes(dc.id))
       .map(dc => ({ id: dc.id, name: `${dc.nameEn} (${dc.nameMr})` }))
   ];
 
-  const filteredProducts = products.filter(p => {
-    // 1. Category Filter
-    let matchesCategory = true;
-    if (selectedCategory === 'masala') {
-      matchesCategory = p.category === 'masala' || p.id.includes('masala');
-    } else if (selectedCategory === 'kolhapuri') {
-      matchesCategory = p.id.includes('kanda-lasun') || p.id.includes('kolhapuri-thecha') || p.id.includes('sukha-chilli');
-    } else if (selectedCategory === 'pickles') {
-      matchesCategory = p.category === 'pickle' || p.id.includes('lonche') || p.id.includes('pickle');
+  const getProductMinPrice = (p: Product) => {
+    if (!p.sizes || p.sizes.length === 0) return 0;
+    return Math.min(...p.sizes.map(s => s.price));
+  };
+
+  // Base category products before user-applied filter/search
+  const categoryProducts = products.filter(p => {
+    if (selectedCategory === 'chutneys' || selectedCategory === 'chutney' || selectedCategory === 'dry-chutneys') {
+      return p.category === 'chutney' || p.category === 'chutneys' || p.id.includes('chutney') || p.id.includes('thecha') || p.id.includes('kanda-lasun') || p.id.includes('vada-pav') || p.id.includes('shengdana') || p.id.includes('til') || p.id.includes('javas') || p.id.includes('karale') || p.id.includes('panchamrut');
+    } else if (selectedCategory === 'achar-lonach' || selectedCategory === 'pickle' || selectedCategory === 'pickles') {
+      return p.category === 'pickle' || p.category === 'achar-lonach' || p.id.includes('lonche') || p.id.includes('pickle') || p.id.includes('achar');
+    } else if (selectedCategory === 'masala') {
+      return p.category === 'masala' || p.id.includes('masala');
     } else if (selectedCategory === 'thecha') {
-      matchesCategory = p.id.includes('thecha') || p.id.includes('panchamrut');
-    } else if (selectedCategory === 'dry-chutneys') {
-      matchesCategory = (p.category === 'chutney' || !p.category) && !p.id.includes('thecha') && !p.id.includes('masala');
+      return p.id.includes('thecha') || p.id.includes('panchamrut');
     } else if (selectedCategory === 'metkut') {
-      matchesCategory = p.id.includes('metkut');
+      return p.id.includes('metkut');
     } else if (selectedCategory !== 'all') {
-      matchesCategory = p.category === selectedCategory;
+      return p.category === selectedCategory;
+    }
+    return true;
+  });
+
+  const filteredProducts = categoryProducts.filter(p => {
+    // 1. Search Query Filter
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim();
+      const matchesName = p.nameEn.toLowerCase().includes(q) || p.nameMr.toLowerCase().includes(q);
+      const matchesTagline = (p.taglineEn || '').toLowerCase().includes(q) || (p.taglineMr || '').toLowerCase().includes(q);
+      const matchesDesc = (p.descriptionEn || '').toLowerCase().includes(q) || (p.descriptionMr || '').toLowerCase().includes(q);
+      const matchesIngredients = (p.ingredientsEn || []).some(i => i.toLowerCase().includes(q)) || (p.ingredientsMr || []).some(i => i.toLowerCase().includes(q));
+
+      if (!matchesName && !matchesTagline && !matchesDesc && !matchesIngredients) return false;
     }
 
-    if (!matchesCategory) return false;
+    // 2. Price Filter
+    if (priceFilter !== 'all') {
+      const minPrice = getProductMinPrice(p);
+      if (priceFilter === 'under-100' && minPrice >= 100) return false;
+      if (priceFilter === '100-200' && (minPrice < 100 || minPrice > 200)) return false;
+      if (priceFilter === '200-300' && (minPrice < 200 || minPrice > 300)) return false;
+      if (priceFilter === '300-plus' && minPrice < 300) return false;
+    }
 
-    // 2. Search Filter
-    if (!searchQuery.trim()) return true;
+    // 3. Popularity Filter
+    if (popularityFilter !== 'all') {
+      if (popularityFilter === 'bestsellers' && !p.isBestSeller) return false;
+      if (popularityFilter === 'top-rated' && p.rating < 4.9) return false;
+    }
 
-    const q = searchQuery.toLowerCase().trim();
-    const matchesName = p.nameEn.toLowerCase().includes(q) || p.nameMr.toLowerCase().includes(q);
-    const matchesTagline = (p.taglineEn || '').toLowerCase().includes(q) || (p.taglineMr || '').toLowerCase().includes(q);
-    const matchesDesc = (p.descriptionEn || '').toLowerCase().includes(q) || (p.descriptionMr || '').toLowerCase().includes(q);
-    const matchesIngredients = (p.ingredientsEn || []).some(i => i.toLowerCase().includes(q)) || (p.ingredientsMr || []).some(i => i.toLowerCase().includes(q));
-
-    return matchesName || matchesTagline || matchesDesc || matchesIngredients;
+    return true;
   });
+
+  // Dynamic sorting
+  const sortedAndFilteredProducts = [...filteredProducts].sort((a, b) => {
+    if (sortBy === 'price-asc') {
+      return getProductMinPrice(a) - getProductMinPrice(b);
+    }
+    if (sortBy === 'price-desc') {
+      return getProductMinPrice(b) - getProductMinPrice(a);
+    }
+    if (sortBy === 'rating') {
+      if (b.rating !== a.rating) return b.rating - a.rating;
+      return (b.reviewCount || 0) - (a.reviewCount || 0);
+    }
+    // Default: 'popular'
+    if (a.isBestSeller && !b.isBestSeller) return -1;
+    if (!a.isBestSeller && b.isBestSeller) return 1;
+    const scoreA = (a.rating || 4.5) * Math.log((a.reviewCount || 10) + 10);
+    const scoreB = (b.rating || 4.5) * Math.log((b.reviewCount || 10) + 10);
+    return scoreB - scoreA;
+  });
+
+  const handleResetAllFilters = () => {
+    setSortBy('popular');
+    setPriceFilter('all');
+    setPopularityFilter('all');
+    setSearchQuery('');
+  };
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
@@ -113,7 +172,7 @@ export const CustomerPortal: React.FC = () => {
             </h1>
 
             <p className="text-sm sm:text-base text-stone-700 max-w-xl leading-relaxed">
-              Authentic Maharashtrian spices, masalas, and condiments made with pure ingredients and traditional recipes. Delivered fresh to your home.
+              Spices, masalas, chutneys, and condiments made with pure ingredients and traditional recipes. Delivered fresh to your home.
             </p>
 
             {/* Direct Contact & Action Buttons */}
@@ -131,9 +190,31 @@ export const CustomerPortal: React.FC = () => {
               <button
                 onClick={() => {
                   setActiveSection('catalog');
+                  setSelectedCategory('chutneys');
+                }}
+                className="px-4 py-3 font-bold text-xs sm:text-sm rounded-xl bg-white hover:bg-amber-50/80 text-stone-900 border border-amber-300/80 transition-all shadow-2xs cursor-pointer flex items-center gap-1.5"
+              >
+                <Sparkles className="w-4 h-4 text-amber-600" />
+                <span>Chutneys (चटण्या)</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  setActiveSection('catalog');
+                  setSelectedCategory('achar-lonach');
+                }}
+                className="px-4 py-3 font-bold text-xs sm:text-sm rounded-xl bg-white hover:bg-amber-50/80 text-stone-900 border border-amber-300/80 transition-all shadow-2xs cursor-pointer flex items-center gap-1.5"
+              >
+                <Flame className="w-4 h-4 text-amber-600" />
+                <span>Achar / Lonach (लोणचं)</span>
+              </button>
+
+              <button
+                onClick={() => {
+                  setActiveSection('catalog');
                   setSelectedCategory('masala');
                 }}
-                className="px-5 py-3 font-bold text-xs sm:text-sm rounded-xl bg-white hover:bg-amber-50/80 text-stone-900 border border-amber-300/80 transition-all shadow-2xs cursor-pointer flex items-center gap-2"
+                className="px-4 py-3 font-bold text-xs sm:text-sm rounded-xl bg-white hover:bg-amber-50/80 text-stone-900 border border-amber-300/80 transition-all shadow-2xs cursor-pointer flex items-center gap-1.5"
               >
                 <Flame className="w-4 h-4 text-amber-600" />
                 <span>Masales (मसाले)</span>
@@ -166,24 +247,25 @@ export const CustomerPortal: React.FC = () => {
               <a href="tel:8591254237" className="font-mono font-bold text-amber-900 underline">
                 8591254237
               </a>
-              <span className="text-stone-500">• Fast Delivery Across Maharashtra</span>
+              <span className="text-stone-500">• Fast Home Delivery</span>
             </div>
           </div>
 
           {/* Right Column: Clean Product Showcase Image */}
-          <div className="lg:col-span-5 hidden sm:flex items-center justify-center">
+          <div className="lg:col-span-5 flex items-center justify-center mt-6 lg:mt-0">
             <div 
               onClick={() => {
                 if (kandaProduct) setSelectedProductDetail(kandaProduct);
               }}
-              className="w-full max-w-sm aspect-4/3 rounded-2xl overflow-hidden border border-amber-200/90 shadow-md hover:shadow-xl hover:shadow-amber-500/20 hover:border-amber-400 transition-all duration-500 cursor-pointer bg-white group group/hero"
+              className="w-full max-w-xs sm:max-w-sm aspect-4/3 rounded-2xl overflow-hidden border border-amber-200/90 shadow-md hover:shadow-xl hover:shadow-amber-500/20 hover:border-amber-400 transition-all duration-500 cursor-pointer bg-white group group/hero relative"
             >
               {kandaProduct && (
                 <ProductVisual
                   product={kandaProduct}
                   imageUrl={kandaProduct.imageUrl}
                   name={kandaProduct.nameEn}
-                  className="w-full h-full object-cover"
+                  aspectRatio="wide"
+                  className="w-full h-full"
                 />
               )}
             </div>
@@ -203,7 +285,7 @@ export const CustomerPortal: React.FC = () => {
           <div className="flex items-center gap-3">
             <Truck className="w-5 h-5 text-amber-600 shrink-0" />
             <div>
-              <div className="font-bold text-stone-900">Express Maharashtra Delivery</div>
+              <div className="font-bold text-stone-900">Express Home Delivery</div>
               <div className="text-[11px] text-stone-600">Packed fresh upon order</div>
             </div>
           </div>
@@ -238,6 +320,36 @@ export const CustomerPortal: React.FC = () => {
           <button
             onClick={() => {
               setActiveSection('catalog');
+              setSelectedCategory('chutneys');
+            }}
+            className={`px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+              activeSection === 'catalog' && (selectedCategory === 'chutneys' || selectedCategory === 'chutney' || selectedCategory === 'dry-chutneys')
+                ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-xs'
+                : 'text-stone-700 hover:text-stone-950 hover:bg-amber-100/60'
+            }`}
+          >
+            <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+            <span>Chutneys (चटण्या)</span>
+          </button>
+
+          <button
+            onClick={() => {
+              setActiveSection('catalog');
+              setSelectedCategory('achar-lonach');
+            }}
+            className={`px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+              activeSection === 'catalog' && (selectedCategory === 'achar-lonach' || selectedCategory === 'pickle' || selectedCategory === 'pickles')
+                ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-xs'
+                : 'text-stone-700 hover:text-stone-950 hover:bg-amber-100/60'
+            }`}
+          >
+            <Flame className="w-3.5 h-3.5 text-amber-600" />
+            <span>Achar / Lonach (लोणचं)</span>
+          </button>
+
+          <button
+            onClick={() => {
+              setActiveSection('catalog');
               setSelectedCategory('masala');
             }}
             className={`px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
@@ -248,34 +360,6 @@ export const CustomerPortal: React.FC = () => {
           >
             <Flame className="w-3.5 h-3.5 text-amber-600" />
             <span>Masales (मसाले)</span>
-          </button>
-
-          <button
-            onClick={() => {
-              setActiveSection('catalog');
-              setSelectedCategory('dry-chutneys');
-            }}
-            className={`px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all cursor-pointer ${
-              activeSection === 'catalog' && selectedCategory === 'dry-chutneys'
-                ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-xs'
-                : 'text-stone-700 hover:text-stone-950 hover:bg-amber-100/60'
-            }`}
-          >
-            Chutneys (चटण्या)
-          </button>
-
-          <button
-            onClick={() => {
-              setActiveSection('catalog');
-              setSelectedCategory('pickles');
-            }}
-            className={`px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all cursor-pointer ${
-              activeSection === 'catalog' && selectedCategory === 'pickles'
-                ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-xs'
-                : 'text-stone-700 hover:text-stone-950 hover:bg-amber-100/60'
-            }`}
-          >
-            Pickles (लोणची)
           </button>
 
           <button
@@ -325,13 +409,15 @@ export const CustomerPortal: React.FC = () => {
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pt-1">
             <div>
               <h2 className="text-2xl font-bold text-stone-900 font-serif">
-                {selectedCategory === 'masala' ? 'Masales (मसाले)' : 
-                 selectedCategory === 'pickles' ? 'Traditional Pickles (लोणची)' : 
-                 selectedCategory === 'dry-chutneys' ? 'Chutneys (चटण्या)' : 
+                {(selectedCategory === 'chutneys' || selectedCategory === 'chutney' || selectedCategory === 'dry-chutneys') ? 'Chutneys (चटण्या)' : 
+                 (selectedCategory === 'achar-lonach' || selectedCategory === 'pickle' || selectedCategory === 'pickles') ? 'Achar / Lonach (लोणचं / आचार)' : 
+                 selectedCategory === 'masala' ? 'Masales (मसाले)' : 
+                 selectedCategory === 'thecha' ? 'Thecha (ठेचा)' : 
+                 selectedCategory === 'metkut' ? 'Metkut (मेतकूट)' : 
                  'All Products'}
               </h2>
               <p className="text-xs text-stone-500 mt-0.5">
-                Authentic Maharashtrian recipes packed in sealed jars. For phone orders call: <strong className="text-stone-800">8591254237</strong>
+                Traditional recipes packed in sealed jars. For phone orders call: <strong className="text-stone-800">8591254237</strong>
               </p>
             </div>
 
@@ -353,6 +439,20 @@ export const CustomerPortal: React.FC = () => {
             </div>
           </div>
 
+          {/* Dynamic Sorting & Filter Control Component */}
+          <CategorySortFilterControl
+            category={selectedCategory}
+            sortBy={sortBy}
+            onSortChange={setSortBy}
+            priceFilter={priceFilter}
+            onPriceFilterChange={setPriceFilter}
+            popularityFilter={popularityFilter}
+            onPopularityFilterChange={setPopularityFilter}
+            totalCount={categoryProducts.length}
+            filteredCount={sortedAndFilteredProducts.length}
+            onResetAll={handleResetAllFilters}
+          />
+
           {/* Notice when Masala Category is Active */}
           {selectedCategory === 'masala' && (
             <div className="p-4 rounded-xl bg-gradient-to-r from-amber-50/90 via-orange-50/70 to-rose-50/80 border border-amber-200 flex items-center justify-between gap-3 text-stone-800 shadow-2xs">
@@ -373,9 +473,9 @@ export const CustomerPortal: React.FC = () => {
           )}
 
           {/* Product Cards Grid */}
-          {filteredProducts.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 sm:gap-6">
-              {filteredProducts.map(product => (
+          {sortedAndFilteredProducts.length > 0 ? (
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
+              {sortedAndFilteredProducts.map(product => (
                 <ProductCard
                   key={product.id}
                   product={product}
@@ -390,16 +490,13 @@ export const CustomerPortal: React.FC = () => {
                 No products found
               </h3>
               <p className="text-xs text-stone-500 max-w-sm mx-auto">
-                No items match your search. Try another query or browse all items.
+                No items match your active filters or search. Try adjusting your price, heat intensity, or popularity options.
               </p>
               <button
-                onClick={() => {
-                  setSearchQuery('');
-                  setSelectedCategory('all');
-                }}
+                onClick={handleResetAllFilters}
                 className="px-4 py-2 rounded-lg bg-gradient-to-r from-amber-500 to-orange-600 text-white text-xs font-bold hover:from-amber-600 hover:to-orange-700 transition-all cursor-pointer shadow-xs"
               >
-                View All Products
+                Reset All Filters
               </button>
             </div>
           )}
@@ -411,7 +508,7 @@ export const CustomerPortal: React.FC = () => {
                 Need Help or Want to Order Directly by Phone?
               </h3>
               <p className="text-xs text-stone-700 mt-0.5">
-                We take phone and WhatsApp orders directly across Maharashtra.
+                We take phone and WhatsApp orders directly with fast home delivery.
               </p>
             </div>
             <div className="flex items-center gap-3">

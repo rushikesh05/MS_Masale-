@@ -55,7 +55,7 @@ export const MockWhatsAppModal: React.FC = () => {
               </div>
               <div>
                 <div className="font-bold text-sm text-[#E9EDEF] flex items-center gap-1.5">
-                  <span>अस्सल गावरान चटणी Official</span>
+                  <span>MS Masale Official</span>
                   <span className="w-3.5 h-3.5 rounded-full bg-[#00A884] text-[9px] text-white flex items-center justify-center">
                     ✓
                   </span>
@@ -108,10 +108,10 @@ export const MockWhatsAppModal: React.FC = () => {
             <div className="flex justify-start">
               <div className="bg-[#202C33] max-w-[85%] rounded-2xl rounded-tl-none p-3 shadow-md border border-[#2A3942]/50 text-xs text-[#E9EDEF]">
                 <p className="font-semibold text-[#00A884] text-[11px] mb-1">
-                  🚩 अस्सल गावरान चटणी & मसाले
+                  🌶️ एम एस मसाले (MS Masale)
                 </p>
                 <p className="leading-relaxed">
-                  नमस्कार! अस्सल गावरान चवीच्या जगात आपले स्वागत आहे. तुमची ऑर्डर अपडेट खालीलप्रमाणे आहे:
+                  नमस्कार! एम एस मसाले परिवारात आपले स्वागत आहे. तुमची ऑर्डर अपडेट खालीलप्रमाणे आहे:
                 </p>
                 <span className="text-[9px] text-[#8696A0] float-right mt-1">10:00 AM</span>
               </div>

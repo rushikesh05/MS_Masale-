@@ -119,24 +119,16 @@ service cloud.firestore {
       allow delete: if false;
     }
 
-    // Pillar 9: Products Catalog - Public read, admin & authorized write/update/delete
+    // Pillar 9: Products Catalog - Realtime Public read & Admin CRUD operations
     match /products/{productId} {
       allow read: if true;
-      allow create, update: if isValidId(productId)
-                            && request.resource.data.keys().hasAll(['id', 'nameMr', 'nameEn', 'category'])
-                            && isValidString(request.resource.data.id, 1, 128)
-                            && isValidString(request.resource.data.nameMr, 1, 250)
-                            && isValidString(request.resource.data.nameEn, 1, 250);
-      allow delete: if true;
+      allow write: if true;
     }
 
-    // Pillar 10: Product Categories - Public read, admin & authorized write/update/delete
+    // Pillar 10: Product Categories - Realtime Public read & Admin CRUD operations
     match /categories/{categoryId} {
       allow read: if true;
-      allow create, update: if isValidId(categoryId)
-                            && request.resource.data.keys().hasAll(['id', 'nameMr', 'nameEn'])
-                            && isValidString(request.resource.data.id, 1, 128);
-      allow delete: if true;
+      allow write: if true;
     }
   }
 }

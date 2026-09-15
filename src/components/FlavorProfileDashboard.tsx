@@ -87,7 +87,7 @@ export const FlavorProfileDashboard: React.FC<FlavorProfileProps> = ({
           totalGrams += weightGrams * item.quantity;
 
           const title = (item.titleMr + ' ' + item.titleEn).toLowerCase();
-          if (title.includes('kolhapuri') || title.includes('thecha') || title.includes('kanda')) spicyScore += item.quantity * 3;
+          if (title.includes('masala') || title.includes('thecha') || title.includes('kanda')) spicyScore += item.quantity * 3;
           if (title.includes('shengdana') || title.includes('peanut')) peanutScore += item.quantity * 3;
           if (title.includes('lasun') || title.includes('garlic')) garlicScore += item.quantity * 2;
           if (title.includes('javas') || title.includes('til') || title.includes('flaxseed')) omegaScore += item.quantity * 3;
@@ -128,8 +128,8 @@ export const FlavorProfileDashboard: React.FC<FlavorProfileProps> = ({
     ];
 
     const pieData = [
-      { name: isMr ? 'कोल्हापुरी कांदा-लसूण' : 'Kolhapuri Kanda-Lasun', value: spicyScore, color: '#B82A16' },
-      { name: isMr ? 'सोलापुरी शेंगदाणा' : 'Solapuri Peanut', value: peanutScore, color: '#D97706' },
+      { name: isMr ? 'कांदा-लसूण' : 'Kanda-Lasun', value: spicyScore, color: '#B82A16' },
+      { name: isMr ? 'शेंगदाणा' : 'Peanut', value: peanutScore, color: '#D97706' },
       { name: isMr ? 'जवसाची ओमेगा-३' : 'Flaxseed Omega-3', value: omegaScore, color: '#15803D' },
       { name: isMr ? 'वडापाव खोबरं-लसूण' : 'Vada Pav Coconut', value: coconutScore, color: '#EA580C' }
     ];
@@ -159,11 +159,11 @@ export const FlavorProfileDashboard: React.FC<FlavorProfileProps> = ({
   // Recommended Chutney based on user's current tolerance
   const recommendedProduct = useMemo(() => {
     if (spiceTolerance > 80) {
-      return PRODUCTS.find(p => p.id === 'kolhapuri-kanda-lasun') || PRODUCTS[0];
+      return PRODUCTS.find(p => p.id === 'prod-kanda-lasun') || PRODUCTS[0];
     } else if (spiceTolerance > 50) {
-      return PRODUCTS.find(p => p.id === 'solapuri-shengdana') || PRODUCTS[1];
+      return PRODUCTS.find(p => p.id === 'prod-shengdana') || PRODUCTS[1];
     } else {
-      return PRODUCTS.find(p => p.id === 'javas-omega3-chutney') || PRODUCTS[2];
+      return PRODUCTS.find(p => p.id === 'prod-javas') || PRODUCTS[2];
     }
   }, [spiceTolerance]);
 
@@ -195,12 +195,12 @@ export const FlavorProfileDashboard: React.FC<FlavorProfileProps> = ({
               <span>{isMr ? 'तुमची वैयक्तिक चव कुंडली (Personalized Palate Intelligence)' : 'Flavor DNA & Consumption Analytics'}</span>
             </div>
             <h2 className="text-2xl sm:text-3xl font-black font-serif text-white tracking-tight">
-              {isMr ? 'अस्सल गावरान चव प्रोफाइल & ट्रेंड्स' : 'Customer Flavor Profile & Ordering Trends'}
+              {isMr ? 'गावरान चव प्रोफाइल & ट्रेंड्स' : 'Customer Flavor Profile & Ordering Trends'}
             </h2>
             <p className="text-xs sm:text-sm text-stone-300 leading-relaxed">
               {isMr
                 ? 'तुमच्या ऑर्डर्स, आवडत्या मसाल्यांचे प्रमाण आणि दगडी खलबत्त्यातील ताज्या चवींचे रीअल-टाइम व्हिज्युअलायझेशन.'
-                : 'Interactive visual analytics of your Maharashtrian spice preferences, ordering velocity, and nutritional health benefits.'}
+                : 'Interactive visual analytics of your spice preferences, ordering velocity, and nutritional health benefits.'}
             </p>
           </div>
 
@@ -248,7 +248,7 @@ export const FlavorProfileDashboard: React.FC<FlavorProfileProps> = ({
                 <span>{isMr ? 'तुमची चव दिशा (Spice & Flavor Palate)' : 'Palate Affinity Matrix'}</span>
               </h3>
               <p className="text-xs text-stone-500 mt-0.5">
-                {isMr ? '६ प्रमुख अस्सल चवींचे वितरण आणि आवड' : 'Distribution across 6 authentic regional spice notes'}
+                {isMr ? '६ प्रमुख चवींचे वितरण आणि आवड' : 'Distribution across 6 distinct spice notes'}
               </p>
             </div>
             <span className="px-2.5 py-1 rounded-full bg-red-50 text-[#B82A16] text-[11px] font-extrabold">
@@ -451,7 +451,7 @@ export const FlavorProfileDashboard: React.FC<FlavorProfileProps> = ({
             </div>
             <p className="text-xs text-emerald-950/80 leading-relaxed">
               {isMr 
-                ? 'अस्सल गावरान चटणी वापरून तुम्ही बाजारातील केमिकल प्रिझर्व्हेटिव्ह व पाम ऑइल पूर्णपणे टाळले आहे.'
+                ? 'पारंपरिक गावरान चटणी वापरून तुम्ही बाजारातील केमिकल प्रिझर्व्हेटिव्ह व पाम ऑइल पूर्णपणे टाळले आहे.'
                 : 'By choosing stone-crushed heritage condiments, you have completely eliminated artificial colors, palm oil, and benzoates.'}
             </p>
           </div>
@@ -513,7 +513,7 @@ export const FlavorProfileDashboard: React.FC<FlavorProfileProps> = ({
           <div className="flex justify-between text-[11px] font-bold text-stone-500">
             <span>{isMr ? '🌿 खमंग व सौम्य (Mild)' : '🌿 Mild & Nutty'}</span>
             <span>{isMr ? '🌶️ मध्यम मसालेदार (Medium)' : '🌶️ Medium Spice'}</span>
-            <span>{isMr ? '🔥 अस्सल कोल्हापुरी झणझणीत (Fiery)' : '🔥 Extreme Kolhapuri'}</span>
+            <span>{isMr ? '🔥 झणझणीत तिखट (Fiery)' : '🔥 Extra Fiery'}</span>
           </div>
         </div>
 

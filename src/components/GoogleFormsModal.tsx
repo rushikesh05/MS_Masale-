@@ -78,7 +78,7 @@ export const GoogleFormsModal: React.FC<GoogleFormsModalProps> = ({ isOpen, onCl
       mr: 'खास रेसिपी वाटण विनंती',
       en: 'Custom Spice Formulation',
       descMr: 'तुमच्या घरच्या किंवा प्रादेशिक पद्धतीनुसार खास खलबत्ता वाटण',
-      descEn: 'Request your family or regional authentic recipe stone-pounded'
+      descEn: 'Request your family or custom recipe stone-pounded'
     }
   ];
 
@@ -140,7 +140,7 @@ export const GoogleFormsModal: React.FC<GoogleFormsModalProps> = ({ isOpen, onCl
 
   const handleWhatsAppSend = () => {
     const waText = encodeURIComponent(
-      `🚩 *अस्सल गावरान चटणी & मसाले चौकशी*\n\n` +
+      `🚩 *गावरान चटणी & मसाले चौकशी*\n\n` +
       `👤 *नाव:* ${fullName || 'Customer'}\n` +
       `📞 *फोन:* ${phone}\n` +
       `📍 *गाव/शहर:* ${city || 'Maharashtra'}\n` +
@@ -252,7 +252,7 @@ export const GoogleFormsModal: React.FC<GoogleFormsModalProps> = ({ isOpen, onCl
                       </button>
                     ))}
                     <span className="text-xs font-bold text-stone-600 ml-2">
-                      {rating === 5 ? (isMr ? 'अप्रतिम अस्सल गावरान! (5/5)' : 'Exceptional Heritage Taste! (5/5)') : `${rating} / 5`}
+                      {rating === 5 ? (isMr ? 'उत्कृष्ट गावरान चव! (5/5)' : 'Exceptional Taste! (5/5)') : `${rating} / 5`}
                     </span>
                   </div>
                 </div>
@@ -311,7 +311,7 @@ export const GoogleFormsModal: React.FC<GoogleFormsModalProps> = ({ isOpen, onCl
                   </label>
                   <input
                     type="text"
-                    placeholder={isMr ? 'उदा. पुणे / सोलापूर' : 'e.g. Pune, Mumbai, Solapur'}
+                    placeholder={isMr ? 'उदा. पुणे / सातारा' : 'e.g. Pune, Mumbai, Nashik'}
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
                     className="w-full px-3.5 py-2.5 rounded-xl border border-stone-300 bg-white text-sm focus:border-[#FF9900] focus:ring-2 focus:ring-[#FF9900]/20 outline-none"
@@ -361,7 +361,7 @@ export const GoogleFormsModal: React.FC<GoogleFormsModalProps> = ({ isOpen, onCl
                   placeholder={
                     isMr
                       ? 'उदा. लग्न समारंभासाठी १०० जार हवे आहेत, किंवा शेंगदाणा चटणीमध्ये लसणाचे प्रमाण जास्त हवे आहे...'
-                      : 'e.g. We require 50 jars of Solapuri Peanut and 50 jars of Vada Pav Chutney for our restaurant / family function...'
+                      : 'e.g. We require 50 jars of Peanut Chutney and 50 jars of Vada Pav Chutney for our restaurant / family function...'
                   }
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}

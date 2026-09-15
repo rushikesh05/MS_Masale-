@@ -21,12 +21,14 @@ import {
   ChevronDown,
   ChevronUp,
   Receipt,
-  UserCheck
+  UserCheck,
+  X
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useAuth } from '../context/AuthContext';
 import { Order } from '../types';
 import { updateOrderStatusInFirestore, subscribeToOrders } from '../lib/firestoreSync';
+import { RealLeafletMap } from './RealLeafletMap';
 
 export const DeliveryPartnerPortal: React.FC = () => {
   const { language, showToast, refreshOrders } = useApp();
@@ -40,6 +42,7 @@ export const DeliveryPartnerPortal: React.FC = () => {
   const [activeFilter, setActiveFilter] = useState<'all' | 'ready' | 'active' | 'pending_prep' | 'delivered'>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedOrderForOtp, setSelectedOrderForOtp] = useState<Order | null>(null);
+  const [activeMapOrder, setActiveMapOrder] = useState<Order | null>(null);
   const [inputOtp, setInputOtp] = useState<string>('');
   const [otpError, setOtpError] = useState<string | null>(null);
   const [cashCollectedCheckbox, setCashCollectedCheckbox] = useState<boolean>(false);
@@ -152,7 +155,7 @@ export const DeliveryPartnerPortal: React.FC = () => {
 
   const handleSendWhatsAppEta = (order: Order) => {
     const phoneClean = order.customer.phone.replace(/\D/g, '');
-    const msg = `नमस्कार ${order.customer.fullName} जी! 🌶️ मी अस्सल गावरान चटणीचा डिलिव्हरी रायडर बोलतोय. तुमची ऑर्डर #${order.id} घेऊन मी निघालो आहे. रक्कम: ₹${order.totalAmount} (${order.paymentMethod === 'cod' ? 'COD रोख' : 'Prepaid Online'}). पोहचल्यावर डिलिव्हरी कोड सांगावा: ${order.deliveryOtp}. धन्यवाद!`;
+    const msg = `नमस्कार ${order.customer.fullName} जी! 🌶️ मी एम एस मसाले डिलिव्हरी रायडर बोलतोय. तुमची ऑर्डर #${order.id} घेऊन मी निघालो आहे. रक्कम: ₹${order.totalAmount} (${order.paymentMethod === 'cod' ? 'COD रोख' : 'Prepaid Online'}). पोहचल्यावर डिलिव्हरी कोड सांगावा: ${order.deliveryOtp}. धन्यवाद!`;
     const url = `https://wa.me/${phoneClean.startsWith('91') ? phoneClean : '91' + phoneClean}?text=${encodeURIComponent(msg)}`;
     window.open(url, '_blank');
   };
@@ -454,6 +457,14 @@ export const DeliveryPartnerPortal: React.FC = () => {
                     </a>
 
                     <button
+                      onClick={() => setActiveMapOrder(order)}
+                      className="flex-1 md:w-full py-2 px-3 rounded-xl bg-red-50 hover:bg-red-100 text-red-800 border border-red-200 transition-colors flex items-center justify-center gap-1.5 text-xs font-bold cursor-pointer"
+                    >
+                      <Navigation className="w-3.5 h-3.5" />
+                      <span>{isMr ? '🗺️ रिअल GPS नकाशा' : '🗺️ Real GPS Map'}</span>
+                    </button>
+
+                    <button
                       onClick={() => handleSendWhatsAppEta(order)}
                       className="flex-1 md:w-full py-2 px-3 rounded-xl bg-green-600 hover:bg-green-700 text-white transition-colors flex items-center justify-center gap-1.5 text-xs font-bold cursor-pointer shadow-xs"
                     >
@@ -714,6 +725,48 @@ export const DeliveryPartnerPortal: React.FC = () => {
                   {isMr ? 'वितरण निश्चित करा' : 'Confirm Delivery'}
                 </button>
               </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Real Leaflet Map Modal for Rider */}
+      <AnimatePresence>
+        {activeMapOrder && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="bg-white rounded-3xl max-w-2xl w-full p-4 sm:p-6 space-y-4 border border-[#EFE4D8] shadow-2xl overflow-hidden"
+            >
+              <div className="flex items-center justify-between pb-3 border-b border-stone-200">
+                <div>
+                  <h3 className="font-extrabold text-base text-stone-900 flex items-center gap-2">
+                    <Navigation className="w-5 h-5 text-red-700" />
+                    <span>{isMr ? `ऑर्डर #${activeMapOrder.id} - लाइव्ह मार्ग नकाशा` : `Order #${activeMapOrder.id} - Live GPS Navigation`}</span>
+                  </h3>
+                  <p className="text-xs text-stone-500">
+                    {activeMapOrder.customer.fullName} • {activeMapOrder.customer.addressLine1}, {activeMapOrder.customer.talukaDistrict}
+                  </p>
+                </div>
+                <button
+                  onClick={() => setActiveMapOrder(null)}
+                  className="w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 flex items-center justify-center text-stone-600 transition"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              <RealLeafletMap
+                orderStatus={activeMapOrder.orderStatus}
+                orderId={activeMapOrder.id}
+                customerCity={activeMapOrder.customer?.talukaDistrict || 'Pune'}
+                riderName={activeMapOrder.assignedDeliveryPerson?.name || riderName}
+                riderPhone={activeMapOrder.assignedDeliveryPerson?.phone || '+91 98901 12345'}
+                vehicleNumber={activeMapOrder.assignedDeliveryPerson?.vehicleNumber || 'MH 09 DX 7712'}
+                deliveryOtp={activeMapOrder.deliveryOtp}
+              />
             </motion.div>
           </div>
         )}

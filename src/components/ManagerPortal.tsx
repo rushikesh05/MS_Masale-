@@ -290,7 +290,7 @@ export const ManagerPortal: React.FC = () => {
 
   const generateWhatsAppWholesaleQuote = (req: WholesaleRequest) => {
     const text = encodeURIComponent(
-      `🚩 *अस्सल गावरान चटणी & मसाले - अधिकृत B2B कोटेशन*\n` +
+      `🌶️ *एम एस मसाले - अधिकृत B2B कोटेशन*\n` +
       `नमस्कार *${req.contactPerson}* (${req.businessName}),\n\n` +
       `आपल्या B2B होलसेल मागणी क्र. *#${req.id}* साठी खालीलप्रमाणे दरपत्रक निश्चित केले आहे:\n\n` +
       `📦 *मागणी प्रमाण:* ${req.totalEstimatedKg} KG (${req.supplyFrequency})\n` +

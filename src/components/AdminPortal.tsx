@@ -63,8 +63,9 @@ import {
   Legend 
 } from 'recharts';
 import { useApp } from '../context/AppContext';
-import { Order, WhatsAppNotification, Inquiry } from '../types';
+import { Order, WhatsAppNotification, Inquiry, SmsNotification } from '../types';
 import { AdminCatalogManager } from './AdminCatalogManager';
+import { AIImagenPackagingStudio } from './AIImagenPackagingStudio';
 
 // Historical monthly sales data including festive surges
 const MONTHLY_SALES_DATA = [
@@ -86,15 +87,15 @@ const MONTHLY_SALES_DATA = [
 const TOP_SPICE_BLENDS = [
   { 
     id: 'shenga',
-    nameMr: 'सोलापूर भाजलेली शेंगदाणा चटणी', 
-    nameEn: 'Solapur Roasted Peanut Chutney',
-    shortName: 'Solapur Shenga',
+    nameMr: 'भाजलेली शेंगदाणा चटणी', 
+    nameEn: 'Roasted Peanut Chutney',
+    shortName: 'Shenga Chutney',
     volumeKg: 860,
     jarsSold: 1720,
     revenue: 344000,
     color: '#C84B31',
     sharePct: 34,
-    flavorNotes: 'Curry leaves, Solapur peanuts, hint of garlic'
+    flavorNotes: 'Curry leaves, roasted peanuts, hint of garlic'
   },
   { 
     id: 'garlic',
@@ -122,9 +123,9 @@ const TOP_SPICE_BLENDS = [
   },
   { 
     id: 'thecha',
-    nameMr: 'कोल्हापुरी कांदा-लसूण व खर्डा मसाला', 
-    nameEn: 'Kolhapuri Thecha & Kanda-Lasun',
-    shortName: 'Kolhapuri Thecha',
+    nameMr: 'कांदा-लसूण व खर्डा मसाला', 
+    nameEn: 'Thecha & Kanda-Lasun',
+    shortName: 'Thecha & Kanda-Lasun',
     volumeKg: 440,
     jarsSold: 880,
     revenue: 211200,
@@ -151,7 +152,7 @@ const BLEND_CATEGORY_PIE = [
   { name: 'शेंगदाणा (Peanut)', nameEn: 'Peanut Blends', value: 34, color: '#C84B31' },
   { name: 'लसूण (Garlic)', nameEn: 'Garlic Blends', value: 25, color: '#E89F4C' },
   { name: 'खोबरे (Coconut)', nameEn: 'Coconut Blends', value: 19, color: '#2D4263' },
-  { name: 'कोल्हापुरी (Thecha/Masala)', nameEn: 'Kolhapuri Masala', value: 14, color: '#D83A56' },
+  { name: 'ठेचा व मसाला (Thecha/Masala)', nameEn: 'Thecha & Masala', value: 14, color: '#D83A56' },
   { name: 'जवस & कारळे (Seeds)', nameEn: 'Omega Seed Blends', value: 8, color: '#10B981' }
 ];
 
@@ -242,10 +243,12 @@ export const AdminPortal: React.FC = () => {
 
   const [orders, setOrders] = useState<Order[]>([]);
   const [whatsappLogs, setWhatsappLogs] = useState<WhatsAppNotification[]>([]);
+  const [smsLogs, setSmsLogs] = useState<SmsNotification[]>([]);
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [staffUsers, setStaffUsers] = useState<StaffUserRecord[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<'analytics' | 'products_management' | 'all_orders' | 'staff_management' | 'inquiries' | 'whatsapp_logs' | 'database'>('analytics');
+  const [dispatchingOrderId, setDispatchingOrderId] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'analytics' | 'products_management' | 'ai_packaging' | 'all_orders' | 'staff_management' | 'inquiries' | 'whatsapp_logs' | 'sms_logs' | 'database'>('products_management');
   const [timeframe, setTimeframe] = useState<'6m' | '12m'>('12m');
   const [blendMetric, setBlendMetric] = useState<'volume' | 'revenue'>('revenue');
 
@@ -266,25 +269,54 @@ export const AdminPortal: React.FC = () => {
   const loadData = async () => {
     setIsLoading(true);
     try {
-      const [ordRes, waRes, inqRes, staffRes] = await Promise.all([
+      const [ordRes, waRes, inqRes, staffRes, smsRes] = await Promise.all([
         fetch('/api/orders'),
         fetch('/api/whatsapp-logs'),
         fetch('/api/inquiries'),
-        fetch('/api/staff-users')
+        fetch('/api/staff-users'),
+        fetch('/api/sms-logs')
       ]);
       const ordData = await ordRes.json();
       const waData = await waRes.json();
       const inqData = await inqRes.json();
       const staffData = await staffRes.json();
+      const smsData = await smsRes.json();
 
       if (ordData.success) setOrders(ordData.data);
       if (waData.success) setWhatsappLogs(waData.data);
       if (inqData.success) setInquiries(inqData.data);
       if (staffData.success) setStaffUsers(staffData.data);
+      if (smsData.success) setSmsLogs(smsData.data);
     } catch (e) {
       console.error('Admin data fetch error:', e);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleDispatchOrder = async (orderId: string) => {
+    setDispatchingOrderId(orderId);
+    try {
+      const res = await fetch(`/api/orders/${orderId}/dispatch`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      const data = await res.json();
+      if (data.success && data.data) {
+        showToast(
+          isMr
+            ? `🚀 ऑर्डर #${orderId} यशस्वीरीत्या रवाना केली! ग्राहकाला SMS द्वारे OTP (${data.data.deliveryOtp}) पाठवला गेला.`
+            : `🚀 Order #${orderId} dispatched! OTP (${data.data.deliveryOtp}) & SMS sent to customer.`
+        );
+        loadData();
+      } else {
+        showToast(data.message || 'Dispatch failed', 'error');
+      }
+    } catch (e) {
+      console.error('Dispatch error:', e);
+      showToast(isMr ? 'ऑर्डर पाठवताना त्रुटी आली.' : 'Failed to dispatch order', 'error');
+    } finally {
+      setDispatchingOrderId(null);
     }
   };
 
@@ -416,7 +448,7 @@ export const AdminPortal: React.FC = () => {
             <span>{isMr ? 'कार्यकारी ॲडमिन डॅशबोर्ड' : 'Executive Brand & Operations Admin'}</span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-extrabold font-brand">
-            {isMr ? 'अस्सल गावरान बिझनेस ॲनालिटिक्स & विक्री आलेख' : 'Brand Operations & Recharts Sales Analytics'}
+            {isMr ? 'बिझनेस ॲनालिटिक्स & विक्री आलेख' : 'Brand Operations & Recharts Sales Analytics'}
           </h2>
           <p className="text-xs sm:text-sm text-gray-300 mt-1">
             {isMr ? 'मासिक विक्री कल, लोकप्रिय चटणी मिश्रण, महसूल आलेख आणि रिअल-टाइम ऑर्डर खतावणी' : 'Interactive monthly sales trends, most-ordered spice blends, and Firestore ledger.'}
@@ -496,6 +528,15 @@ export const AdminPortal: React.FC = () => {
       {/* Tabs */}
       <div className="flex flex-wrap gap-2 border-b border-[#EFE4D8] pb-1">
         <button
+          onClick={() => setActiveTab('products_management')}
+          className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+            activeTab === 'products_management' ? 'bg-[#C84B31] text-white shadow-xs' : 'bg-white text-gray-600 hover:bg-gray-50'
+          }`}
+        >
+          <ShoppingBag className="w-4 h-4 text-amber-300" />
+          <span>{isMr ? '📦 उत्पादने, चित्रे व मसाले व्यवस्थापन' : '📦 Products, Images & Catalog Manager'}</span>
+        </button>
+        <button
           onClick={() => setActiveTab('analytics')}
           className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
             activeTab === 'analytics' ? 'bg-[#C84B31] text-white shadow-xs' : 'bg-white text-gray-600 hover:bg-gray-50'
@@ -505,13 +546,17 @@ export const AdminPortal: React.FC = () => {
           <span>{isMr ? '📊 विक्री आलेख & मसाले ट्रेंड्स' : '📊 Recharts Sales & Spice Trends'}</span>
         </button>
         <button
-          onClick={() => setActiveTab('products_management')}
+          id="tab-admin-ai-packaging"
+          onClick={() => setActiveTab('ai_packaging')}
           className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-            activeTab === 'products_management' ? 'bg-[#C84B31] text-white shadow-xs' : 'bg-white text-gray-600 hover:bg-gray-50'
+            activeTab === 'ai_packaging' ? 'bg-[#C84B31] text-white shadow-xs' : 'bg-white text-gray-600 hover:bg-gray-50'
           }`}
         >
-          <Flame className="w-4 h-4 text-amber-500" />
-          <span>{isMr ? '🌶️ उत्पादने व मसाले व्यवस्थापन' : '🌶️ Products & Masales Manager'}</span>
+          <Sparkles className="w-4 h-4 text-amber-400" />
+          <span>{isMr ? '🎨 AI Imagen पॅकेजिंग' : '🎨 AI Imagen Packaging'}</span>
+          <span className="px-1.5 py-0.2 rounded-full text-[9px] font-extrabold bg-amber-400 text-stone-900 uppercase tracking-wider">
+            Imagen 3
+          </span>
         </button>
         <button
           onClick={() => setActiveTab('all_orders')}
@@ -543,6 +588,19 @@ export const AdminPortal: React.FC = () => {
           {isMr ? '💬 व्हॉट्सॲप ट्रान्समिशन लॉग्स' : 'WhatsApp Transmission Logs'}
         </button>
         <button
+          onClick={() => setActiveTab('sms_logs')}
+          className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+            activeTab === 'sms_logs' ? 'bg-[#C84B31] text-white shadow-xs' : 'bg-white text-gray-600 hover:bg-gray-50'
+          }`}
+        >
+          <span>📱 {isMr ? 'रिअल SMS लॉग्स & OTP' : 'Real SMS Logs & OTP'}</span>
+          {smsLogs.length > 0 && (
+            <span className="ml-1 px-1.5 py-0.2 rounded-full text-[10px] font-extrabold bg-emerald-600 text-white">
+              {smsLogs.length}
+            </span>
+          )}
+        </button>
+        <button
           id="tab-admin-staff"
           onClick={() => setActiveTab('staff_management')}
           className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
@@ -572,6 +630,11 @@ export const AdminPortal: React.FC = () => {
       {/* TAB: Products & Masales Manager (CRUD) */}
       {activeTab === 'products_management' && (
         <AdminCatalogManager />
+      )}
+
+      {/* TAB: AI Imagen Packaging & Label Studio */}
+      {activeTab === 'ai_packaging' && (
+        <AIImagenPackagingStudio />
       )}
 
       {/* TAB 1: Analytics & Recharts Insights */}
@@ -898,9 +961,9 @@ export const AdminPortal: React.FC = () => {
                   <div className="text-[10px] text-stone-400">Hub: Dadar, Thane, Vashi</div>
                 </div>
                 <div className="p-3.5 bg-[#FAF8F5] rounded-2xl border border-[#EFE4D8] space-y-1">
-                  <div className="text-gray-500 font-medium">कोल्हापूर & सांगली (Western MH)</div>
+                  <div className="text-gray-500 font-medium">सांगली व पश्चिम विभाग (Western Region)</div>
                   <div className="text-xl font-extrabold text-[#2D2424]">20% Orders</div>
-                  <div className="text-[10px] text-stone-400">Hub: Rajarampuri, Miraj</div>
+                  <div className="text-[10px] text-stone-400">Hub: Regional Delivery</div>
                 </div>
                 <div className="p-3.5 bg-[#FAF8F5] rounded-2xl border border-[#EFE4D8] space-y-1">
                   <div className="text-gray-500 font-medium">नाशिक, संभाजीनगर व इतर जिल्हे</div>
@@ -940,43 +1003,158 @@ export const AdminPortal: React.FC = () => {
 
       {/* TAB 2: Orders Ledger */}
       {activeTab === 'all_orders' && (
-        <div className="bg-white rounded-2xl border border-[#EFE4D8] shadow-xs overflow-hidden">
+        <div className="bg-white rounded-2xl border border-[#EFE4D8] shadow-xs overflow-hidden space-y-4 p-4">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 pb-2 border-b border-[#EFE4D8]">
+            <div>
+              <h3 className="font-extrabold text-base text-[#2D2424] font-brand flex items-center gap-2">
+                <Truck className="w-5 h-5 text-[#C84B31]" />
+                <span>{isMr ? 'सर्व ऑर्डर्स खतावणी & डिस्पॅच कंट्रोल' : 'Order Ledger & Live Dispatch Center'}</span>
+              </h3>
+              <p className="text-xs text-stone-500">
+                {isMr 
+                  ? 'येथून तुम्ही "Dispatch" बटण दाबून ग्राहकाला ४ अंकी सुरक्षित OTP सह SMS पाठवू शकता.' 
+                  : 'Click "Dispatch Order" to generate 4-digit OTP and send official real SMS notification to the customer.'}
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold px-3 py-1 bg-amber-50 text-amber-900 rounded-full border border-amber-200">
+                {orders.length} {isMr ? 'एकूण ऑर्डर्स' : 'Total Orders'}
+              </span>
+            </div>
+          </div>
+
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead className="bg-[#FAF8F5] border-b border-[#EFE4D8] text-gray-600 font-bold uppercase tracking-wider">
                 <tr>
                   <th className="p-3.5">Order ID</th>
-                  <th className="p-3.5">Customer</th>
+                  <th className="p-3.5">Customer & Phone</th>
                   <th className="p-3.5">Items</th>
-                  <th className="p-3.5">Total</th>
-                  <th className="p-3.5">Payment</th>
+                  <th className="p-3.5">Total & Payment</th>
+                  <th className="p-3.5">Delivery OTP</th>
                   <th className="p-3.5">Status</th>
+                  <th className="p-3.5 text-right">Dispatch Action</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#F5EDE4]">
-                {orders.map(order => (
-                  <tr key={order.id} className="hover:bg-[#FFFDFB]">
-                    <td className="p-3.5 font-mono font-bold text-[#C84B31]">#{order.id}</td>
-                    <td className="p-3.5">
-                      <div className="font-bold text-[#2D2424]">{order.customer.fullName}</div>
-                      <div className="text-gray-400 text-[11px]">{order.customer.talukaDistrict}</div>
-                    </td>
-                    <td className="p-3.5">
-                      {order.items.map(i => (
-                        <div key={i.id} className="truncate max-w-xs">
-                          • {isMr ? i.titleMr : i.titleEn} ({i.size})
+                {orders.map(order => {
+                  const isDelivered = order.orderStatus === 'delivered';
+                  const isOutForDelivery = order.orderStatus === 'out_for_delivery';
+                  const canDispatch = !isDelivered && !isOutForDelivery;
+
+                  return (
+                    <tr key={order.id} className="hover:bg-[#FFFDFB]">
+                      <td className="p-3.5">
+                        <span className="font-mono font-bold text-[#C84B31] bg-red-50 px-2 py-0.5 rounded border border-red-200">
+                          #{order.id}
+                        </span>
+                        <div className="text-[10px] text-stone-400 mt-1">
+                          {new Date(order.createdAt).toLocaleDateString()}
                         </div>
-                      ))}
-                    </td>
-                    <td className="p-3.5 font-extrabold text-[#2D2424]">₹{order.totalAmount}</td>
-                    <td className="p-3.5 uppercase font-semibold text-gray-600">{order.paymentMethod}</td>
-                    <td className="p-3.5">
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase bg-gray-100 text-gray-800">
-                        {order.orderStatus.replace('_', ' ')}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
+                      </td>
+                      <td className="p-3.5">
+                        <div className="font-bold text-[#2D2424]">{order.customer.fullName}</div>
+                        <div className="text-stone-600 font-mono text-[11px] flex items-center gap-1">
+                          <Phone className="w-3 h-3 text-stone-400" />
+                          <span>{order.customer.phone}</span>
+                        </div>
+                        <div className="text-gray-400 text-[10px] truncate max-w-[180px]">
+                          {order.customer.talukaDistrict}, {order.customer.pincode}
+                        </div>
+                      </td>
+                      <td className="p-3.5">
+                        {order.items.map(i => (
+                          <div key={i.id} className="truncate max-w-xs text-stone-700">
+                            • {isMr ? i.titleMr : i.titleEn} <span className="text-stone-400">({i.size} × {i.quantity})</span>
+                          </div>
+                        ))}
+                      </td>
+                      <td className="p-3.5">
+                        <div className="font-extrabold text-[#2D2424] text-sm">₹{order.totalAmount}</div>
+                        <span className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-bold uppercase mt-0.5 ${
+                          order.paymentMethod === 'cod' 
+                            ? 'bg-amber-100 text-amber-900 border border-amber-200' 
+                            : 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                        }`}>
+                          {order.paymentMethod === 'cod' ? 'COD' : 'Paid Online (GPay)'}
+                        </span>
+                      </td>
+                      <td className="p-3.5">
+                        {order.deliveryOtp ? (
+                          <div className="flex items-center gap-1.5">
+                            <span className="px-2.5 py-1 bg-amber-50 border border-amber-300 rounded-lg font-mono font-black text-amber-950 text-sm tracking-widest shadow-xs">
+                              {order.deliveryOtp}
+                            </span>
+                            <button
+                              onClick={() => copyToClipboard(order.deliveryOtp || '', `otp-${order.id}`, `OTP ${order.deliveryOtp} copied!`)}
+                              title="Copy OTP"
+                              className="p-1 hover:bg-stone-100 text-stone-500 rounded transition"
+                            >
+                              {copiedKey === `otp-${order.id}` ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+                            </button>
+                          </div>
+                        ) : (
+                          <span className="text-stone-400 text-[11px] italic">
+                            {isMr ? 'डिस्पॅच झाल्यावर तयार होईल' : 'Generated on dispatch'}
+                          </span>
+                        )}
+                      </td>
+                      <td className="p-3.5">
+                        <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider flex items-center gap-1 w-fit ${
+                          isDelivered
+                            ? 'bg-emerald-100 text-emerald-800'
+                            : isOutForDelivery
+                            ? 'bg-amber-100 text-amber-900 border border-amber-300 animate-pulse'
+                            : 'bg-stone-100 text-stone-700'
+                        }`}>
+                          {isOutForDelivery && <Truck className="w-3 h-3" />}
+                          {isDelivered && <CheckCircle2 className="w-3 h-3 text-emerald-600" />}
+                          <span>{order.orderStatus.replace(/_/g, ' ')}</span>
+                        </span>
+                        {order.assignedDeliveryPerson && (
+                          <div className="text-[10px] text-stone-500 mt-1">
+                            Rider: <strong className="text-stone-700">{order.assignedDeliveryPerson.name.split(' ')[0]}</strong>
+                          </div>
+                        )}
+                      </td>
+                      <td className="p-3.5 text-right">
+                        {canDispatch ? (
+                          <button
+                            onClick={() => handleDispatchOrder(order.id)}
+                            disabled={dispatchingOrderId === order.id}
+                            className="px-3.5 py-2 bg-[#C84B31] hover:bg-[#A83B23] text-white rounded-xl font-bold flex items-center gap-1.5 text-xs shadow-md active:scale-95 transition-all ml-auto cursor-pointer disabled:opacity-50"
+                          >
+                            <Truck className={`w-3.5 h-3.5 ${dispatchingOrderId === order.id ? 'animate-spin' : ''}`} />
+                            <span>
+                              {dispatchingOrderId === order.id
+                                ? (isMr ? 'पाठवत आहे...' : 'Dispatching...')
+                                : (isMr ? '🚀 ऑर्डर रवाना करा (SMS OTP)' : '🚀 Dispatch (Send OTP SMS)')}
+                            </span>
+                          </button>
+                        ) : isOutForDelivery ? (
+                          <div className="flex items-center justify-end gap-2">
+                            <span className="text-[11px] font-bold text-amber-700 bg-amber-50 px-2 py-1 rounded border border-amber-200">
+                              🛵 {isMr ? 'रस्त्यावर' : 'In Transit'}
+                            </span>
+                            <button
+                              onClick={() => handleDispatchOrder(order.id)}
+                              disabled={dispatchingOrderId === order.id}
+                              title="Resend OTP SMS notification"
+                              className="px-2.5 py-1 bg-stone-100 hover:bg-stone-200 text-stone-700 rounded-lg text-xs font-semibold flex items-center gap-1 transition"
+                            >
+                              <Send className="w-3 h-3 text-stone-500" />
+                              <span>Resend SMS</span>
+                            </button>
+                          </div>
+                        ) : (
+                          <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2 py-1 rounded border border-emerald-200">
+                            ✅ {isMr ? 'डिलिव्हरी पूर्ण' : 'Completed'}
+                          </span>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -1109,6 +1287,80 @@ export const AdminPortal: React.FC = () => {
               </div>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* TAB: Real SMS Logs & Delivery OTPs */}
+      {activeTab === 'sms_logs' && (
+        <div className="space-y-4">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 bg-white p-4 rounded-2xl border border-[#EFE4D8]">
+            <div>
+              <h3 className="font-bold text-sm text-[#2D2424] flex items-center gap-2">
+                <span>📱 {isMr ? 'रिअल SMS ट्रान्समिशन & डिलिव्हरी OTP लॉग्स' : 'Real SMS Transmission & OTP Audit Log'}</span>
+              </h3>
+              <p className="text-xs text-stone-500">
+                {isMr 
+                  ? 'Fast2SMS व Twilio द्वारे पाठवलेले सर्व अधिकृत SMS मेसेज, डिलिव्हरी OTP व गेटवे स्थिती.' 
+                  : 'Live log of all customer SMS dispatches containing 4-digit security OTPs via active SMS gateways.'}
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold px-3 py-1 bg-emerald-50 text-emerald-800 rounded-full border border-emerald-200">
+                {smsLogs.length} {isMr ? 'पाठवलेले SMS' : 'SMS Transmitted'}
+              </span>
+            </div>
+          </div>
+
+          {smsLogs.length === 0 ? (
+            <div className="bg-white p-8 rounded-2xl border border-[#EFE4D8] text-center text-stone-500 text-xs">
+              {isMr ? 'अद्याप कोणतेही SMS लॉग उपलब्ध नाहीत. ऑर्डर्स टॅबमधून "Dispatch" करा.' : 'No SMS notifications recorded yet. Dispatch an order to generate one.'}
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {smsLogs.map(sms => (
+                <div
+                  key={sms.id}
+                  className="bg-white p-4 sm:p-5 rounded-2xl border border-[#EFE4D8] shadow-xs hover:border-[#C84B31] transition-all space-y-3"
+                >
+                  <div className="flex flex-wrap items-center justify-between gap-2 border-b border-stone-100 pb-2.5">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+                      <span className="font-mono font-bold text-xs text-[#C84B31] bg-red-50 px-2 py-0.5 rounded border border-red-200">
+                        Order #{sms.orderId}
+                      </span>
+                      <span className="text-xs font-bold text-stone-900">{sms.recipientName}</span>
+                      <span className="text-[11px] font-mono text-stone-500">({sms.recipientPhone})</span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-stone-100 text-stone-700">
+                        Gateway: {sms.provider}
+                      </span>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 uppercase">
+                        {sms.status}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="bg-[#FAF8F5] p-3 rounded-xl border border-[#EFE4D8] font-mono text-xs text-stone-800 whitespace-pre-wrap">
+                    {sms.messageText}
+                  </div>
+
+                  <div className="flex flex-wrap items-center justify-between gap-2 text-[10px] text-stone-400">
+                    <div className="flex items-center gap-2">
+                      {sms.otpCode && (
+                        <span className="font-bold text-amber-900 bg-amber-100 px-2 py-0.5 rounded">
+                          OTP: {sms.otpCode}
+                        </span>
+                      )}
+                      <span>Gateway Ref: {sms.gatewayMessageId || sms.id}</span>
+                    </div>
+                    <span>{new Date(sms.createdAt).toLocaleString()}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
@@ -1480,7 +1732,7 @@ export const AdminPortal: React.FC = () => {
 
                       const portalParam = user.role === 'admin' ? 'admin' : user.role === 'manager' ? 'manager' : user.role === 'delivery' ? 'delivery' : 'customer';
                       const directUrl = `${window.location.origin}${window.location.pathname}?portal=${portalParam}`;
-                      const waInviteText = `🚩 *अस्सल गावरान चटणी & मसाले - स्टाफ ॲक्सेस आमंत्रण* 🌶️\n\nनमस्कार ${user.displayName},\nतुम्हाला सिस्टीममध्ये *${roleBadge.label}* म्हणून ॲक्सेस देण्यात आला आहे.\n\n🔗 *थेट लॉगिन लिंक:*\n${directUrl}\n\nकृपया या लिंकवर क्लिक करून डॅशबोर्ड सुरू करा. 🙏`;
+                      const waInviteText = `🌶️ *एम एस मसाले - स्टाफ ॲक्सेस आमंत्रण* 🌶️\n\nनमस्कार ${user.displayName},\nतुम्हाला सिस्टीममध्ये *${roleBadge.label}* म्हणून ॲक्सेस देण्यात आला आहे.\n\n🔗 *थेट लॉगिन लिंक:*\n${directUrl}\n\nकृपया या लिंकवर क्लिक करून डॅशबोर्ड सुरू करा. 🙏`;
 
                       return (
                         <tr key={user.id} className="hover:bg-[#FAF8F5] transition-colors">
@@ -1651,7 +1903,7 @@ export const AdminPortal: React.FC = () => {
                   </div>
                   <div>
                     <h3 className="font-extrabold text-base font-brand">
-                      {isMr ? 'अस्सल गावरान - संपूर्ण सिस्टीम आर्किटेक्चर & कोड मॅन्युअल' : 'Assal Gavran - Complete System Architecture & Code Manual'}
+                      {isMr ? 'एम एस मसाले - संपूर्ण सिस्टीम आर्किटेक्चर & कोड मॅन्युअल' : 'MS Masale - Complete System Architecture & Code Manual'}
                     </h3>
                     <p className="text-xs text-stone-300">
                       {isMr ? 'लॉगिन क्रेडेंशियल्स, रोल व्यवस्थापन, क्लाउड डेटाबेस व API संदर्भ' : 'Login credentials, access management, Cloud Firestore schemas & API documentation'}
@@ -1684,7 +1936,7 @@ export const AdminPortal: React.FC = () => {
                   <div className="flex justify-between items-start">
                     <div>
                       <h1 className="text-2xl font-black text-[#2D2424] font-brand">
-                        🚩 अस्सल गावरान चटणी & मसाले
+                        🌶️ एम एस मसाले (MS Masale)
                       </h1>
                       <div className="text-xs font-bold text-[#C84B31]">
                         Full-Stack E-Commerce, Custom Mortar Engine & Live Delivery Platform
@@ -1764,14 +2016,14 @@ export const AdminPortal: React.FC = () => {
                   <div className="space-y-2 text-[11px] text-stone-600">
                     <p><strong>• Frontend:</strong> React 18, TypeScript, Tailwind CSS, Lucide Icons, Recharts Data Visualizations, Motion UI Transitions.</p>
                     <p><strong>• Backend REST Engine:</strong> Node.js Express Server serving product catalog, WhatsApp notifications, inquiries, sommelier pairing engine, and staff role management.</p>
-                    <p><strong>• AI Sommelier (अस्सल चव पारखी):</strong> Lazy-initialized Google Gemini 3.7 Flash SDK delivering traditional Maharashtrian recipe pairing suggestions with instant culinary fallback knowledge base.</p>
+                    <p><strong>• AI Sommelier (चव पारखी):</strong> Lazy-initialized Google Gemini 3.7 Flash SDK delivering traditional recipe pairing suggestions with instant culinary fallback knowledge base.</p>
                     <p><strong>• Cloud Database:</strong> Google Cloud Firestore with real-time snapshot listeners (<code>onSnapshot</code>) ensuring atomic transactions (<code>runTransaction</code>) for order placement, stock deduction, and delivery OTP authentication.</p>
                   </div>
                 </div>
 
                 {/* Print Footer Note */}
                 <div className="text-center text-[10px] text-stone-400 pt-4 border-t border-stone-200">
-                  अस्सल गावरान चटणी & मसाले • All Rights Reserved • Pune, Maharashtra
+                  एम एस मसाले (MS Masale) • All Rights Reserved
                 </div>
               </div>
             </motion.div>

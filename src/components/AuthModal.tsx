@@ -91,7 +91,7 @@ export const AuthModal: React.FC = () => {
                 <span className="text-xs text-white/60">• Firebase Auth</span>
               </div>
               <h2 className="text-xl font-bold font-serif text-white tracking-tight mt-0.5">
-                {isMr ? 'अस्सल गावरान' : 'Assal Gavran'}
+                {isMr ? 'एम एस मसाले' : 'MS Masale'}
               </h2>
             </div>
           </div>

@@ -78,7 +78,7 @@ export const VoiceSearchBar: React.FC<VoiceSearchBarProps> = ({
 
   const englishSuggestions = [
     { label: 'Peanut Chutney', query: 'peanut' },
-    { label: 'Kolhapuri Thecha', query: 'thecha' },
+    { label: 'Green Thecha', query: 'thecha' },
     { label: 'Kanda Lasun', query: 'garlic' },
     { label: 'Vada Pav Red Chutney', query: 'coconut' },
     { label: 'Flaxseed / Javas', query: 'flaxseed' },
@@ -310,7 +310,7 @@ export const VoiceSearchBar: React.FC<VoiceSearchBarProps> = ({
               </span>
               <span>
                 {isMarathi
-                  ? '🎙️ अस्सल मराठीत बोला... (उदा. "शेंगदाणा चटणी", "लसूण", "ठेचा")'
+                  ? '🎙️ मराठीत स्पष्ट बोला... (उदा. "शेंगदाणा चटणी", "लसूण", "ठेचा")'
                   : '🎙️ Listening in Marathi (mr-IN)... Speak now!'}
               </span>
             </div>

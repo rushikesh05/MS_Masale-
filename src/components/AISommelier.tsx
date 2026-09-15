@@ -14,16 +14,16 @@ export const AISommelier: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [recommendation, setRecommendation] = useState<any>({
     dishIdentified: 'गरम ज्वारीची भाकरी',
-    recommendedChutneyMr: 'सोलापुरी शेंगदाणा चटणी व गावरान कांदा-लसूण चटणी',
-    recommendedChutneyEn: 'Solapuri Crunchy Peanut Chutney & Gavran Kanda-Lasun',
+    recommendedChutneyMr: 'भाजलेली शेंगदाणा चटणी व कांदा-लसूण चटणी',
+    recommendedChutneyEn: 'Crunchy Peanut Chutney & Kanda-Lasun',
     whyPairingMr: 'कडक किंवा मऊ गरम भाकरीसोबत शेंगदाणा चटणीत कच्चे लाकडी घाण्याचे तेल किंवा पांढरे लोणी मिसळल्यास स्वर्गीय चव मिळते. सोबत कांदा चुरडून खावा.',
-    whyPairingEn: 'The nutty richness of Solapuri roasted peanuts and spicy garlic creates the ultimate rustic Maharashtrian staple with hot Jowar/Bajra Bhakri and raw wood-pressed oil.',
+    whyPairingEn: 'The nutty richness of roasted peanuts and spicy garlic creates the ultimate pairing with hot Jowar/Bajra Bhakri and raw wood-pressed oil.',
     proTipMr: 'भाकरीवर १ चमचा शेंगदाणा चटणी पसरवा आणि त्यावर २ चमचे कोमट शेंगदाणा तेल शिंपडा.',
     proTipEn: 'Spread 1 tbsp chutney on hot Bhakri and drizzle 2 tbsp warm groundnut oil or homemade white butter.',
     flavorProfile: {
       spice: 'गावरान खमंग ठसका',
       crunch: '१०/१० खलबत्त्यात कुटलेली',
-      traditionScore: '१००% अस्सल गावरान'
+      traditionScore: '१००% गावरान'
     },
     suggestedProductId: 'prod-shengdana-chutney'
   });
@@ -34,7 +34,7 @@ export const AISommelier: React.FC = () => {
     { mr: 'भाजणीचे थालीपीठ', en: 'Bhajani Thalipeeth', icon: '🥞' },
     { mr: 'मुंबई-पुणे वडापाव', en: 'Vada Pav', icon: '🍔' },
     { mr: 'तूप-वरण-भात', en: 'Ghee & Varan Bhaat', icon: '🍲' },
-    { mr: 'झणझणीत मिसळ', en: 'Kolhapuri Misal', icon: '🌶️' },
+    { mr: 'झणझणीत मिसळ', en: 'Spicy Misal', icon: '🌶️' },
     { mr: 'उकडपेंडी / उपमा', en: 'Ukadpendi / Upma', icon: '🥣' }
   ];
 
@@ -78,7 +78,7 @@ export const AISommelier: React.FC = () => {
         <div className="relative z-10 text-center mb-8">
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#C84B31]/40 text-[#F5C2B8] border border-[#C84B31]/50 text-xs font-semibold mb-3">
             <Sparkles className="w-3.5 h-3.5 text-amber-300" />
-            <span>{isMr ? 'AI अस्सल चव पारखी (Chutney Sommelier)' : 'AI Maharashtrian Chutney Sommelier'}</span>
+            <span>{isMr ? 'AI चव पारखी (Chutney Sommelier)' : 'AI Chutney Sommelier'}</span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-extrabold font-brand tracking-tight">
             {isMr ? 'आज जेवणात काय आहे? योग्य चटणी जोडीदार शोधा!' : 'What are you eating today? Find the perfect chutney pairing!'}
@@ -178,18 +178,18 @@ export const AISommelier: React.FC = () => {
                   🥜 {recommendation.flavorProfile?.crunch || 'खमंग खलबत्त्यात कुटलेली'}
                 </span>
                 <span className="bg-black/30 px-2.5 py-1 rounded-md">
-                  🚩 {recommendation.flavorProfile?.traditionScore || '१००% अस्सल'}
+                  🚩 {recommendation.flavorProfile?.traditionScore || '१००% गावरान'}
                 </span>
               </div>
             </div>
 
             {/* Right Product Card Match (4 cols) */}
             <div className="md:col-span-4 bg-white text-[#2D2424] rounded-xl p-4 shadow-xl border border-white/20 text-center group group/ai">
-              <div className="w-full h-32 overflow-hidden rounded-lg mb-2 shadow-xs transition-shadow duration-300 group-hover/ai:shadow-md">
+              <div className="w-full aspect-square max-h-48 overflow-hidden rounded-xl mb-3 shadow-xs border border-amber-100/90 transition-shadow duration-300 group-hover/ai:shadow-md">
                 <ProductVisual
                   product={matchedProduct}
                   isMarathi={isMr}
-                  allowToggle={false}
+                  aspectRatio="square"
                 />
               </div>
               <div className="font-bold text-xs line-clamp-1 font-brand">

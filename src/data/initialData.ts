@@ -6,8 +6,8 @@ export const BASE_INGREDIENTS: BaseIngredientOption[] = [
     nameMr: 'भाजलेले शेंगदाणे',
     nameEn: 'Roasted Peanuts',
     marathiScript: 'शेंगदाणे',
-    descriptionMr: 'सोलापूरची गावरान चव, खरपूस भाजलेले आणि खमंग खुसखुशीत',
-    descriptionEn: 'Crispy slow-roasted Solapuri peanuts rich in protein and crunchy bite',
+    descriptionMr: 'खरपूस भाजलेले आणि खमंग खुसखुशीत',
+    descriptionEn: 'Crispy slow-roasted peanuts rich in protein and crunchy bite',
     color: '#D97706',
     patternColor: '#B45309',
     pricePer100g: 35,
@@ -19,8 +19,8 @@ export const BASE_INGREDIENTS: BaseIngredientOption[] = [
     nameMr: 'सुके खोबरे',
     nameEn: 'Dry Copra / Coconut',
     marathiScript: 'खोबरे',
-    descriptionMr: 'कोकणातील दर्जेदार सुके खोबरे, मंद आचेवर भाजलेले',
-    descriptionEn: 'Konkan-origin sun-dried roasted coconut flakes for authentic texture',
+    descriptionMr: 'दर्जेदार सुके खोबरे, मंद आचेवर भाजलेले',
+    descriptionEn: 'Sun-dried roasted coconut flakes for natural texture',
     color: '#D4A373',
     patternColor: '#A98467',
     pricePer100g: 45,
@@ -45,26 +45,26 @@ export const BASE_INGREDIENTS: BaseIngredientOption[] = [
     nameMr: 'भाजलेले जवस',
     nameEn: 'Roasted Flaxseed',
     marathiScript: 'जवस',
-    descriptionMr: 'ओमेगा-३ युक्त निरोगी जवस, हृदयासाठी अमृततुल्य',
-    descriptionEn: 'Omega-3 power-packed roasted flaxseeds for digestion and cardiac health',
+    descriptionMr: 'ओमेगा-३ युक्त निरोगी जवस, हृदयासाठी उत्तम',
+    descriptionEn: 'Omega-3 power-packed roasted flaxseeds for digestion and health',
     color: '#8C5242',
     patternColor: '#5C3826',
     pricePer100g: 38,
     iconName: 'HeartPulse',
-    aromaNotes: 'सुदृढ आरोग्यासाठी खास अस्सल गावठी जवस'
+    aromaNotes: 'सुदृढ आरोग्यासाठी खास गावठी जवस'
   },
   {
     id: 'redChilliBase',
     nameMr: 'खास लवंगी / बेडगी तिखट बेस',
     nameEn: 'Pure Bedgi & Lavangi Chilli Base',
     marathiScript: 'लाल तिखट बेस',
-    descriptionMr: 'गावरान लाल मिरचीची खरी धगधगती चव व नैसर्गिक गडद लाल रंग',
-    descriptionEn: 'Authentic Maharashtrian whole chillies with natural color',
+    descriptionMr: 'लाल मिरचीची खरी धगधगती चव व नैसर्गिक गडद लाल रंग',
+    descriptionEn: 'Sun-dried whole chillies with natural color',
     color: '#DC2626',
     patternColor: '#991B1B',
     pricePer100g: 50,
     iconName: 'Flame',
-    aromaNotes: 'गावरान तिखटपणा आणि सुरेख लाल रंग'
+    aromaNotes: 'गावरान चव आणि सुरेख लाल रंग'
   }
 ];
 
@@ -92,24 +92,24 @@ export const SPICE_LEVELS: SpiceLevelOption[] = [
     labelMr: 'मसालेदार झणझणीत',
     labelEn: 'Spicy (Punchy & Bold)',
     scovilleDescMr: 'खऱ्या चोखंदळ खवय्यांची पहिली पसंती',
-    scovilleDescEn: 'Zesty kick with authentic chilli heat',
+    scovilleDescEn: 'Zesty kick with bold chilli heat',
     color: '#F97316',
     flameCount: 3
   },
   {
     level: 4,
-    labelMr: 'कोल्हापुरी लवंगी ठसका',
-    labelEn: 'Kolhapuri Fiery (Extra Hot)',
-    scovilleDescMr: 'जिभेवर ठसका देणारी कोल्हापुरी गावरान मिरची',
-    scovilleDescEn: 'Real Kolhapuri spicy kick that opens up all senses',
+    labelMr: 'लवंगी ठसका',
+    labelEn: 'Fiery (Extra Hot)',
+    scovilleDescMr: 'जिभेवर ठसका देणारी गावरान लवंगी मिरची',
+    scovilleDescEn: 'Spicy kick that opens up all senses',
     color: '#EF4444',
     flameCount: 4
   },
   {
     level: 5,
-    labelMr: 'अस्सल गावरान अंगार (Extreme Hot)',
+    labelMr: 'गावरान अंगार (Extreme Hot)',
     labelEn: 'Gavran Angar (Extreme)',
-    scovilleDescMr: 'तांबडा-पांढरा रस्सा प्रेमींसाठी खास जळजळीत चव',
+    scovilleDescMr: 'रस्सा प्रेमींसाठी खास जळजळीत चव',
     scovilleDescEn: 'Pure fire made with raw sun-dried Lavangi and Sankeshwari',
     color: '#991B1B',
     flameCount: 5
@@ -138,7 +138,7 @@ export const GARLIC_OPTIONS: GarlicOption[] = [
     labelMr: 'गावरान भाजलेला लसूण (Classic Gavran)',
     labelEn: 'Classic Roasted Garlic',
     extraPrice: 20,
-    descMr: 'अस्सल गावरान खमंग लसणाचा स्वाद',
+    descMr: 'गावरान खमंग लसणाचा स्वाद',
     descEn: 'Traditional ratio of golden roasted cloves'
   },
   {
@@ -154,7 +154,7 @@ export const GARLIC_OPTIONS: GarlicOption[] = [
 export const SALT_OPTIONS: SaltOption[] = [
   {
     id: 'regular',
-    labelMr: 'अस्सल शुद्ध मीठ',
+    labelMr: 'शुद्ध मीठ',
     labelEn: 'Pure Sea Salt',
     extraPrice: 0,
     descMr: 'नेहमीचे संतुलित मीठ',
@@ -189,11 +189,11 @@ export const OIL_OPTIONS: OilOption[] = [
   },
   {
     id: 'groundnut_cold_pressed',
-    labelMr: 'लाकडी घाण्याचे अस्सल शेंगदाणा तेल',
+    labelMr: 'लाकडी घाण्याचे शेंगदाणा तेल',
     labelEn: 'Wood-Pressed Groundnut Oil Drizzle',
     extraPrice: 25,
     descMr: 'पारंपरिक पद्धतीने मुरवलेली ओली चटणी',
-    descEn: 'Infused with authentic wooden ghani kacchi ghani oil'
+    descEn: 'Infused with cold-pressed groundnut oil'
   },
   {
     id: 'extra_drizzle',
@@ -208,46 +208,42 @@ export const OIL_OPTIONS: OilOption[] = [
 export const PRODUCTS: Product[] = [
   {
     id: 'prod-kanda-lasun',
-    nameMr: 'अस्सल कोल्हापुरी कांदा-लसूण चटणी व मसाला (मुख्य वैशिष्ट्य #1)',
-    nameEn: 'Authentic Kolhapuri Kanda-Lasun Chutney & Masala (Flagship #1)',
-    taglineMr: 'कोल्हापूरची जगप्रसिद्ध अस्सल कांदा-लसूण चटणी • लवंगी मिरची व भाजलेला कांदा',
-    taglineEn: "Kolhapur's legendary flagship roasted onion, garlic & fiery chilli chutney",
-    descriptionMr: 'कोल्हापूरची अस्सल शान! मंद आचेवर भाजलेला कांदा, गावरान लसूण आणि कोल्हापूरची लवंगी मिरची एकत्र कुटून तयार केलेली ही जगप्रसिद्ध कांदा-लसूण चटणी. रस्सा, सुक्का, मिसळ किंवा गरम भाकरीसोबत खाण्यासाठी कोल्हापूरचे मुख्य वैशिष्ट्य.',
-    descriptionEn: "The undisputed crown jewel of Kolhapur. Slow-caramelized onions, hand-peeled desi garlic, and sun-cured fiery Kolhapuri Lavangi chillies blended into a fragrant, rich crimson dry chutney. An absolute must-have for authentic Kolhapuri Misal, curries, or straight on hot Bhakri.",
+    nameMr: 'कांदा लसूण मसाला',
+    nameEn: 'Kanda Lasun Masala',
+    taglineMr: 'भाजलेला कांदा, लसूण आणि लाल मिरचीचा खमंग मसाला',
+    taglineEn: 'Roasted onion, garlic & red chilli spice blend',
+    descriptionMr: 'मंद आचेवर भाजलेला कांदा, लसूण आणि लाल मिरची एकत्र करून तयार केलेला मसाला. रस्सा भाजी, उसळ, मिसळ किंवा जेवणात रोजच्या वापरासाठी उत्तम.',
+    descriptionEn: 'Slow-roasted onions, garlic cloves, and red chillies blended into a flavorful dry spice blend. Great for everyday gravies, curries, and dal.',
     category: 'chutney',
     spiceLevel: 4,
-    badgeMr: 'कोल्हापूरची मुख्य शान (Flagship #1)',
-    badgeEn: "Kolhapur's #1 Flagship Chutney",
+    badgeMr: 'बेस्ट सेलर',
+    badgeEn: 'Best Seller',
     rating: 4.98,
     reviewCount: 780,
     imageUrl: '/products/kanda-lasun.jpg',
-    ingredientsMr: ['गावरान भाजलेला कांदा', 'रानटी लसूण', 'कोल्हापुरी लवंगी व बेडगी मिरची', 'लाकडी घाण्याचे तेल', 'खडे मीठ', 'धने-जिरे'],
-    ingredientsEn: ['Roasted Gavran Onion', 'Desi Garlic Cloves', 'Kolhapuri Lavangi & Bedgi Chillies', 'Wood-Pressed Oil', 'Sea Salt', 'Coriander & Cumin'],
-    pairingRecommendationsMr: ['ज्वारीची किंवा बाजरीची गरम भाकरी', 'झणझणीत मिसळ', 'पिठलं-भात', 'सुक्के मटण / चिकन'],
-    pairingRecommendationsEn: ['Hot Jowar/Bajra Bhakri', 'Kolhapuri Misal', 'Pithla Bhaat', 'Sukka Gravy Accompaniment'],
+    ingredientsMr: ['भाजलेला कांदा', 'लसूण', 'लाल मिरची', 'तेल', 'मीठ', 'धने-जिरे'],
+    ingredientsEn: ['Roasted Onion', 'Garlic Cloves', 'Red Chillies', 'Oil', 'Sea Salt', 'Coriander & Cumin'],
+    pairingRecommendationsMr: ['गरम भाकरी', 'मिसळ', 'पिठलं-भात', 'सुक्की भाजी'],
+    pairingRecommendationsEn: ['Hot Bhakri', 'Misal', 'Pithla Bhaat', 'Curry Accompaniment'],
     whereToUseMr: [
-      'मटण रस्सा, चिकन सुक्का किंवा अंडा करी बनवताना फोडणीत १-२ चमचे घालून अस्सल कोल्हापुरी तर्री आणा.',
-      'झणझणीत पिठलं (झुणका) आणि शेव भाजीसाठी मुख्य मसाला म्हणून वापरा.',
-      'कडक भाकरी आणि गोड दह्यासोबत थेट तोंडी लावण्यासाठी वापरा.',
-      'मिसळचा कट (तर्री) बनवताना उत्कृष्ट लाल रंग आणि झणझणीतपणासाठी.'
+      'भाजी किंवा रस्सा बनवताना फोडणीत १-२ चमचे घालून खमंग चव आणा.',
+      'पिठलं आणि शेव भाजीसाठी मुख्य मसाला म्हणून वापरा.',
+      'गरम भाकरी आणि दह्यासोबत थेट तोंडी लावण्यासाठी वापरा.'
     ],
     whereToUseEn: [
-      'Add 1-2 tablespoons while tempering curry gravies (Mutton Rassa, Chicken Sukka, or Egg Curry) for authentic Kolhapuri aroma.',
-      'Essential base seasoning for rustic Maharashtrian Pithla (Zunka) and Shev Bhaji.',
-      'Serve raw alongside hot Bhakri and fresh curd as a spicy palate enhancer.',
-      'Incorporate into Kolhapuri Misal Kat (spicy gravy) for unmatched depth and color.'
+      'Add 1-2 tablespoons while cooking gravies and curries for rich flavor.',
+      'Use as base seasoning for Pithla and Shev Bhaji.',
+      'Serve alongside hot Bhakri and curd.'
     ],
     hygienePrecautionsMr: [
-      'नैसर्गिकरीत्या सुकवलेल्या अस्सल मिरच्या: कोणत्याही रासायनिक प्रक्रियेविना सूर्यप्रकाशात वाळवलेल्या बेडगी व लवंगी मिरच्या.',
-      'लाकडी घाण्याचे अस्सल तेल: फोडणी व भाजणीसाठी केवळ शुद्ध लाकडी घाण्याचे तेल वापरले जाते.',
-      'स्वच्छतेची कठोर त्रिसूत्री: लसूण व कांदा हाताने निवडून, स्वच्छ धुवून व वाळवूनच खलबत्त्यात कुटला जातो.',
-      'प्रयोगशाळेत प्रमाणित (Lab Tested): ओलावा व सूक्ष्मजीव तपासणी करूनच ग्राहकांपर्यंत पोहोचवले जाते.'
+      'नैसर्गिकरीत्या सुकवलेल्या मिरच्या: कोणत्याही रासायनिक प्रक्रियेविना सूर्यप्रकाशात वाळवलेल्या लाल मिरच्या.',
+      'घाण्याचे शुद्ध तेल: फोडणी व भाजणीसाठी केवळ शुद्ध घाण्याचे तेल वापरले जाते.',
+      'स्वच्छतेची त्रिसूत्री: लसूण व कांदा हाताने निवडून, स्वच्छ धुवून व वाळवूनच तयार केला जातो.'
     ],
     hygienePrecautionsEn: [
-      'Naturally Sun-Dried Chillies: Raw Bedgi & Lavangi peppers naturally cured under direct sunlight without sulfur treatment.',
-      'Pure Cold-Pressed Oil: Roasted solely using unadulterated cold-pressed groundnut oil.',
-      'Hand-Inspected & Sorted: Each clove of garlic and bulb of onion is cleaned and sorted manually before processing.',
-      'Lab Certified Quality: Thorough microbial and moisture testing conducted for every fresh batch.'
+      'Naturally Sun-Dried Chillies: Raw peppers naturally cured under direct sunlight.',
+      'Pure Cold-Pressed Oil: Roasted solely using unadulterated groundnut oil.',
+      'Hand-Inspected & Sorted: Each clove of garlic and bulb of onion is cleaned and sorted manually.'
     ],
     storageTipsMr: 'कोरड्या जागी हवाबंद बरणीत ठेवा. पाण्याचा थेंबही लागू देऊ नका. ९ महिने उत्तम टिकते.',
     storageTipsEn: 'Store in an airtight jar in a cool place. Avoid moisture contact. Best before 9 months.',
@@ -265,53 +261,47 @@ export const PRODUCTS: Product[] = [
     ],
     isBestSeller: true,
     isRegionalSpecialty: true,
-    regionOriginMr: 'कोल्हापूर',
-    regionOriginEn: 'Kolhapur'
+    regionOriginMr: 'खास मिश्रण',
+    regionOriginEn: 'Special Blend'
   },
   {
     id: 'prod-shengdana-chutney',
-    nameMr: 'सोलापुरी शेंगदाणा आणि लसणाची सुकी चटणी (Shenga Chutney)',
-    nameEn: 'Solapuri Shengdana ani Lasanachi Sukki Chutney (Peanut Garlic Dry Chutney)',
-    taglineMr: 'सोलापूरची जगप्रसिद्ध खमंग शेंगदाणा कोरडी चटणी, जाडसर कुटलेली',
-    taglineEn: 'Classic coarse roasted peanut dry chutney with garlic',
-    descriptionMr: 'सोलापूरचे नाव निघाले की डोळ्यासमोर येते ती म्हणजे खमंग शेंगदाणा चटणी. स्थानिक शेतकऱ्यांकडून घेतलेले टपोरे शेंगदाणे लाकडी चुलीवर मंद आचेवर भाजून तयार केली जाते. लाल मिरची, खडे मीठ आणि गावरान लसूण यांचा अचूक समतोल.',
-    descriptionEn: 'The undisputed pride of Solapur condiments. Jumbo peanuts slow-roasted over wood embers and coarsely prepared with raw garlic, sea salt, and fiery Bedgi red chilli flakes. Zero added water or cooked food filler—pure dry chutney.',
+    nameMr: 'शेंगदाणा चटणी',
+    nameEn: 'Shengdana Peanut Chutney',
+    taglineMr: 'खमंग भाजलेले शेंगदाणे आणि लसणाची कोरडी चटणी',
+    taglineEn: 'Classic roasted peanut dry chutney with garlic',
+    descriptionMr: 'मंद आचेवर खमंग भाजलेले शेंगदाणे, लसूण, लाल मिरची आणि मीठ एकत्र करून तयार केलेली चवदार कोरडी चटणी.',
+    descriptionEn: 'Slow-roasted peanuts prepared with garlic, sea salt, and red chilli flakes. A classic savory dry chutney for everyday meals.',
     category: 'chutney',
     spiceLevel: 3,
-    badgeMr: 'सोलापूरची अस्सल ओळख',
-    badgeEn: 'Original Solapuri Taste',
+    badgeMr: 'लोकप्रिय',
+    badgeEn: 'Popular',
     rating: 4.95,
     reviewCount: 512,
     imageUrl: '/products/shengdana-peanuts.jpg',
-    ingredientsMr: ['सोलापुरी टपोरे शेंगदाणे', 'गावरान लसूण', 'बेडगी व संकेश्वरी मिरची', 'कच्चे शेंगदाणा तेल', 'मीठ'],
-    ingredientsEn: ['Solapuri Jumbo Peanuts', 'Desi Garlic', 'Bedgi & Sankeshwari Chilli', 'Cold-Pressed Groundnut Oil', 'Salt'],
-    pairingRecommendationsMr: ['सोलापुरी कडक भाकरी', 'दही-पोहे', 'उपमा', 'तूप-वरण-भात', 'थालीपीठ लोणी'],
-    pairingRecommendationsEn: ['Solapuri Crisp Kadak Bhakri', 'Dahi Poha', 'Upma', 'Varan Bhaat with Pure Ghee', 'Thalipeeth with Makkhan'],
+    ingredientsMr: ['शेंगदाणे', 'लसूण', 'लाल मिरची', 'कच्चे शेंगदाणा तेल', 'मीठ'],
+    ingredientsEn: ['Jumbo Peanuts', 'Garlic', 'Red Chilli', 'Groundnut Oil', 'Salt'],
+    pairingRecommendationsMr: ['गरम भाकरी', 'दही-पोहे', 'उपमा', 'तूप-वरण-भात', 'थालीपीठ लोणी'],
+    pairingRecommendationsEn: ['Crisp Bhakri', 'Dahi Poha', 'Upma', 'Varan Bhaat with Ghee', 'Thalipeeth with Butter'],
     whereToUseMr: [
-      'गरमागरम ज्वारीच्या किंवा बाजरीच्या भाकरीवर १ चमचा चटणी व त्यावर लाकडी घाण्याचे कच्चे शेंगदाणा तेल ओतून खा.',
-      'सकाळच्या कांदे पोहे, उपमा किंवा शिऱ्यावर भुरभुरवून खमंग चव वाढवा.',
+      'गरमागरम ज्वारीच्या किंवा बाजरीच्या भाकरीवर १ चमचा चटणी व त्यावर थोडे तेल ओतून खा.',
+      'सकाळच्या पोहे, उपमा किंवा शिऱ्यावर भुरभुरवून खमंग चव वाढवा.',
       'वरण-भातावर साजूक तूप आणि १ चमचा शेंगदाणा चटणी घालून आस्वाद घ्या.',
-      'गरम थालीपीठासोबत घरचे लोणी आणि ही चटणी अप्रतिम लागते.',
-      'सँडविच किंवा टोस्टवर बटरसोबत स्प्रिंकल करून युनिक देसी फ्लेवर मिळवा.'
+      'गरम थालीपीठासोबत घरचे लोणी आणि ही चटणी छान लागते.'
     ],
     whereToUseEn: [
-      'Sprinkle generously on hot Jowar or Bajra Bhakri with a drizzle of cold-pressed groundnut oil.',
-      'Dust over morning Poha, Upma, or Khichdi for an instant crunch and garlic warmth.',
-      'Spoon over steaming Varan Bhaat (Dal Rice) along with melted Desi Cow Ghee.',
-      'Serve as an indispensable side with Maharashtrian Thalipeeth and white butter.',
-      'Use as a zesty dry seasoning for butter toasts, wraps, and rolls.'
+      'Sprinkle generously on hot Jowar or Bajra Bhakri with a drizzle of oil.',
+      'Dust over morning Poha, Upma, or Khichdi for instant crunch and garlic warmth.',
+      'Spoon over steaming Varan Bhaat (Dal Rice) along with melted Ghee.',
+      'Serve alongside Thalipeeth and fresh butter.'
     ],
     hygienePrecautionsMr: [
-      '१००% शून्य प्रिझर्व्हेटिव्ह: आम्ही कोणत्याही प्रकारचे कृत्रिम प्रिझर्व्हेटिव्ह (उदा. Sodium Benzoate) किंवा कृत्रिम रंग वापरत नाही.',
-      'पारंपारिक कुटाई: मंद वेगाने तयार केल्यामुळे शेंगदाण्यातील नैसर्गिक तेल व जीवनसत्त्वे सुरक्षित राहतात.',
-      'अन्न-दर्जा निर्जंतुक काचेची बरणी: काचेच्या एअरटाइट जारमध्ये पॅक केल्याने प्लास्टिक रसायनांचा कोणताही धोका नसतो व कुरकुरीतपणा टिकून राहतो.',
-      'हात न लावता स्वयंचलित पॅकिंग: सर्व बॅचेस उच्च स्वच्छता मानके पाळून आणि एफएसएसएआय (FSSAI) नियमावलीनुसार तयार केल्या जातात.'
+      '१००% शून्य प्रिझर्व्हेटिव्ह: आम्ही कोणत्याही प्रकारचे कृत्रिम रंग किंवा प्रिझर्व्हेटिव्ह वापरत नाही.',
+      'पारंपारिक पद्धत: मंद वेगाने तयार केल्यामुळे शेंगदाण्यातील नैसर्गिक तेल व चव सुरक्षित राहते.'
     ],
     hygienePrecautionsEn: [
-      'Zero Chemical Preservatives: 100% free from sodium benzoate, artificial food colorings, or synthetic flavor enhancers.',
-      'Slow Traditional Preparation: Processed slowly to eliminate heat buildup and retain wholesome natural plant oils.',
-      'Sanitized Glass Heritage Jars: Packaged in food-grade airtight glass containers preventing any plastic chemical leaching.',
-      'FSSAI Certified & Touchless Packing: Strict batch-tested hygiene protocols followed from farm harvest to hermetic seal.'
+      'Zero Chemical Preservatives: 100% free from artificial flavor enhancers or synthetic food colorings.',
+      'Slow Traditional Preparation: Processed gently to retain wholesome natural plant oils.'
     ],
     storageTipsMr: 'नेहमी कोरड्या चमच्याने वापरा. थेट सूर्यप्रकाशापासून दूर थंड व कोरड्या जागी ठेवा. ६ महिने ताजी राहते.',
     storageTipsEn: 'Always use a dry spoon. Store in a cool, dry place away from direct sunlight. Shelf life: 6 months.',
@@ -329,49 +319,45 @@ export const PRODUCTS: Product[] = [
     ],
     isBestSeller: true,
     isRegionalSpecialty: true,
-    regionOriginMr: 'सोलापूर',
-    regionOriginEn: 'Solapur'
+    regionOriginMr: 'खास मिश्रण',
+    regionOriginEn: 'Special Blend'
   },
   {
     id: 'prod-vada-pav-coconut',
-    nameMr: 'सुके खोबरे आणि लसूण चटणी (वडापाव स्पेशल कोरडी लाल चटणी)',
-    nameEn: 'Sukhe Khobare ani Lasun Chutney (Vada Pav Red Coconut Garlic Chutney)',
-    taglineMr: 'मुंबई-पुण्याच्या वडापावची तीच खमंग आणि कुरकुरीत लाल कोरडी चटणी',
+    nameMr: 'वडापाव चटणी',
+    nameEn: 'Vada Pav Red Chutney',
+    taglineMr: 'भाजलेले सुके खोबरे आणि लसणाची कुरकुरीत लाल कोरडी चटणी',
     taglineEn: 'Crispy roasted coconut & golden garlic red dry chutney powder',
-    descriptionMr: 'प्रत्येक वडापाव प्रेमीचे स्वप्न! दर्जेदार कोकणी सुके खोबरे आणि भाजलेला लसूण मंद आचेवर तळून, त्यात अस्सल काश्मिरी-बेडगी मिरचीचा रंग व तिखटपणा मिळवून बनवलेली ही कुरकुरीत चटणी.',
-    descriptionEn: 'The legendary secret behind Maharashtra’s world-famous dry condiment. Golden-toasted Konkani copra shreds, roasted garlic flakes, and vibrant Bedgi chilli blended into a crispy, aromatic powder.',
+    descriptionMr: 'भाजलेले सुके खोबरे, भाजलेला लसूण आणि लाल मिरची यांचे खमंग आणि कुरकुरीत मिश्रण. वडापाव, समोसा आणि स्नॅक्ससाठी उत्तम.',
+    descriptionEn: 'Toasted dry coconut, crisp roasted garlic flakes, and vibrant red chilli blended into a crispy savory powder.',
     category: 'chutney',
     spiceLevel: 3,
-    badgeMr: '१००% अस्सल वडापाव लाल चटणी',
-    badgeEn: 'Iconic Red Chutney',
+    badgeMr: '१००% नैसर्गिक',
+    badgeEn: '100% Natural',
     rating: 4.8,
     reviewCount: 289,
     imageUrl: '/products/vada-pav-lasun.jpg',
-    ingredientsMr: ['कोकणी सुके खोबरे', 'भाजलेला लसूण', 'बेडगी लाल मिरची', 'सेंधव मीठ', 'हिंग'],
-    ingredientsEn: ['Dried Coconut Copra', 'Crisp Fried Garlic', 'Bedgi Red Chilli Powder', 'Rock Salt', 'Asafoetida'],
+    ingredientsMr: ['सुके खोबरे', 'भाजलेला लसूण', 'लाल मिरची', 'सेंधव मीठ', 'हिंग'],
+    ingredientsEn: ['Dried Coconut', 'Crisp Fried Garlic', 'Red Chilli Powder', 'Rock Salt', 'Asafoetida'],
     pairingRecommendationsMr: ['गरमागरम वडा पाव', 'समोसा', 'कांदा भजी', 'तूप-भात', 'थालीपीठ'],
     pairingRecommendationsEn: ['Steaming Hot Vada Pav', 'Samosa & Kanda Bhaji', 'Ghee Rice', 'Crispy Thalipeeth'],
     whereToUseMr: [
-      'घरी बनवलेल्या वडापावच्या पावामध्ये भरपूर भरून अस्सल मुंबई स्ट्रीट स्टाईल चव मिळवा.',
-      'गरमागरम बटाटा भजी, कांदा भजी व समोसा सोबत क्रिस्पी डीप म्हणून सर्व्ह करा.',
-      'ब्रेड रोल्स, कटलेट व फ्रँकी रोलमध्ये स्प्रिंकल करा.',
-      'गरम साध्या भातावर थोडे तूप आणि ही खोबरे-लसूण चटणी खाऊन बघा.'
+      'वडापावच्या पावामध्ये भरून छान चव मिळवा.',
+      'गरमागरम भजी व समोसा सोबत क्रिस्पी डीप म्हणून सर्व्ह करा.',
+      'गरम साध्या भातावर थोडे तूप आणि ही चटणी खाऊन बघा.'
     ],
     whereToUseEn: [
-      'Stuff generously inside hot Pav alongside Vada for that unmistakable Mumbai street-corner magic.',
-      'Serve as a crispy crunchy dry dip with piping hot onion pakoras (Bhajiya) and samosas.',
-      'Dust over frankies, wraps, toasties, and cutlets.',
-      'Mix with plain hot steamed rice and melted butter for a quick gourmet treat.'
+      'Stuff inside hot Pav alongside Vada for delicious savory crunch.',
+      'Serve as a crispy crunchy dry dip with piping hot pakoras and samosas.',
+      'Mix with plain hot steamed rice and butter for a quick treat.'
     ],
     hygienePrecautionsMr: [
-      'कोकणी वाळवलेले खोबरे: जुने किंवा रासायनिक गंध असलेले खोबरे कधीही न वापरता फक्त ताजे कोकणी खोबरे वापरले जाते.',
-      'कमी तापमानावर भाजणी: खोबरे करपू न देता मंद आचेवर सोनेरी भाजल्याने नैसर्गिक चव टिकते.',
-      'हवाबंद पॅकिंग: ओलावा व हवा आत जाऊ नये यासाठी व्हॅक्यूम सीलबंद बरणी वापरली जाते.'
+      'निवडक वाळवलेले खोबरे: दर्जेदार ताजे खोबरे वापरले जाते.',
+      'कमी तापमानावर भाजणी: खोबरे करपू न देता मंद आचेवर सोनेरी भाजल्याने नैसर्गिक चव टिकते.'
     ],
     hygienePrecautionsEn: [
-      'Premium Konkan Copra: Only select, sweet-smelling dry coconut kernels used without sulfur treatment.',
-      'Slow Low-Heat Toasting: Toasted gently to golden perfection without burning delicate coconut fats.',
-      'Moisture-Lock Seal: Vacuum hermetic jars prevent rancidity and ensure months of crisp aroma.'
+      'Select Copra: Only sweet-smelling dry coconut used without artificial treatment.',
+      'Slow Low-Heat Toasting: Toasted gently to golden perfection without burning delicate coconut fats.'
     ],
     storageTipsMr: 'बरणीचे झाकण घट्ट बंद ठेवा. सूर्यप्रकाशापासून दूर कोरड्या जागी ठेवा. ६ महिने कुरकुरीत राहते.',
     storageTipsEn: 'Keep lid tightly closed. Store away from heat and direct sunlight. 6 months shelf life.',
@@ -389,46 +375,44 @@ export const PRODUCTS: Product[] = [
     ],
     isBestSeller: true,
     isRegionalSpecialty: true,
-    regionOriginMr: 'कोकण व मुंबई',
-    regionOriginEn: 'Konkan & Mumbai'
+    regionOriginMr: 'खास मिश्रण',
+    regionOriginEn: 'Special Blend'
   },
   {
     id: 'prod-til-chutney',
-    nameMr: 'महाराष्ट्रीयन खमंग तीळ-कूट चटणी (कॅल्शियमयुक्त गावरान तीळ)',
-    nameEn: 'Maharashtrian Tilachi Chutney / Til-Koot (Roasted Sesame Seed Chutney)',
-    taglineMr: 'गावठी तीळ आणि लसणाची मंद सुवासिक व पौष्टिक कोरडी चटणी',
-    taglineEn: 'Naturally calcium-rich unpolished sesame seeds with mild garlic spice',
-    descriptionMr: 'गावठी गावरान पांढरे व तपकिरी तीळ मंद विस्तवावर भाजून, त्यात जिरे आणि लसूण घालून पाट्यावर वाटल्यासारखी तयार केलेली तिळाची चटणी. हिवाळ्यात व वर्षभर शरीराला उष्णता व ताकद देणारी पारंपरिक रेसिपी.',
-    descriptionEn: 'Slow-roasted unpolished desi sesame seeds pounded with cumin and mild garlic into a nutty dry chutney powder. Rich in natural calcium, magnesium, and dietary fiber.',
+    nameMr: 'तीळ चटणी',
+    nameEn: 'Til Sesame Chutney',
+    taglineMr: 'भाजलेले तीळ आणि लसणाची सुवासिक व पौष्टिक कोरडी चटणी',
+    taglineEn: 'Naturally calcium-rich roasted sesame seeds with mild garlic spice',
+    descriptionMr: 'मंद आचेवर भाजलेले तीळ, जिरे आणि लसूण एकत्र करून तयार केलेली पौष्टिक आणि खमंग चटणी. रोजच्या जेवणात चव वाढवण्यासाठी उत्तम.',
+    descriptionEn: 'Slow-roasted unpolished sesame seeds prepared with cumin and mild garlic into a nutty dry chutney powder. Rich in natural calcium and dietary fiber.',
     category: 'chutney',
     spiceLevel: 2,
-    badgeMr: 'हाडांसाठी कॅल्शियमचा खजिना',
-    badgeEn: 'High Calcium Superfood',
+    badgeMr: 'कॅल्शियमयुक्त',
+    badgeEn: 'High Calcium',
     rating: 4.9,
     reviewCount: 198,
     imageUrl: '/products/til-sesame.jpg',
-    ingredientsMr: ['गावरान तीळ', 'लसूण पाकळ्या', 'भाजलेले जिरे', 'लाल तिखट', 'सेंधव मीठ'],
-    ingredientsEn: ['Desi Roasted Sesame Seeds', 'Garlic Cloves', 'Roasted Cumin', 'Mild Red Chilli', 'Sendhav Salt'],
+    ingredientsMr: ['तीळ', 'लसूण पाकळ्या', 'भाजलेले जिरे', 'लाल तिखट', 'सेंधव मीठ'],
+    ingredientsEn: ['Roasted Sesame Seeds', 'Garlic Cloves', 'Roasted Cumin', 'Mild Red Chilli', 'Sendhav Salt'],
     pairingRecommendationsMr: ['बाजरीची भाकरी व लोणी', 'पोहे', 'उकडपेंडी', 'दडपे पोहे', 'वरण-भात'],
-    pairingRecommendationsEn: ['Bajra Bhakri with Homemade Butter', 'Kanda Poha', 'Ukadpendi', 'Dadpe Pohe', 'Varan Bhaat'],
+    pairingRecommendationsEn: ['Bajra Bhakri with Homemade Butter', 'Poha', 'Ukadpendi', 'Dadpe Pohe', 'Varan Bhaat'],
     whereToUseMr: [
-      'बाजरीच्या कडक किंवा मऊ भाकरीवर साजूक तूप किंवा लोण्यासोबत १ चमचा तिळाची चटणी खा.',
-      'दडपे पोहे, कांदे पोहे किंवा उपम्यावर वरून भुरभुरवून पोषकता व खमंगपणा वाढवा.',
+      'बाजरीच्या भाकरीवर साजूक तूप किंवा लोण्यासोबत १ चमचा तिळाची चटणी खा.',
+      'पोहे किंवा उपम्यावर वरून भुरभुरवून पोषकता व खमंगपणा वाढवा.',
       'मुलांच्या डब्यामध्ये चपातीवर थोडे तूप आणि तिळाची चटणी रोल करून द्या.'
     ],
     whereToUseEn: [
-      'Enjoy with hot Bajra Bhakri and fresh homemade white butter for a classic Maharashtrian breakfast.',
-      'Sprinkle over Dadpe Poha, Kanda Poha, or Upma for natural crunch and bone-strengthening calcium.',
+      'Enjoy with hot Bajra Bhakri and fresh butter for a classic wholesome meal.',
+      'Sprinkle over Poha or Upma for natural crunch and bone-strengthening calcium.',
       'Spread on Ghee Chapati and roll up for a wholesome school tiffin snack.'
     ],
     hygienePrecautionsMr: [
-      'गावरान न पॉलिश केलेले तीळ: केमिकलने धुतलेले चकचकीत तीळ न वापरता थेट शेतकऱ्यांचे गावरान तीळ वापरले जातात.',
-      'दगडी खलबत्त्यात कुटाई: तिळाचे तेल वेगळे न होता कोरडा व खमंग पोत टिकतो.',
-      'शून्य प्रिझर्व्हेटिव्ह व खडे मीठ: आरोग्यदायी सेंधव मिठाचा समतोल वापर.'
+      'न पॉलिश केलेले तीळ: थेट शेतकऱ्यांचे नैसर्गिक तीळ वापरले जातात.',
+      'शून्य प्रिझर्व्हेटिव्ह: आरोग्यदायी सेंधव मिठाचा समतोल वापर.'
     ],
     hygienePrecautionsEn: [
-      'Unpolished Desi Sesame: Sourced directly from local farmers without chemical bleaching or polish.',
-      'Stone Pounded: Maintains intact cellular nutrients without turning excessively oily.',
+      'Unpolished Sesame: Sourced directly without chemical bleaching or polish.',
       'Pure Himalayan Rock Salt: Prepared with natural mineral-rich rock salt.'
     ],
     storageTipsMr: 'थंड व कोरड्या जागी ठेवा. ६ महिने टिकते.',
@@ -447,44 +431,44 @@ export const PRODUCTS: Product[] = [
     ],
     isBestSeller: false,
     isRegionalSpecialty: true,
-    regionOriginMr: 'मराठवाडा व विदर्भ',
-    regionOriginEn: 'Marathwada & Vidarbha'
+    regionOriginMr: 'नैसर्गिक',
+    regionOriginEn: 'Natural'
   },
   {
     id: 'prod-javas-chutney',
-    nameMr: 'अस्सल गावरान जवस चटणी (ओमेगा-३ युक्त पारंपरिक चव)',
-    nameEn: 'Maharashtrian Jawas Chutney (Roasted Flaxseed Superfood Chutney)',
-    taglineMr: 'हृदयाच्या व केसांच्या आरोग्यासाठी अत्यंत गुणकारी गावरान कोरडी चटणी',
+    nameMr: 'जवस चटणी',
+    nameEn: 'Javas Flaxseed Chutney',
+    taglineMr: 'हृदयाच्या व केसांच्या आरोग्यासाठी अत्यंत गुणकारी कोरडी चटणी',
     taglineEn: 'Cardio-protective Omega-3 rich flaxseed dry chutney roasted to perfection',
-    descriptionMr: 'जवस शरीरासाठी किती फायदेशीर आहे हे आपल्या आजी-आजोबांना चांगलेच ठाऊक होते. आम्ही गावरान जवस तडतडेपर्यंत भाजून त्यात लसूण व तिखट घालून ही चविष्ट व आरोग्यदायी कोरडी चटणी तयार केली आहे.',
-    descriptionEn: 'Harnessing the age-old Maharashtrian wisdom of flaxseed nutrition. Rich in Alpha-Linolenic Acid (Omega-3), lignans, and soluble fiber. Pounded with garlic and mild red spice.',
+    descriptionMr: 'मंद आचेवर खमंग भाजलेले जवस, लसूण आणि लाल तिखट एकत्र करून बनवलेली चविष्ट व आरोग्यदायी कोरडी चटणी.',
+    descriptionEn: 'Wholesome flaxseed dry chutney rich in Alpha-Linolenic Acid (Omega-3) and dietary fiber. Prepared with garlic and mild red spice.',
     category: 'chutney',
     spiceLevel: 2,
-    badgeMr: 'ओमेगा-३ & हृदय स्वास्थ्य',
+    badgeMr: 'ओमेगा-३ युक्त',
     badgeEn: 'Heart-Healthy Omega-3',
     rating: 4.85,
     reviewCount: 215,
     imageUrl: '/products/javas-flaxseed.jpg',
-    ingredientsMr: ['गावरान जवस', 'भाजलेला लसूण', 'कढीपत्ता', 'लाल मिरची पूड', 'सेंधव मीठ'],
+    ingredientsMr: ['जवस', 'भाजलेला लसूण', 'कढीपत्ता', 'लाल मिरची पूड', 'सेंधव मीठ'],
     ingredientsEn: ['Roasted Flaxseed', 'Garlic Cloves', 'Curry Leaves', 'Red Chilli Powder', 'Rock Salt'],
-    pairingRecommendationsMr: ['गरम भाकरी व कच्चे शेंगदाणा तेल', 'गव्हाची पोळी', 'मुगाची खिचडी', 'दही-भात'],
-    pairingRecommendationsEn: ['Hot Bhakri with Raw Groundnut Oil', 'Wholewheat Roti', 'Moong Dal Khichdi', 'Curd Rice'],
+    pairingRecommendationsMr: ['गरम भाकरी व तेल', 'गव्हाची पोळी', 'मुगाची खिचडी', 'दही-भात'],
+    pairingRecommendationsEn: ['Hot Bhakri with Oil', 'Wholewheat Roti', 'Moong Dal Khichdi', 'Curd Rice'],
     whereToUseMr: [
-      'दररोज जेवणात १ चमचा जवस चटणी भाकरी किंवा चपातीसोबत खाऊन कोलेस्ट्रॉल व हृदयाचे आरोग्य सुधारा.',
+      'दररोज जेवणात १ चमचा जवस चटणी भाकरी किंवा चपातीसोबत खा.',
       'सकाळच्या दलिया, ओट्स किंवा खिचडीमध्ये मिसळून न्यूट्रिशन वाढवा.',
       'दही-भातामध्ये वरून टाकून खमंग चवीचा आनंद घ्या.'
     ],
     whereToUseEn: [
-      'Take 1 tablespoon daily with Bhakri or Roti to support healthy lipid profiles and heart wellness.',
-      'Mix into morning porridge, oats, or khichdi for an omega-3 powerhouse boost.',
-      'Stir into curd rice or salads for rustic nutty seasoning.'
+      'Take 1 tablespoon daily with Bhakri or Roti to support healthy heart wellness.',
+      'Mix into morning oats or khichdi for an omega-3 boost.',
+      'Stir into curd rice for rustic nutty seasoning.'
     ],
     hygienePrecautionsMr: [
-      '१००% गावरान देशी जवस: काळजीपूर्वक निवडून खडे व धूळ विरहित केलेले बियाणे.',
-      'कमी उष्णतेवर भाजणी: ओमेगा-३ फॅटी ऍसिड नष्ट न होता पूर्ण पोषकता टिकून राहते.'
+      '१००% स्वच्छ जवस: काळजीपूर्वक निवडून खडे व धूळ विरहित केलेले बियाणे.',
+      'कमी उष्णतेवर भाजणी: पोषकता टिकून राहते.'
     ],
     hygienePrecautionsEn: [
-      'Triple Cleaned Flaxseeds: Manually sorted to remove any dust or impurities.',
+      'Triple Cleaned Flaxseeds: Manually sorted to remove impurities.',
       'Low Temperature Roasting: Preserves vulnerable ALA Omega-3 fatty chains.'
     ],
     storageTipsMr: 'कोरड्या बरणीत ठेवा. ६ महिने उत्तम टिकते.',
@@ -503,45 +487,45 @@ export const PRODUCTS: Product[] = [
     ],
     isBestSeller: false,
     isRegionalSpecialty: true,
-    regionOriginMr: 'पश्चिम महाराष्ट्र',
-    regionOriginEn: 'Western Maharashtra'
+    regionOriginMr: 'नैसर्गिक',
+    regionOriginEn: 'Natural'
   },
   {
     id: 'prod-kolhapuri-thecha',
-    nameMr: 'अस्सल कोल्हापुरी हिरवी मिरची-लसूण ठेचा / खर्डा (Mirchi Thecha)',
-    nameEn: 'Authentic Kolhapuri Hirvi Mirchi Thecha (Green Chilli & Garlic Kharda)',
-    taglineMr: 'गावरान हिरवी लवंगी मिरची आणि लसूण ठेचा',
-    taglineEn: 'Traditional fiery green chilli & garlic rustic thecha',
-    descriptionMr: 'कोल्हापूर आणि खान्देशची जान असलेला हा अस्सल गावरान ठेचा. तव्यावर हलक्या तेलात भाजलेली लवंगी हिरवी मिरची, शेंगदाणे, लसूण आणि खडे मीठ जाडसर तयार केले जाते.',
-    descriptionEn: 'The fiery soul of rustic Maharashtra. Fresh spicy green chillies, unpeeled pungent garlic, roasted peanuts, and crystal sea salt prepared according to traditional recipes.',
+    nameMr: 'हिरवी मिरची ठेचा',
+    nameEn: 'Green Chilli Thecha',
+    taglineMr: 'हिरवी मिरची, लसूण आणि शेंगदाण्याचा जाडसर ठेचा',
+    taglineEn: 'Spicy green chilli, garlic & roasted peanut thecha',
+    descriptionMr: 'तव्यावर भाजलेली ताजी हिरवी मिरची, लसूण, शेंगदाणे आणि मीठ एकत्र करून तयार केलेला खमंग ठेचा. भाकरी आणि जेवणासोबत उत्तम.',
+    descriptionEn: 'Fresh green chillies, garlic, roasted peanuts, and sea salt coarsely crushed. Great companion for bhakri and dal rice.',
     category: 'chutney',
     spiceLevel: 5,
-    badgeMr: 'अस्सल कोल्हापुरी ठसका',
-    badgeEn: 'Fiery Rustic Thecha',
+    badgeMr: 'झणझणीत ठेचा',
+    badgeEn: 'Spicy Thecha',
     rating: 4.96,
     reviewCount: 420,
     imageUrl: '/products/thecha-green.jpg',
-    ingredientsMr: ['गावठी हिरवी लवंगी मिरची', 'रानटी लसूण', 'भाजलेले शेंगदाणे', 'खडे मीठ', 'लाकडी घाण्याचे तेल'],
-    ingredientsEn: ['Gavran Green Lavangi Chillies', 'Pungent Garlic', 'Roasted Peanuts', 'Sea Salt', 'Wood-Pressed Groundnut Oil'],
-    pairingRecommendationsMr: ['बाजरीची कडक भाकरी', 'पिठलं', 'दही-भात', 'वरण-भात'],
+    ingredientsMr: ['हिरवी लवंगी मिरची', 'लसूण', 'भाजलेले शेंगदाणे', 'खडे मीठ', 'तेल'],
+    ingredientsEn: ['Green Lavangi Chillies', 'Garlic', 'Roasted Peanuts', 'Sea Salt', 'Groundnut Oil'],
+    pairingRecommendationsMr: ['बाजरीची भाकरी', 'पिठलं', 'दही-भात', 'वरण-भात'],
     pairingRecommendationsEn: ['Bajra Bhakri', 'Pithla', 'Curd Rice', 'Varan Bhaat'],
     whereToUseMr: [
       'गरमागरम बाजरीची किंवा ज्वारीची भाकरी आणि पिठल्यासोबत हा ठेचा तोंडी लावा.',
-      'दही-भातासोबत खाल्ल्यास ठेच्याचा ठसका आणि दह्याचा गारवा मनाला तृप्त करतो.',
-      'सुख्या भाज्यांमध्ये किंवा उसळीमध्ये १ चमचा ठेचा टाकून झणझणीत चव आणा.'
+      'दही-भातासोबत खाल्ल्यास ठेच्याचा ठसका आणि दह्याचा गारवा छान लागतो.',
+      'सुख्या भाज्यांमध्ये किंवा उसळीमध्ये १ चमचा ठेचा टाकून चव वाढवा.'
     ],
     whereToUseEn: [
-      'The quintessential companion to hot Bajra Bhakri and rustic Pithla.',
-      'Pair with curd rice to create an exhilarating contrast between fiery spice and cool yoghurt.',
-      'Stir into stir-fried veggies or sprout curries for a jolt of green chilli zest.'
+      'The companion to hot Bajra Bhakri and Pithla.',
+      'Pair with curd rice to create a balanced contrast between spice and cool yoghurt.',
+      'Stir into stir-fried veggies or sprout curries for green chilli zest.'
     ],
     hygienePrecautionsMr: [
       'ताजी शेतातील हिरवी लवंगी मिरची: थेट शेतातून तोडलेली ताजी मिरची वापरली जाते.',
-      'लाकडी घाण्याचे शुद्ध तेल: हलक्या भाजणीसाठी कोणतेही पामतेल किंवा रिफाइन्ड तेल वापरले जात नाही.'
+      'शुद्ध तेल: हलक्या भाजणीसाठी दर्जेदार तेल वापरले जाते.'
     ],
     hygienePrecautionsEn: [
-      'Farm-Fresh Lavangi Peppers: Harvested directly from partner growers in Kolhapur.',
-      'Cold-Pressed Oil Only: Prepared without any refined oils or artificial vinegar.'
+      'Farm-Fresh Lavangi Peppers: Fresh green peppers sorted and cleaned carefully.',
+      'Pure Cold-Pressed Oil: Prepared without refined oils or artificial additives.'
     ],
     storageTipsMr: 'उघडल्यानंतर फ्रीजमध्ये ठेवल्यास १ महिना ताजेपणा टिकून राहतो. कोरडा चमचा वापरा.',
     storageTipsEn: 'Refrigerate after opening to preserve green vibrancy. Use a dry spoon. 1-2 months.',
@@ -559,44 +543,44 @@ export const PRODUCTS: Product[] = [
     ],
     isBestSeller: true,
     isRegionalSpecialty: true,
-    regionOriginMr: 'कोल्हापूर & खान्देश',
-    regionOriginEn: 'Kolhapur & Khandesh'
+    regionOriginMr: 'नैसर्गिक',
+    regionOriginEn: 'Natural'
   },
   {
     id: 'prod-karale-khurasani',
-    nameMr: 'खानदेशी गावरान कारळे / खुरासणी चटणी (Khurasani Chutney)',
-    nameEn: 'Khandeshi Karale / Khurasani Chutney (Roasted Niger Seed Chutney)',
-    taglineMr: 'मराठवाडा व नाशिकची प्रसिद्ध पौष्टिक व खमंग काळी चटणी',
-    taglineEn: 'Traditional Marathwada roasted niger seed dry chutney powder',
-    descriptionMr: 'खुरासणी (कारळे) ही मराठवाडा व नाशिक भागातील अत्यंत लोकप्रिय व पारंपरिक बियाणे आहे. मंद आचेवर खरपूस भाजून लसूण, जिरे व लाल तिखटासोबत कुटलेली ही चटणी भाकरीसोबत खाताना अप्रतिम लागते.',
-    descriptionEn: 'A cherished regional specialty from Marathwada and Nashik. High in iron and healthy plant fats, unpolished niger seeds are roasted until fragrant and pounded with roasted garlic and Bedgi chilli.',
+    nameMr: 'कारळे चटणी',
+    nameEn: 'Karale Chutney (Niger Seed Chutney)',
+    taglineMr: 'भाजलेली खुरासणी (कारळे) आणि लसणाची पौष्टिक काळी चटणी',
+    taglineEn: 'Roasted niger seed dry chutney powder with garlic',
+    descriptionMr: 'खुरासणी (कारळे) मंद आचेवर भाजून लसूण, जिरे व लाल तिखटासोबत कुटून तयार केलेली ही चटणी भाकरीसोबत खाताना खमंग लागते.',
+    descriptionEn: 'Niger seeds roasted until fragrant and pounded with garlic, cumin, and red chilli. Rich in iron and healthy plant fats.',
     category: 'chutney',
     spiceLevel: 3,
-    badgeMr: 'पारंपरिक खान्देशी चव',
-    badgeEn: 'Regional Specialty',
+    badgeMr: 'पौष्टिक चटणी',
+    badgeEn: 'Nutritious Chutney',
     rating: 4.88,
     reviewCount: 176,
     imageUrl: '/products/karale-niger.jpg',
-    ingredientsMr: ['गावरान खुरासणी (कारळे)', 'भाजलेला लसूण', 'लाल तिखट', 'जिरे', 'सेंधव मीठ'],
-    ingredientsEn: ['Desi Niger Seeds (Khurasani)', 'Roasted Garlic', 'Red Chilli Powder', 'Cumin', 'Rock Salt'],
-    pairingRecommendationsMr: ['ज्वारीची भाकरी व कच्चे तेल', 'दही-पोहे', 'थालीपीठ', 'भातावर तूप व चटणी'],
-    pairingRecommendationsEn: ['Jowar Bhakri with Raw Oil', 'Dahi Poha', 'Thalipeeth', 'Steamed Rice with Ghee'],
+    ingredientsMr: ['खुरासणी (कारळे)', 'भाजलेला लसूण', 'लाल तिखट', 'जिरे', 'सेंधव मीठ'],
+    ingredientsEn: ['Niger Seeds (Khurasani)', 'Roasted Garlic', 'Red Chilli Powder', 'Cumin', 'Rock Salt'],
+    pairingRecommendationsMr: ['ज्वारीची भाकरी व तेल', 'दही-पोहे', 'थालीपीठ', 'भातावर तूप व चटणी'],
+    pairingRecommendationsEn: ['Jowar Bhakri with Oil', 'Dahi Poha', 'Thalipeeth', 'Steamed Rice with Ghee'],
     whereToUseMr: [
-      'ज्वारीच्या भाकरीवर १ चमचा कारळे चटणी व कच्चे गोडेतेल घालून अस्सल खान्देशी जेवणाचा आनंद घ्या.',
+      'ज्वारीच्या भाकरीवर १ चमचा कारळे चटणी व गोडेतेल घालून जेवणाचा आनंद घ्या.',
       'दही-पोहे आणि थालीपीठासोबत तोंडी लावण्यासाठी.',
       'लोह (Iron) वाढवण्यासाठी रोजच्या जेवणात १ चमचा समाविष्ट करा.'
     ],
     whereToUseEn: [
       'Sprinkle on hot Jowar Bhakri with unheated sweet groundnut oil.',
-      'Ideal dry chutney accompaniment for Dahi Poha and Thalipeeth.',
+      'Dry chutney accompaniment for Dahi Poha and Thalipeeth.',
       'Naturally high in dietary iron and minerals for daily wellness.'
     ],
     hygienePrecautionsMr: [
-      'गावरान अस्सल कारळे बिया: माती व खडे विरहित स्वच्छ केलेली अस्सल बियाणे.',
+      'स्वच्छ कारळे बिया: माती व खडे विरहित स्वच्छ केलेली बियाणे.',
       'शून्य प्रिझर्व्हेटिव्ह: कोणतीही रसायने न वापरता नैसर्गिक पद्धतीने तयार.'
     ],
     hygienePrecautionsEn: [
-      'Triple-Filtered Niger Seeds: Completely free from foreign grit or stones.',
+      'Filtered Niger Seeds: Clean and free from foreign grit or stones.',
       'Zero Additives: Pure roasted seeds, garlic, and natural spices.'
     ],
     storageTipsMr: 'थंड व कोरड्या जागी ठेवा. ६ महिने टिकते.',
@@ -615,45 +599,45 @@ export const PRODUCTS: Product[] = [
     ],
     isBestSeller: false,
     isRegionalSpecialty: true,
-    regionOriginMr: 'नाशिक व मराठवाडा',
-    regionOriginEn: 'Nashik & Marathwada'
+    regionOriginMr: 'नैसर्गिक',
+    regionOriginEn: 'Natural'
   },
   {
     id: 'prod-kala-masala',
-    nameMr: 'पारंपरिक महाराष्ट्रीयन काळा / गोडा मसाला (२४ अस्सल खडे मसाले)',
-    nameEn: 'Traditional Maharashtrian Goda / Kala Masala (24 Artisan Spices)',
-    taglineMr: 'दगडफूल, दालचिनी व भाजलेल्या खोबऱ्याचा सुगंधित पारंपरिक मसाला',
-    taglineEn: 'Heritage wood-roasted black spice blend for authentic Maharashtrian curries',
-    descriptionMr: '२४ अस्सल सुगंधी खडे मसाले, दगडफूल, नागकेशर, आणि खोबरे लोखंडी कढईत मंद आचेवर भाजून तयार केलेला हा काळा मसाला. शेव भाजी, उसळ, मटण रस्सा आणि वांग्याच्या भरताला अस्सल गावरान चव देतो.',
-    descriptionEn: 'The crown jewel of traditional Maharashtrian cooking. 24 whole spices including Stone Flower (Dagad Phool), Cobra Saffron (Nagkeshar), and dry copra slow-roasted in iron woks into a dark aromatic spice blend.',
+    nameMr: 'काळा मसाला',
+    nameEn: 'Kala Masala',
+    taglineMr: 'दगडफूल, दालचिनी व भाजलेल्या खोबऱ्याचा सुगंधित मसाला',
+    taglineEn: 'Roasted black spice blend for curries and vegetables',
+    descriptionMr: 'सुगंधी खडे मसाले, दगडफूल, नागकेशर आणि खोबरे लोखंडी कढईत मंद आचेवर भाजून तयार केलेला हा काळा मसाला. शेव भाजी, उसळ आणि रस्सा भाजीला उत्तम चव देतो.',
+    descriptionEn: 'A blend of whole spices including Stone Flower (Dagad Phool), Cobra Saffron (Nagkeshar), and dry copra slow-roasted in iron woks into a dark aromatic spice powder.',
     category: 'masala',
     spiceLevel: 3,
-    badgeMr: '२४ औषधी खडे मसाले',
-    badgeEn: '24 Artisan Spices',
+    badgeMr: 'खडे मसाले',
+    badgeEn: 'Whole Spices',
     rating: 4.9,
     reviewCount: 164,
     imageUrl: '/products/kala-masala.jpg',
     ingredientsMr: ['धने', 'दगडफूल', 'दालचिनी', 'लवंग', 'वेलदोडे', 'तीळ', 'खोबरे', 'नागकेशर', 'तमालपत्र', 'जिरे', 'हळकुंड'],
     ingredientsEn: ['Coriander', 'Stone Flower', 'Cassia Bark', 'Cloves', 'Cardamom', 'Sesame', 'Copra', 'Nagkeshar', 'Bay Leaves', 'Cumin'],
-    pairingRecommendationsMr: ['भरली वांगी (Khandeshi Baingan)', 'तर्री उसळ', 'काळा मटण / चिकन रस्सा', 'कट वडा'],
-    pairingRecommendationsEn: ['Stuffed Brinjal (Bharli Vangi)', 'Kolhapuri Usal', 'Kala Rassa', 'Kat Vada'],
+    pairingRecommendationsMr: ['भरली वांगी', 'तर्री उसळ', 'काळा रस्सा', 'कट वडा'],
+    pairingRecommendationsEn: ['Stuffed Brinjal (Bharli Vangi)', 'Spiced Usal', 'Kala Rassa', 'Kat Vada'],
     whereToUseMr: [
       'भरली वांगी, शेव भाजी, मटकी उसळ व चणा उसळ बनवताना १-२ चमचे काळा मसाला घाला.',
-      'अस्सल गावरान काळा मटण किंवा चिकन रस्सा तयार करण्यासाठी मुख्य घटक.',
+      'काळा रस्सा तयार करण्यासाठी मुख्य घटक.',
       'वांग्याचे भरीत, बटाट्याची सुकी भाजी व आमटीला सुवासिक चव देण्यासाठी.'
     ],
     whereToUseEn: [
-      'Use 1-2 teaspoons for Bharli Vangi (Stuffed Eggplant), Khandeshi Shev Bhaji, and sprout curries.',
-      'The authentic heart of Maharashtrian Black Curry (Kala Mutton / Kala Chicken Rassa).',
-      'Adds rich dark aroma to Aamti, Dal, and vegetable stir fries.'
+      'Use 1-2 teaspoons for Bharli Vangi (Stuffed Eggplant), Shev Bhaji, and sprout curries.',
+      'The flavorful heart of Black Curry (Kala Rassa).',
+      'Adds rich dark aroma to Dal, vegetables, and gravies.'
     ],
     hygienePrecautionsMr: [
-      '२४ अस्सल औषधी मसाले: कोणतेही भेसळयुक्त घटक न वापरता शुद्ध खडे मसाले वापरले जातात.',
+      'औषधी मसाले: कोणतेही भेसळयुक्त घटक न वापरता शुद्ध खडे मसाले वापरले जातात.',
       'लोखंडी कढईत मंद भाजणी: खडे मसाल्यांचा सुगंध व तेल जळून न जाता परिपूर्ण काळा रंग येतो.'
     ],
     hygienePrecautionsEn: [
-      '24 Whole Aromatic Spices: Stone Flower, Nagkeshar, and organic condiments without synthetic fillers.',
-      'Traditional Iron Wok Roasting: Roasted in heavy iron woks to yield signature deep umami complexity.'
+      'Whole Aromatic Spices: Stone Flower, Nagkeshar, and natural condiments without synthetic fillers.',
+      'Traditional Iron Wok Roasting: Roasted in heavy iron woks to yield signature deep complexity.'
     ],
     storageTipsMr: 'हवाबंद काचेच्या बरणीत ठेवा. १२ महिने सुवास टिकून राहतो.',
     storageTipsEn: 'Store in airtight glass container. Maintains freshness for 12 months.',
@@ -671,45 +655,45 @@ export const PRODUCTS: Product[] = [
     ],
     isBestSeller: false,
     isRegionalSpecialty: true,
-    regionOriginMr: 'नाशिक व खान्देश',
-    regionOriginEn: 'Nashik & Khandesh'
+    regionOriginMr: 'खास मिश्रण',
+    regionOriginEn: 'Special Blend'
   },
   {
     id: 'prod-metkut',
-    nameMr: 'पारंपरिक महाराष्ट्रीयन साजूक मेतकूट (पौष्टिक पाचक कूट)',
-    nameEn: 'Traditional Maharashtrian Metkut (Heritage Roasted Dal & Spiced Digestive Powder)',
-    taglineMr: 'गरम भात, साजूक तूप आणि मेतकूट • आजोळची अस्सल चव आणि पचनास उत्तम',
-    taglineEn: 'Heirloom roasted multi-dal, whole grain & warm spice comfort powder for hot steamed rice and ghee',
-    descriptionMr: 'महाराष्ट्राच्या प्रत्येक सुगरण आजीची समृद्ध परंपरा! भाजलेली हरभरा डाळ, उडीद डाळ, मूग डाळ, गहू, तांदूळ, धने, जिरे, सुंठ आणि हळद मंद आचेवर खरपूस भाजून पाट्यावर वाटल्यासारखे बारीक केलेले हे पौष्टिक मेतकूट. लहान मुलांपासून ज्येष्ठांपर्यंत सर्वांच्या पचनास अत्यंत हितकारक.',
-    descriptionEn: 'The quintessential Maharashtrian heirloom comfort food. Slow-roasted multi-lentils (chana, urad, and moong dal) and golden grains ground with sunth (dry ginger), turmeric, coriander, and cumin. Non-spicy, aromatic, and best enjoyed mixed into steaming white rice with pure desi ghee or creamy curd.',
+    nameMr: 'मेतकूट',
+    nameEn: 'Metkut Powder',
+    taglineMr: 'भाजलेल्या डाळी, गहू, तांदूळ आणि सुंठीचे पाचक पीठ',
+    taglineEn: 'Roasted lentils, grains and mild digestive spices for rice and ghee',
+    descriptionMr: 'भाजलेली हरभरा डाळ, उडीद डाळ, मूग डाळ, गहू, तांदूळ, धने, जिरे, सुंठ आणि हळद मंद आचेवर भाजून बारीक केलेले हे पौष्टिक मेतकूट. भात आणि तुपासोबत अप्रतिम लागते.',
+    descriptionEn: 'Roasted lentils (chana, urad, and moong dal) and golden grains ground with dry ginger, turmeric, coriander, and cumin. Delicious mixed into warm rice with ghee or curd.',
     category: 'chutney',
     spiceLevel: 1,
-    badgeMr: 'पारंपरिक मेतकूट • पचनास सर्वोत्तम',
-    badgeEn: 'Heirloom Metkut • Easy Digestion',
+    badgeMr: 'पाचक मेतकूट',
+    badgeEn: 'Digestive Powder',
     rating: 4.97,
     reviewCount: 342,
     imageUrl: '/products/metkut-rice.jpg',
-    ingredientsMr: ['भाजलेली हरभरा डाळ', 'उडीद डाळ', 'मूग डाळ', 'गहू', 'तांदूळ', 'धने', 'जिरे', 'सुंठ', 'राजापुरी हळद', 'हिंग', 'सेंधव मीठ'],
+    ingredientsMr: ['भाजलेली हरभरा डाळ', 'उडीद डाळ', 'मूग डाळ', 'गहू', 'तांदूळ', 'धने', 'जिरे', 'सुंठ', 'हळद', 'हिंग', 'सेंधव मीठ'],
     ingredientsEn: ['Roasted Bengal Gram (Chana Dal)', 'Black Gram (Urad Dal)', 'Moong Dal', 'Whole Wheat', 'Rice', 'Coriander Seeds', 'Cumin', 'Dry Ginger (Sunth)', 'Turmeric', 'Asafoetida (Hing)', 'Rock Salt'],
-    pairingRecommendationsMr: ['गरम वाफाळलेला भात आणि साजूक तूप', 'दही-भात', 'पोळी किंवा दशमीवर तूप लावून', 'उपमा / दलिया'],
-    pairingRecommendationsEn: ['Steaming Hot Rice with Pure Desi Ghee', 'Curd Rice (Dahi Bhaat)', 'Warm Roti with Ghee', 'Savory Porridge / Upma'],
+    pairingRecommendationsMr: ['गरम वाफाळलेला भात आणि साजूक तूप', 'दही-भात', 'पोळीवर तूप लावून', 'उपमा / दलिया'],
+    pairingRecommendationsEn: ['Steaming Hot Rice with Ghee', 'Curd Rice (Dahi Bhaat)', 'Warm Roti with Ghee', 'Savory Porridge / Upma'],
     whereToUseMr: [
-      'गरम पांढऱ्या भातावर १-२ चमचे मेतकूट आणि भरपूर साजूक तूप घालून कालवून खा.',
+      'गरम पांढऱ्या भातावर १-२ चमचे मेतकूट आणि तूप घालून कालवून खा.',
       'दही-भातात मिसळून खाल्ल्याने पचनक्रिया सुधारते आणि शरीराला थंडावा मिळतो.',
-      'आजारी व्यक्तीला किंवा तोंडाला चव नसताना पातळ तांदळाच्या कांजीसोबत उत्तम पथ्यकर आहार.'
+      'तोंडे चव नसताना किंवा पोटाच्या आरामासाठी तांदळाच्या पेजसोबत उपयुक्त.'
     ],
     whereToUseEn: [
-      'Sprinkle 1-2 spoons over steaming hot white rice, crown with melted golden desi ghee, and mix gently.',
-      'Mix into fresh curd rice for a comforting, gut-friendly light meal.',
-      'Ideal mild, nourishing diet with rice porridge during recuperation or for toddlers.'
+      'Sprinkle 1-2 spoons over steaming hot white rice, crown with melted ghee, and mix gently.',
+      'Mix into fresh curd rice for a comforting, gut-friendly meal.',
+      'Ideal mild, nourishing diet with warm rice porridge.'
     ],
     hygienePrecautionsMr: [
-      'मंद विस्तवावर खरपूस भाजणी: कडधान्ये व डाळी न जळता आतपर्यंत भाजल्या जातात.',
+      'मंद आचेवर खरपूस भाजणी: कडधान्ये व डाळी न जळता आतपर्यंत भाजल्या जातात.',
       'सुंठ आणि हिंगाची शुद्धता: नैसर्गिक पाचक गुणधर्म टिकवून ठेवले जातात.'
     ],
     hygienePrecautionsEn: [
-      'Even Wood-Fire Dry Roasting: Roasted slowly to eliminate moisture and preserve aroma.',
-      'Natural Healing Spices: Prepared with authentic ginger and unadulterated asafoetida.'
+      'Slow Dry Roasting: Roasted slowly to eliminate moisture and preserve aroma.',
+      'Natural Healing Spices: Prepared with ginger and pure asafoetida.'
     ],
     storageTipsMr: 'कोरड्या जागी हवाबंद बरणीत ठेवा. ६ महिने ताजे राहते.',
     storageTipsEn: 'Store in an airtight container away from moisture. Fresh for 6 months.',
@@ -727,44 +711,44 @@ export const PRODUCTS: Product[] = [
     ],
     isBestSeller: true,
     isRegionalSpecialty: true,
-    regionOriginMr: 'पुणे व पश्चिम महाराष्ट्र',
-    regionOriginEn: 'Pune & Western Maharashtra'
+    regionOriginMr: 'नैसर्गिक',
+    regionOriginEn: 'Natural'
   },
   {
     id: 'prod-ambyache-lonche',
-    nameMr: 'पारंपरिक महाराष्ट्रीयन आंब्याचे लोणचे (Ambyache Lonche / Heirloom Raw Mango Pickle)',
-    nameEn: 'Traditional Maharashtrian Raw Mango Pickle (Ambyache Lonche - Heirloom Recipe)',
-    taglineMr: 'मेथी-मोहरीच्या दाणेदार मसाल्यात आणि मोहरीच्या तेलात पारंपरिक पद्धतीने मुरवलेले कैरीचे लोणचे',
-    taglineEn: "Authentic Maharashtrian heirloom raw mango pickle cured with split mustard & fenugreek in mustard oil",
-    descriptionMr: 'तरला दलाल यांच्या खास रेसिपीवर आधारित अस्सल महाराष्ट्रीयन आंब्याचे लोणचे! गावरान राजापुरी कैरीचे सुबक तुकडे, मेथीची डाळ (मेथी कुरिया), मोहरीची डाळ (राई कुरिया), हळद, हिंग आणि अस्सल लाल तिखट एकत्र करून कडकडीत तापवून थंड केलेल्या मोहरीच्या तेलात मुरवले जाते. भाकरी, वरण-भात किंवा चपातीसोबत जिभेवर रेंगाळणारी आंबट-तिखट चव.',
-    descriptionEn: "Inspired by Tarla Dalal's celebrated Maharashtrian pickle recipe. Heirloom raw green mangoes diced and marinated in crushed fenugreek seeds (methi na kuria), split yellow mustard seeds (rai na kuria), unadulterated asafoetida, and fiery red chillies bathed in cold-pressed mustard oil. Sun-cured to perfection.",
+    nameMr: 'कैरीचे लोणचे',
+    nameEn: 'Raw Mango Pickle',
+    taglineMr: 'मेथी-मोहरीच्या दाणेदार मसाल्यात आणि मोहरीच्या तेलात मुरवलेले कैरीचे लोणचे',
+    taglineEn: 'Raw mango pickle cured with split mustard & fenugreek in mustard oil',
+    descriptionMr: 'कच्च्या कैरीचे सुबक तुकडे, मेथीची डाळ, मोहरीची डाळ, हळद, हिंग आणि लाल तिखट एकत्र करून मोहरीच्या तेलात मुरवलेले रुचकर लोणचे. भाकरी, वरण-भात किंवा चपातीसोबत उत्तम लागते.',
+    descriptionEn: 'Raw green mangoes diced and marinated in crushed fenugreek seeds, split yellow mustard seeds, asafoetida, and red chillies bathed in cold-pressed mustard oil.',
     category: 'pickle',
     spiceLevel: 4,
-    badgeMr: 'पारंपरिक कैरीचे लोणचे • Heirloom Lonche',
-    badgeEn: 'Heirloom Recipe • Authentic Raw Mango',
+    badgeMr: 'कैरीचे लोणचे',
+    badgeEn: 'Raw Mango Pickle',
     rating: 4.96,
     reviewCount: 420,
     imageUrl: '/products/mango-pickle.jpg',
-    ingredientsMr: ['गावठी राजापुरी कच्ची कैरी', 'मोहरीची डाळ (राई कुरिया)', 'मेथीची डाळ', 'कच्च्या घाण्याचे मोहरीचे तेल', 'बेडगी मिरची पूड', 'राजापुरी हळद', 'खडे मीठ', 'हिंग'],
-    ingredientsEn: ['Raw Green Mangoes (Rajapuri)', 'Split Mustard Seeds (Rai Kuria)', 'Fenugreek Seeds (Methi Kuria)', 'Cold-Pressed Mustard Oil', 'Bedgi Chilli Powder', 'Turmeric', 'Sea Salt', 'Asafoetida (Hing)'],
-    pairingRecommendationsMr: ['गरम वाफाळलेला वरण-भात व साजूक तूप', 'ज्वारीची कडक भाकरी', 'दही-भात', 'गरम चपाती व पोळी', 'मठ्ठा'],
-    pairingRecommendationsEn: ['Steaming Varan Bhaat with Desi Ghee', 'Crisp Jowar Bhakri', 'Curd Rice (Dahi Bhaat)', 'Fresh Wheat Phulka / Roti', 'Spiced Buttermilk'],
+    ingredientsMr: ['कच्ची कैरी', 'मोहरीची डाळ', 'मेथीची डाळ', 'मोहरीचे तेल', 'बेडगी मिरची पूड', 'हळद', 'खडे मीठ', 'हिंग'],
+    ingredientsEn: ['Raw Green Mangoes', 'Split Mustard Seeds', 'Fenugreek Seeds', 'Cold-Pressed Mustard Oil', 'Bedgi Chilli Powder', 'Turmeric', 'Sea Salt', 'Asafoetida (Hing)'],
+    pairingRecommendationsMr: ['गरम वाफाळलेला वरण-भात व साजूक तूप', 'कडक भाकरी', 'दही-भात', 'गरम चपाती व पोळी', 'मठ्ठा'],
+    pairingRecommendationsEn: ['Steaming Varan Bhaat with Ghee', 'Crisp Bhakri', 'Curd Rice (Dahi Bhaat)', 'Fresh Wheat Phulka / Roti', 'Spiced Buttermilk'],
     whereToUseMr: [
-      'दुपारच्या जेवणात पानात डाव्या बाजूला वाढून पारंपरिक जेवणाची रंगत वाढवा.',
+      'दुपारच्या जेवणात पानात डाव्या बाजूला वाढून जेवणाची रंगत वाढवा.',
       'मठ्ठा आणि वाफाळलेल्या मऊ भातावर साजूक तूप व १ फोड लोणचे कालवून खा.',
-      'प्रवासात चपाती-रोल किंवा दशमीसोबत उत्तम टिकणारा सोबती.'
+      'प्रवासात चपाती-रोलसोबत उत्तम टिकणारा सोबती.'
     ],
     whereToUseEn: [
-      'Serve as an indispensable condiment on the traditional Maharashtrian thali.',
-      'Pairs matchlessly with soft curd rice or steaming hot dal-chawal crowned with ghee.',
-      'Classic travel companion rolled inside warm rotis, parathas, or dashmi.'
+      'Serve as an indispensable condiment on your daily meal plate.',
+      'Pairs matchlessly with soft curd rice or steaming hot dal-rice crowned with ghee.',
+      'Classic travel companion rolled inside warm rotis or parathas.'
     ],
     hygienePrecautionsMr: [
       'काचेच्या किंवा मातीच्या बरणीत नैसर्गिक ऊन देऊन मुरवले जाते.',
       'कोणताही कृत्रिम रंग किंवा रसायन वापरलेले नाही, शुद्ध मोहरीचे तेल नैसर्गिक संरक्षक म्हणून कार्य करते.'
     ],
     hygienePrecautionsEn: [
-      'Cured naturally in sterilized ceramic and glass martabans under filtered sun.',
+      'Cured naturally in sterilized ceramic and glass containers under filtered sun.',
       '100% free from artificial food colorings; preserved solely by rock salt and cold-pressed mustard oil.'
     ],
     storageTipsMr: 'नेहमी कोरड्या चमच्याने काढावे. तेलाचा थर फोडींवर राहील याची काळजी घ्या. १२ महिने उत्तम टिकते.',
@@ -783,36 +767,36 @@ export const PRODUCTS: Product[] = [
     ],
     isBestSeller: true,
     isRegionalSpecialty: true,
-    regionOriginMr: 'कोकण व पश्चिम महाराष्ट्र',
-    regionOriginEn: 'Konkan & Western Maharashtra'
+    regionOriginMr: 'नैसर्गिक',
+    regionOriginEn: 'Natural'
   },
   {
     id: 'prod-limbache-lonche',
-    nameMr: 'साजूक लिंबाचे आंबट-गोड पाचक लोणचे (Sweet & Sour Lemon Pickle)',
-    nameEn: 'Maharashtrian Sweet & Sour Lemon Pickle (Limbache Lonche - Oil-Free)',
-    taglineMr: 'अजवायन, सेंधव मीठ व गूळ-मसाल्यात मुरवलेले तेलविरहित पाचक लिंबू लोणचे',
-    taglineEn: 'Traditional oil-free sun-ripened juicy lemon pickle with carom seeds and digestive spices',
-    descriptionMr: 'तरला दलाल यांच्या खास शैलीतील तेलविरहित साजूक लिंबाचे लोणचे! रसदार पातळ सालीचे कागदी लिंबू, ओवा (अजवायन), सेंधव मीठ, काळे मीठ, भाजलेले जिरे आणि सेंद्रिय गुळाच्या पाकात मंद उन्हात मुरवून तयार केलेले. पचनासाठी अत्यंत गुणकारी आणि चवीला गोड-आंबट-तिखट असे अप्रतिम!',
-    descriptionEn: 'The beloved Maharashtrian digestive classic featured in Tarla Dalal’s repertoire. Paper-thin juicy yellow lemons cubed and naturally matured in the sun with digestive carom seeds (ajwain), Himalayan black salt, roasted cumin, and pure unrefined jaggery syrup. 100% oil-free and naturally soothing for the gut.',
+    nameMr: 'लिंबू लोणचे',
+    nameEn: 'Lemon Pickle',
+    taglineMr: 'ओवा, सेंधव मीठ व गूळ-मसाल्यात मुरवलेले तेलविरहित पाचक लिंबू लोणचे',
+    taglineEn: 'Oil-free lemon pickle with carom seeds and digestive spices',
+    descriptionMr: 'पातळ सालीचे रसदार कागदी लिंबू, ओवा, सेंधव मीठ, काळे मीठ, भाजलेले जिरे आणि सेंद्रिय गुळाच्या पाकात मुरवून तयार केलेले तेलविरहित लोणचे. पचनासाठी अत्यंत गुणकारी.',
+    descriptionEn: 'Paper-thin juicy yellow lemons cubed and naturally matured with carom seeds (ajwain), black salt, roasted cumin, and unrefined jaggery syrup. 100% oil-free and naturally soothing for digestion.',
     category: 'pickle',
     spiceLevel: 2,
-    badgeMr: '१००% तेलविरहित • पाचक लोणचे',
-    badgeEn: 'Oil-Free • Ayurvedic Digestion',
+    badgeMr: 'पाचक लिंबू लोणचे',
+    badgeEn: 'Oil-Free Lemon Pickle',
     rating: 4.98,
     reviewCount: 388,
     imageUrl: '/products/lemon-pickle.jpg',
     ingredientsMr: ['रसदार कागदी लिंबू', 'सेंद्रिय गूळ', 'ओवा (अजवायन)', 'सेंधव व काळे मीठ', 'भाजलेली जिरे पूड', 'काश्मिरी लाल तिखट'],
     ingredientsEn: ['Juicy Thin-Skinned Lemons', 'Organic Jaggery', 'Carom Seeds (Ajwain)', 'Rock Salt & Black Salt', 'Roasted Cumin Powder', 'Kashmiri Mild Chilli'],
-    pairingRecommendationsMr: ['मुगाची मऊ खिचडी', 'थालीपीठ', 'दही-भात', 'उपवास / आजारपणानंतर तोंडाला चव आणण्यासाठी'],
+    pairingRecommendationsMr: ['मुगाची मऊ खिचडी', 'थालीपीठ', 'दही-भात', 'तोंडी लावण्यासाठी'],
     pairingRecommendationsEn: ['Comforting Moong Dal Khichdi', 'Crispy Thalipeeth', 'Curd Rice', 'Appetite restoring side with light meals'],
     whereToUseMr: [
       'मऊ गरमागरम खिचडीवर साजूक तूप आणि १ चमचा लिंबू लोणचे घालून खा.',
-      'अपचन, मळमळ किंवा तोंडाची चव गेली असल्यास १ छोटा तुकडा खाल्ल्याने पचन सुधारते.',
-      'लहान मुलांना पोळीसोबत रोल करून देण्यासाठी आरोग्यदायी पर्याय.'
+      'अपचन, मळमळ किंवा तोंडाची चव गेली असल्यास १ छोटा तुकडा खाल्ल्याने आराम मिळतो.',
+      'लहान मुलांना पोळीसोबत रोल करून देण्यासाठी चांगला पर्याय.'
     ],
     whereToUseEn: [
-      'Crown hot moong dal khichdi with desi cow ghee and a spoonful of this sweet-tangy lemon pickle.',
-      'Natural Ayurvedic remedy to settle digestion and stimulate taste buds.',
+      'Crown hot moong dal khichdi with ghee and a spoonful of this sweet-tangy lemon pickle.',
+      'Natural remedy to settle digestion and stimulate taste buds.',
       'Delicious spread for toddler rotis or soft parathas without greasy oils.'
     ],
     hygienePrecautionsMr: [
@@ -839,44 +823,44 @@ export const PRODUCTS: Product[] = [
     ],
     isBestSeller: true,
     isRegionalSpecialty: true,
-    regionOriginMr: 'पुणे व सातारा',
-    regionOriginEn: 'Pune & Satara'
+    regionOriginMr: 'नैसर्गिक',
+    regionOriginEn: 'Natural'
   },
   {
     id: 'prod-panchamrut',
-    nameMr: 'पारंपरिक महाराष्ट्रीयन सणासुदीचे पंचामृत (Maharashtrian Panchamrut Chutney Relish)',
-    nameEn: 'Traditional Maharashtrian Panchamrut (Festive Sweet & Tangy Chutney Relish)',
-    taglineMr: 'शेंगदाणे, तीळ, सुके खोबरे, चिंच-गूळ आणि गोडा मसाल्याची चटकदार सणाची चटणी',
-    taglineEn: 'Celebratory sweet, tangy & spicy relish made with roasted peanuts, sesame, coconut, tamarind & goda masala',
-    descriptionMr: 'महाराष्ट्रातील सत्यनारायण पूजा, लग्नकार्य आणि सणावाराच्या पानावर डाव्या बाजूला अग्रस्थान असणारे पारंपरिक पंचामृत! भाजलेले शेंगदाणे, पांढरे तीळ, सुक्या खोबऱ्याचे तुकडे, हिरवी मिरची, चिंचेचा कोळ, गूळ आणि अस्सल गोडा मसाला यांची खमंग फोडणी देऊन मंद आचेवर घट्ट शिजवलेली ही शाही चटणी. तरला दलाल यांच्या खास रेसिपीनुसार तयार.',
-    descriptionEn: "The signature celebratory relish of Maharashtra featured in Tarla Dalal’s traditional collection. Roasted peanuts, nutty sesame seeds, tender dried coconut strips, and slit green chillies simmered in a dense, glistening tamarind-jaggery syrup scented with authentic Maharashtrian Goda Masala. Sweet, sour, spicy, and profoundly aromatic.",
+    nameMr: 'पंचामृत चटणी',
+    nameEn: 'Panchamrut Relish',
+    taglineMr: 'शेंगदाणे, तीळ, सुके खोबरे, चिंच-गूळ आणि मसाल्यांची चटकदार चटणी',
+    taglineEn: 'Sweet, tangy & spicy relish made with roasted peanuts, sesame, coconut and tamarind',
+    descriptionMr: 'सत्यनारायण पूजा आणि लग्नकार्यातील पानावर वाढली जाणारी पंचामृत चटणी. भाजलेले शेंगदाणे, पांढरे तीळ, सुक्या खोबऱ्याचे तुकडे, हिरवी मिरची, चिंचेचा कोळ आणि गूळ यांची खमंग फोडणी देऊन तयार केलेली चटकदार चटणी.',
+    descriptionEn: 'Roasted peanuts, nutty sesame seeds, dried coconut strips, and slit green chillies simmered in a rich tamarind-jaggery syrup with warm spices. Sweet, sour, spicy, and aromatic.',
     category: 'chutney',
     spiceLevel: 2,
-    badgeMr: 'सणासुदीचे खास पंचामृत • Festive Relish',
-    badgeEn: 'Festive Maharashtrian Relish',
+    badgeMr: 'पंचामृत चटणी',
+    badgeEn: 'Sweet & Tangy Relish',
     rating: 4.95,
     reviewCount: 310,
     imageUrl: '/products/panchamrut.jpg',
-    ingredientsMr: ['भाजलेले सोलापुरी शेंगदाणे', 'गावरान पांढरे तीळ', 'सुक्या खोबऱ्याच्या कातऱ्या', 'गावरान चिंचेचा कोळ', 'सेंद्रिय गूळ', 'गोडा मसाला', 'हिरवी मिरची', 'मोहरी व कढीपत्ता फोडणी'],
-    ingredientsEn: ['Roasted Solapuri Peanuts', 'White Sesame Seeds', 'Dry Coconut Slivers', 'Tamarind Pulp', 'Organic Jaggery', 'Authentic Goda Masala', 'Green Chillies', 'Mustard & Curry Leaf Tadka'],
-    pairingRecommendationsMr: ['सणाचे ताट (पुरणपोळी)', 'मसाले भात', 'कढी-भात', 'थालीपीठ', 'गरम पुरी-भाजी'],
-    pairingRecommendationsEn: ['Festive Thali with Puran Poli', 'Maharashtrian Masale Bhaat', 'Kadhi Bhaat', 'Crisp Hot Puris', 'Thalipeeth'],
+    ingredientsMr: ['भाजलेले शेंगदाणे', 'पांढरे तीळ', 'सुक्या खोबऱ्याच्या कातऱ्या', 'चिंचेचा कोळ', 'सेंद्रिय गूळ', 'खडे मसाले', 'हिरवी मिरची', 'मोहरी व कढीपत्ता फोडणी'],
+    ingredientsEn: ['Roasted Peanuts', 'White Sesame Seeds', 'Dry Coconut Slivers', 'Tamarind Pulp', 'Organic Jaggery', 'Spices', 'Green Chillies', 'Mustard & Curry Leaf Tadka'],
+    pairingRecommendationsMr: ['सणाचे ताट', 'मसाले भात', 'कढी-भात', 'थालीपीठ', 'गरम पुरी-भाजी'],
+    pairingRecommendationsEn: ['Festive Thali', 'Masale Bhaat', 'Kadhi Bhaat', 'Crisp Hot Puris', 'Thalipeeth'],
     whereToUseMr: [
-      'सणासुदीच्या नैवेद्याच्या ताटात डाव्या बाजूला तोंडी लावण्यासाठी वाढा.',
-      'मसाले भातासोबत १ चमचा पंचामृत खाल्ल्याने भाताची चव द्विगुणीत होते.',
+      'जेवणाच्या ताटात डाव्या बाजूला तोंडी लावण्यासाठी वाढा.',
+      'मसाले भातासोबत १ चमचा पंचामृत खाल्ल्याने भाताची चव वाढते.',
       'गरम पुरी किंवा चपातीसोबत चविष्ट साइड डिश म्हणून अप्रतिम.'
     ],
     whereToUseEn: [
-      'The quintessential companion on the traditional festive banana leaf feast.',
-      'Spoon generously beside Maharashtrian Masale Bhaat for an unforgettable flavor balance.',
-      'Delicious dip with piping hot puris, bhajis, or evening snacks.'
+      'The quintessential companion on the traditional feast plate.',
+      'Spoon beside Masale Bhaat for an enjoyable flavor balance.',
+      'Delicious dip with piping hot puris or snacks.'
     ],
     hygienePrecautionsMr: [
       'मंद आचेवर शिजवून चिंच व गुळाचा परिपूर्ण पाक तयार केला जातो.',
-      'कोणतेही कृत्रिम रंग किंवा प्रिझर्व्हेटिव्ह नसलेली १००% शुद्ध घरगुती पद्धत.'
+      'कोणतेही कृत्रिम रंग किंवा प्रिझर्व्हेटिव्ह नसलेली शुद्ध पद्धत.'
     ],
     hygienePrecautionsEn: [
-      'Simmered slowly in heavy copper-bottom pots to create an authentic glossy consistency.',
+      'Simmered slowly in heavy copper-bottom pots to create a glossy consistency.',
       'Zero synthetic additives; purely concentrated with natural jaggery and tamarind.'
     ],
     storageTipsMr: 'रेफ्रिजरेटरमध्ये हवाबंद बरणीत ठेवा. ३ महिने उत्तम ताजे राहते.',
@@ -895,34 +879,34 @@ export const PRODUCTS: Product[] = [
     ],
     isBestSeller: true,
     isRegionalSpecialty: true,
-    regionOriginMr: 'मराठवाडा व पश्चिम महाराष्ट्र',
-    regionOriginEn: 'Marathwada & Western Maharashtra'
+    regionOriginMr: 'नैसर्गिक',
+    regionOriginEn: 'Natural'
   },
   {
     id: 'prod-hirvi-mirchi-lonche',
-    nameMr: 'झटपट हिरव्या मिरचीचे लोणचे (Instant Maharashtrian Green Chilli Pickle)',
-    nameEn: 'Instant Maharashtrian Green Chilli Pickle (Hirvya Mirchyanche Lonche)',
+    nameMr: 'हिरव्या मिरचीचे लोणचे',
+    nameEn: 'Green Chilli Pickle',
     taglineMr: 'मोहरीची डाळ, लिंबाचा रस व हिंगाच्या खमंग फोडणीत ताजी हिरवी मिरची',
-    taglineEn: 'Crunchy green chillies infused with crushed yellow mustard seeds, lemon juice & aromatic hing',
-    descriptionMr: 'तरला दलाल यांच्या इन्स्टंट लोणचे रेसिपीवर आधारित कुरकुरीत हिरव्या मिरचीचे लोणचे! कमी तिखट गावठी ताज्या हिरव्या मिरच्या उभ्या चिरून त्यात मोहरीची डाळ (राई कुरिया), हळद, हिंग, खडे मीठ आणि ताज्या लिंबाचा रस घालून गरम तेलाची खमंग फोडणी दिली जाते. कोणत्याही जेवणाला त्वरित तिखट-आंबट किक देणारे लोणचे.',
-    descriptionEn: "Inspired by Tarla Dalal's quick Maharashtrian pickle recipe. Slit tender fresh green chillies tossed with cracked yellow mustard seeds, turmeric, sea salt, fragrant hing, and bathed in fresh lemon juice and warm peanut oil. Crunchy, zesty, and instantly awakens the appetite.",
+    taglineEn: 'Fresh green chillies with yellow mustard seeds, lemon juice and asafoetida',
+    descriptionMr: 'कुरकुरीत ताज्या हिरव्या मिरच्या उभ्या चिरून त्यात मोहरीची डाळ, हळद, हिंग, मीठ आणि ताज्या लिंबाचा रस घालून गरम तेलाची खमंग फोडणी देऊन तयार केलेले रुचकर लोणचे.',
+    descriptionEn: 'Slit tender green chillies tossed with cracked yellow mustard seeds, turmeric, sea salt, fragrant hing, fresh lemon juice and warm oil. Crunchy, tangy, and zesty.',
     category: 'pickle',
     spiceLevel: 3,
-    badgeMr: 'झटपट लोणचे • Crunchy & Tangy',
-    badgeEn: 'Instant Green Chilli Pickle',
+    badgeMr: 'मिरचीचे लोणचे',
+    badgeEn: 'Green Chilli Pickle',
     rating: 4.91,
     reviewCount: 260,
     imageUrl: '/products/chilli-pickle.jpg',
-    ingredientsMr: ['ताज्या गावरan हिरव्या मिरच्या', 'मोहरीची डाळ (राई कुरिया)', 'ताज्या लिंबाचा रस', 'हिंग', 'राजापुरी हळद', 'सेंधव मीठ', 'कच्च्या घाण्याचे शेंगदाणा तेल'],
-    ingredientsEn: ['Fresh Slit Green Chillies', 'Yellow Mustard Seeds (Rai Kuria)', 'Fresh Lemon Juice', 'Asafoetida (Hing)', 'Turmeric', 'Rock Salt', 'Cold-Pressed Groundnut Oil'],
-    pairingRecommendationsMr: ['वरण-भात आणि तूप', 'ज्वारीची भाकरी', 'दाल-खिचडी', 'पराठा'],
-    pairingRecommendationsEn: ['Varan Bhaat with Ghee', 'Rustic Jowar Bhakri', 'Dal Khichdi', 'Stuffed Parathas'],
+    ingredientsMr: ['ताज्या हिरव्या मिरच्या', 'मोहरीची डाळ', 'ताज्या लिंबाचा रस', 'हिंग', 'हळद', 'सेंधव मीठ', 'शेंगदाणा तेल'],
+    ingredientsEn: ['Fresh Green Chillies', 'Yellow Mustard Seeds', 'Fresh Lemon Juice', 'Asafoetida (Hing)', 'Turmeric', 'Rock Salt', 'Groundnut Oil'],
+    pairingRecommendationsMr: ['वरण-भात आणि तूप', 'भाकरी', 'दाल-खिचडी', 'पराठा'],
+    pairingRecommendationsEn: ['Varan Bhaat with Ghee', 'Rustic Bhakri', 'Dal Khichdi', 'Stuffed Parathas'],
     whereToUseMr: [
       'जेवणात साध्या डाळ-भातासोबत १ चमचा तोंडी लावा.',
       'खिचडी किंवा पराठ्यासोबत चटकदार साइड म्हणून वाढा.'
     ],
     whereToUseEn: [
-      'Ideal zesty accompaniment with comforting dal-chawal or khichdi.',
+      'Ideal accompaniment with comforting dal-rice or khichdi.',
       'Delicious crunchy condiment paired with everyday flatbreads and parathas.'
     ],
     hygienePrecautionsMr: [
@@ -949,37 +933,93 @@ export const PRODUCTS: Product[] = [
     ],
     isBestSeller: false,
     isRegionalSpecialty: true,
-    regionOriginMr: 'खानदेश व मराठवाडा',
-    regionOriginEn: 'Khandesh & Marathwada'
+    regionOriginMr: 'नैसर्गिक',
+    regionOriginEn: 'Natural'
+  },
+  {
+    id: 'prod-lasun-lonche',
+    nameMr: 'लसणाचे लोणचे',
+    nameEn: 'Garlic Pickle',
+    taglineMr: 'लसूण पाकळ्या, हळद, तिखट, तेल, मोहरी डाळ, मेथी दाणे व हिंग',
+    taglineEn: 'Whole garlic cloves steeped in cracked mustard seeds, hing & spiced oil',
+    descriptionMr: 'टपोऱ्या लसूण पाकळ्या, हळद, तिखट, मोहरी डाळ, मेथी दाणे, मीठ, हिंग आणि ताज्या लिंबाचा रस एकत्र करून घाण्याच्या तेलात मुरवलेले रुचकर लोणचे. पचनासाठी गुणकारी.',
+    descriptionEn: 'Whole peeled garlic cloves cured in cold-pressed oil with split mustard seeds, fenugreek seeds, turmeric, pungent hing, and fresh lemon juice. Rich flavor and soothing for digestion.',
+    category: 'pickle',
+    spiceLevel: 3,
+    badgeMr: 'लसूण लोणचे',
+    badgeEn: 'Garlic Pickle',
+    rating: 4.96,
+    reviewCount: 340,
+    imageUrl: '/products/garlic-pickle.jpg',
+    ingredientsMr: ['लसूण पाकळ्या', 'हळद', 'तिखट', 'तेल', 'मोहरी डाळ', 'मेथी दाणे', 'हिंग', 'लिंबू रस', 'खडे मीठ'],
+    ingredientsEn: ['Garlic Cloves', 'Turmeric', 'Red Chilli Powder', 'Cold-Pressed Oil', 'Yellow Mustard Dal', 'Fenugreek Seeds', 'Asafoetida', 'Lemon Juice', 'Rock Salt'],
+    pairingRecommendationsMr: ['गरमागरम भाकरी', 'वरण-भात आणि तूप', 'दाल खिचडी', 'थालीपीठ'],
+    pairingRecommendationsEn: ['Piping Hot Bhakri', 'Comforting Varan Bhaat with Ghee', 'Moong Dal Khichdi', 'Thalipeeth'],
+    whereToUseMr: [
+      'दुपारच्या किंवा रात्रीच्या जेवणात १-२ लसूण पाकळ्या लोणच्यासह तोंडी लावा.',
+      'गरम वरण-भातावर साजूक तूप आणि लसणाचं लोणचं एकत्र करून खा.',
+      'भाकरीसोबत ठेचा आणि लसणाचं लोणचं अप्रतिम लागते.'
+    ],
+    whereToUseEn: [
+      'Relish 1-2 spiced garlic cloves alongside daily meals for incredible taste and digestion.',
+      'Pair with warm steamed dal-rice and melted ghee.',
+      'Serve alongside rustic flatbreads and pitla for an earthy meal.'
+    ],
+    hygienePrecautionsMr: [
+      'हाताने सोललेल्या ताज्या लसूण पाकळ्या वापरल्या जातात.',
+      'कोणतेही कृत्रिम रंग अथवा ॲसिड नसलेली शुद्ध पद्धत.'
+    ],
+    hygienePrecautionsEn: [
+      'Carefully sorted and hand-peeled garlic cloves to ensure complete cleanliness.',
+      '100% natural curing in oil with no synthetic preservatives or acidity regulators.'
+    ],
+    storageTipsMr: 'काचेच्या हवाबंद बरणीत ठेवा. नेहमी कोरड्या चमच्याचा वापर करा. १ वर्ष उत्तम टिकते.',
+    storageTipsEn: 'Store in an airtight glass jar. Always use a dry spoon. Shelf life 12 months.',
+    hsnCode: '20019000',
+    nutritionFacts: {
+      calories: '145 kcal / 100g',
+      protein: '4.5g',
+      healthyFats: '8.2g',
+      fiber: '2.8g'
+    },
+    sizes: [
+      { size: '250g', grams: 250, price: 160, originalPrice: 195, inStock: true },
+      { size: '500g', grams: 500, price: 295, originalPrice: 360, inStock: true },
+      { size: '1kg', grams: 1000, price: 560, originalPrice: 700, inStock: true }
+    ],
+    isBestSeller: true,
+    isRegionalSpecialty: true,
+    regionOriginMr: 'नैसर्गिक',
+    regionOriginEn: 'Natural'
   },
   {
     id: 'prod-malvani-masala',
-    nameMr: 'अस्सल मालवणी मसाला (Malvani Fish & Veg Masala)',
-    nameEn: 'Authentic Konkan Malvani Masala (28-Spice Royal Blend)',
-    taglineMr: 'कोकणचा जगप्रसिद्ध २८ मसाल्यांचा पारंपरिक सुगंधी मसाला • नाकेश्वर व दगडफूल',
-    taglineEn: 'Legendary coastal Konkan masala with star anise, dagad phool & roasted copra',
-    descriptionMr: 'कोकणातील सिंधुदुर्ग व मालवणची खरी ओळख! २८ निवडक खडे मसाले, दगडफूल, त्रिफळा, चक्रफूल, नाकेश्वर आणि मंद आचेवर भाजलेले सुके खोबरे एकत्र करून दगडी खलबत्त्यात कुटलेला अस्सल मालवणी मसाला. माशांचे कालवण, मटण सुक्का किंवा कडधान्यांच्या उसळीसाठी सर्वोत्तम.',
-    descriptionEn: 'The pride of the Konkan coastline. A secret heritage blend of 28 sun-cured spices including triphala, stone flower (dagad phool), cobra saffron (nagkeshar), star anise, and slow-roasted dry copra. Imparts an unforgettable coastal aroma to fish curries, chicken rassa, and hearty sprouted bean gravies.',
+    nameMr: 'मालवणी मसाला',
+    nameEn: 'Malvani Masala',
+    taglineMr: 'मसाल्यांचे खमंग सुगंधी मिश्रण • नाकेश्वर व दगडफूल',
+    taglineEn: 'Coastal spice blend with star anise, stone flower & roasted copra',
+    descriptionMr: 'निवडक खडे मसाले, दगडफूल, त्रिफळा, चक्रफूल, नाकेश्वर आणि मंद आचेवर भाजलेले सुके खोबरे एकत्र करून तयार केलेला मालवणी मसाला. कालवण, उसळ आणि रस्सा भाजीसाठी उत्तम.',
+    descriptionEn: 'A balanced coastal spice blend of whole spices including triphala, stone flower (dagad phool), cobra saffron (nagkeshar), star anise, and roasted dry copra. Enhances curries and gravies.',
     category: 'masala',
     spiceLevel: 4,
-    badgeMr: 'कोकणची अस्सल शान • 28 Spices',
-    badgeEn: 'Konkan Royal Heritage (28 Spices)',
+    badgeMr: 'मालवणी मसाला',
+    badgeEn: 'Coastal Blend',
     rating: 4.97,
     reviewCount: 420,
     imageUrl: '/products/kala-masala.jpg',
     ingredientsMr: ['बेडगी व काश्मिरी मिरची', 'दगडफूल', 'नाकेश्वर', 'त्रिफळा', 'चक्रफूल', 'शहाजिरे', 'दालचिनी', 'भाजलेले सुके खोबरे', 'धने व जिरे'],
     ingredientsEn: ['Bedgi & Kashmiri Chillies', 'Stone Flower (Dagad Phool)', 'Nagkeshar', 'Triphala', 'Star Anise', 'Shahjeera', 'Cinnamon', 'Roasted Copra', 'Coriander & Cumin'],
-    pairingRecommendationsMr: ['सुरमई / पापलेट कालवण', 'कोंबडी वडे', 'सुकट उसळ', 'काळ्या वाटणाची उसळ'],
-    pairingRecommendationsEn: ['Surmai / Pomfret Curry', 'Kombdi Vade', 'Dry Fish Fry', 'Black Coconut Sprouted Usal'],
+    pairingRecommendationsMr: ['सुरमई कालवण', 'कोंबडी वडे', 'सुकट उसळ', 'उसळ रस्सा'],
+    pairingRecommendationsEn: ['Fish Curry', 'Kombdi Vade', 'Dry Fish Fry', 'Sprouted Bean Usal'],
     whereToUseMr: [
-      'मासे किंवा कोळंबीचे कालवण बनवताना फोडणीत २ चमचे मालवणी मसाला घाला.',
-      'कोंबडी वड्यांसोबतच्या झणझणीत रश्शासाठी मुख्य मसाला म्हणून वापरा.',
-      'वांगी-बटाटा किंवा वालच्या उसळीत खमंग कोकणी स्वादासाठी १ चमचा वापरा.'
+      'कालवण बनवताना फोडणीत २ चमचे मालवणी मसाला घाला.',
+      'रश्शासाठी मुख्य मसाला म्हणून वापरा.',
+      'वांगी-बटाटा किंवा वालच्या उसळीत चवीसाठी १ चमचा वापरा.'
     ],
     whereToUseEn: [
-      'Incorporate 2 tablespoons into coastal fish or prawn gravies for intense aroma.',
-      'Essential signature seasoning for Kombdi Vade chicken curry.',
-      'Enhance sprouted bean usal and brinjal curries with distinctive Konkan fragrance.'
+      'Incorporate 2 tablespoons into curries for rich aroma.',
+      'Signature seasoning for hearty gravies.',
+      'Enhance sprouted bean usal and vegetable curries with distinctive fragrance.'
     ],
     storageTipsMr: 'थंड व कोरड्या जागी हवाबंद बरणीत ठेवा. १ वर्ष सुवास तसाच टिकतो.',
     storageTipsEn: 'Store in airtight glass or stainless container. Retains peak aroma for 12 months.',
@@ -993,35 +1033,35 @@ export const PRODUCTS: Product[] = [
     ],
     isBestSeller: true,
     isRegionalSpecialty: true,
-    regionOriginMr: 'सिंधुदुर्ग व मालवण',
-    regionOriginEn: 'Konkan (Malvan)'
+    regionOriginMr: 'सिंधुदुर्ग',
+    regionOriginEn: 'Sindhudurg'
   },
   {
     id: 'prod-khandeshi-kala-masala',
-    nameMr: 'खानदेशी घरगुती काळा मसाला (Khandeshi Kala Masala)',
-    nameEn: 'Authentic Khandeshi Kala Masala (Charred Coriander & Coconut)',
-    taglineMr: 'शेव भाजी व गावरan उसळीसाठी खास गडद खमंग काळा मसाला • जळगाव स्पेशल',
-    taglineEn: 'Deep-roasted dark masala for iconic Khandeshi Shev Bhaji & rustic curries',
-    descriptionMr: 'खानदेशची प्रसिद्ध शेव भाजी ज्या मसाल्याशिवाय अपूर्ण आहे तो हा अस्सल खानदेशी काळा मसाला! धने, तीळ, सुके खोबरे आणि २५ खडे मसाले लोखंडी कढईत काळे होईपर्यंत भाजून तयार केले जातात. यात कांद्याची काळी पेस्ट न घालताही रश्शाला दाटपणा व आकर्षक गडद रंग येतो.',
-    descriptionEn: 'The heart and soul of Khandesh cuisine. Whole coriander seeds, white sesame, dry copra, and 25 whole spices dark-roasted on iron pans until deep mahogany-black, then finely pulverized. Yields the famous spicy dark gravy of Khandeshi Shev Bhaji, Patodi Rassa, and rustic dal baati.',
+    nameMr: 'काळा मसाला (शेव भाजी स्पेशल)',
+    nameEn: 'Dark Roast Kala Masala',
+    taglineMr: 'शेव भाजी व उसळीसाठी खास गडद खमंग काळा मसाला',
+    taglineEn: 'Deep-roasted dark masala for shev bhaji and rustic curries',
+    descriptionMr: 'धने, तीळ, सुके खोबरे आणि खडे मसाले लोखंडी कढईत गडद होईपर्यंत भाजून तयार केलेला हा काळा मसाला. शेव भाजी, उसळ आणि रस्सा भाजीला दाटपणा व गडद रंग देतो.',
+    descriptionEn: 'Whole coriander seeds, white sesame, dry copra, and whole spices dark-roasted on iron pans until deep mahogany-black, then finely pulverized. Yields rich, flavorful gravies for curries and vegetables.',
     category: 'masala',
     spiceLevel: 5,
-    badgeMr: 'खानदेशची खास शेव भाजी मसाला',
-    badgeEn: 'Khandesh Shev Bhaji Special',
+    badgeMr: 'शेव भाजी स्पेशल',
+    badgeEn: 'Dark Roast Blend',
     rating: 4.96,
     reviewCount: 380,
     imageUrl: '/products/kala-masala.jpg',
     ingredientsMr: ['काळे भाजलेले धने', 'सुके खोबरे', 'तीळ', 'लवंग', 'काळी मिरी', 'दगडफूल', 'तमालपत्र', 'दालचिनी', 'बडीशेप', 'खसखस'],
     ingredientsEn: ['Dark-Roasted Coriander', 'Dry Copra', 'Sesame Seeds', 'Cloves', 'Black Peppercorns', 'Stone Flower', 'Bay Leaf', 'Cinnamon', 'Fennel', 'Poppy Seeds'],
-    pairingRecommendationsMr: ['खानदेशी तिखट शेv भाजी', 'पातोडी रस्सा', 'वरण-बट्टी', 'गावरान चिकन सुक्का'],
-    pairingRecommendationsEn: ['Spicy Khandeshi Shev Bhaji', 'Patodi Rassa', 'Khandeshi Varan Batti', 'Rustic Chicken Sukka'],
+    pairingRecommendationsMr: ['तिखट शेव भाजी', 'पातोडी रस्सा', 'वरण-बट्टी', 'उसळ रस्सा'],
+    pairingRecommendationsEn: ['Spicy Shev Bhaji', 'Patodi Rassa', 'Varan Batti', 'Spicy Curries'],
     whereToUseMr: [
-      'खानदेशी शेव भाजी बनवताना फोडणीत २ चमचे घालून तेल सुटेपर्यंत परता.',
+      'शेव भाजी बनवताना फोडणीत २ चमचे घालून तेल सुटेपर्यंत परता.',
       'पातोडीच्या रश्शासाठी किंवा वांग्याच्या भाजीसाठी १-२ चमचे वापरा.'
     ],
     whereToUseEn: [
-      'Fry 2 tbsp in hot oil for iconic Khandeshi Shev Bhaji until oil floats atop.',
-      'Ideal for Patodi Rassa, Bharli Vangi, and winter country curries.'
+      'Fry 2 tbsp in hot oil for rich Shev Bhaji until oil floats atop.',
+      'Ideal for Patodi Rassa, Bharli Vangi, and country curries.'
     ],
     storageTipsMr: 'हवाबंद डब्यात ठेवा. वर्षभर सुवास व गडद रंग कायम राहतो.',
     storageTipsEn: 'Keep sealed in an airtight jar away from light. Stays fresh for 12 months.',
@@ -1035,17 +1075,17 @@ export const PRODUCTS: Product[] = [
     ],
     isBestSeller: true,
     isRegionalSpecialty: true,
-    regionOriginMr: 'जळगाव व धुळे (खानदेश)',
-    regionOriginEn: 'Khandesh (Jalgaon & Dhule)'
+    regionOriginMr: 'नैसर्गिक',
+    regionOriginEn: 'Natural'
   },
   {
     id: 'prod-goda-masala',
-    nameMr: 'पेशवाई गोडा मसाला (Peshwai Brahmin Goda Masala)',
-    nameEn: 'Peshwai Sweet Aromatic Goda Masala (No Onion, No Garlic)',
+    nameMr: 'गोडा मसाला',
+    nameEn: 'Goda Masala',
     taglineMr: 'दगडफूल, पांढरे तीळ व सुक्या खोबऱ्याचा सुवासिक गोडा मसाला • कांदा-लसूण विरहित',
-    taglineEn: 'Traditional Brahmin sweet masala with stone flower, sesame & dry copra',
-    descriptionMr: 'पुणे व नाशिकच्या ब्राह्मणी परंपरेतील अत्यंत सुगंधी, सात्विक आणि कांदा-लसूण विरहित पेशवाई गोडा मसाला. दगडफूल (Stone Flower), पांढरे तीळ, खसखस, सुके खोबरे आणि दालचिनी मंद आचेवर साजूक तुपाची धार लावून भाजले जातात. वरण, आमटी, भरली वांगी आणि मटकी उसळीला स्वर्गीय सुगंध देणारा मसाला.',
-    descriptionEn: 'The aristocratic culinary jewel of Maharashtra. 100% pure vegetarian, no onion, no garlic. Crafted with fragrant stone flower (dagad phool), unpolished white sesame, poppy seeds, dry coconut, and royal cinnamon kissed with desi cow ghee. Essential for authentic Maharashtrian Amti, Bharli Vangi, Katachi Amti, and Matki Usal.',
+    taglineEn: 'Sweet aromatic spice blend with stone flower, sesame & dry copra',
+    descriptionMr: 'अत्यंत सुगंधी, सात्विक आणि कांदा-लसूण विरहित गोडा मसाला. दगडफूल, पांढरे तीळ, खसखस, सुके खोबरे आणि दालचिनी मंद आचेवर साजूक तुपाची धार लावून भाजले जातात. वरण, आमटी, भरली वांगी आणि मटकी उसळीला छान सुगंध देणारा मसाला.',
+    descriptionEn: 'Pure vegetarian, no onion, no garlic. Crafted with fragrant stone flower (dagad phool), white sesame, poppy seeds, dry coconut, and royal cinnamon roasted with ghee. Essential for amti, bharli vangi, katachi amti, and matki usal.',
     category: 'masala',
     spiceLevel: 2,
     badgeMr: 'सात्विक • कांदा-लसूण विरहित',
@@ -1054,18 +1094,18 @@ export const PRODUCTS: Product[] = [
     reviewCount: 610,
     imageUrl: '/products/til-sesame.jpg',
     ingredientsMr: ['धने', 'दगडफूल', 'पांढरे तीळ', 'सुके खोबरे', 'दालचिनी', 'लवंग', 'काळी मिरी', 'नाकेश्वर', 'हिंग', 'शुद्ध साजूक तूप'],
-    ingredientsEn: ['Coriander Seeds', 'Stone Flower (Dagad Phool)', 'White Sesame', 'Dry Copra', 'Cinnamon', 'Cloves', 'Black Peppercorns', 'Nagkeshar', 'Asafoetida', 'Desi Cow Ghee'],
-    pairingRecommendationsMr: ['मराठमोळी तुरीची आमटी', 'भरली वांगी (मसाला वांगी)', 'कटाची आमटी व पुरणपोळी', 'मटकीची उसळ'],
-    pairingRecommendationsEn: ['Traditional Maharashtrian Amti', 'Bharli Vangi (Stuffed Brinjal)', 'Katachi Amti with Puran Poli', 'Matki Sprouted Usal'],
+    ingredientsEn: ['Coriander Seeds', 'Stone Flower (Dagad Phool)', 'White Sesame', 'Dry Copra', 'Cinnamon', 'Cloves', 'Black Peppercorns', 'Nagkeshar', 'Asafoetida', 'Ghee'],
+    pairingRecommendationsMr: ['तुरीची आमटी', 'भरली वांगी (मसाला वांगी)', 'कटाची आमटी', 'मटकीची उसळ'],
+    pairingRecommendationsEn: ['Toor Dal Amti', 'Bharli Vangi (Stuffed Brinjal)', 'Katachi Amti', 'Matki Sprouted Usal'],
     whereToUseMr: [
       'रोजच्या तुरीच्या डाळीच्या आमटीमध्ये उकळताना १ लहान चमचा गोडा मसाला घाला.',
       'भरली वांगी करताना वाटणात २ चमचे घालून गूळ व चिंचेसोबत शिजवा.',
-      'सणासुदीला पुरणपोळीच्या कटाच्या आमटीत खास खमंग चवीसाठी वापरा.'
+      'कटाच्या आमटीत खास खमंग चवीसाठी वापरा.'
     ],
     whereToUseEn: [
       'Add 1 teaspoon while simmering everyday Toor Dal Amti for heavenly aroma.',
       'Blend 2 tablespoons into the coconut-peanut stuffing for stuffed brinjals (Bharli Vangi).',
-      'The definitive secret spice for festive Katachi Amti alongside Puran Poli.'
+      'The definitive spice for festive Katachi Amti.'
     ],
     storageTipsMr: 'कोरड्या जागी काचेच्या बरणीत ठेवा. पाण्याचा स्पर्श होऊ देऊ नका. १२ महिने टिकते.',
     storageTipsEn: 'Store in an airtight glass jar away from moisture. Stays fragrant for 12 months.',
@@ -1079,35 +1119,35 @@ export const PRODUCTS: Product[] = [
     ],
     isBestSeller: true,
     isRegionalSpecialty: true,
-    regionOriginMr: 'पुणे व नाशिक',
-    regionOriginEn: 'Pune & Nashik (Peshwai)'
+    regionOriginMr: 'नैसर्गिक',
+    regionOriginEn: 'Natural'
   },
   {
     id: 'prod-agri-koli-masala',
-    nameMr: 'अस्सल आगरी-कोळी मसाला (Agri Koli Coastal Masala)',
-    nameEn: 'Authentic Agri-Koli Seafood & Mutton Masala',
-    taglineMr: 'रायगड-ठाणे किनारपट्टीचा खास झणझणीत २१ मसाल्यांचा खजिना',
-    taglineEn: 'Coastal fiery spice blend perfected for fresh seafood, prawns & curries',
-    descriptionMr: 'मुंबई, ठाणे, रायगड व अलिबागच्या किनारपट्टीवरील आगरी-कोळी बांधवांची कौटुंबिक रेसिपी! २१ अस्सल मसाले, तेज लवंगी मिरची आणि खडे मसाले एकत्र करून तयार केलेला हा मसाला. सुकटाची उसळ, कोळंबी भात किंवा मटणाच्या रश्शाला तिखट आणि लालभडक तर्री आणणारा खास मसाला.',
-    descriptionEn: 'The fiery heritage blend of Mumbai, Thane, and Alibaug coastal fishermen and farmers. 21 hand-curated spices ground with high-pungency red chillies. Imparts unmistakable rustic heat and brilliant red natural oil separation (tarri) to prawn curries, crab masala, and mutton preparations.',
+    nameMr: 'आगरी-कोळी मसाला',
+    nameEn: 'Agri-Koli Masala',
+    taglineMr: 'किनारपट्टीचा खास झणझणीत मसाल्यांचा खजिना',
+    taglineEn: 'Coastal fiery spice blend perfected for seafood and curries',
+    descriptionMr: 'निवडक मसाले, लवंगी मिरची आणि खडे मसाले एकत्र करून तयार केलेला हा मसाला. उसळ, भात किंवा रश्शाला तिखट आणि लालभडक रंग आणणारा खास मसाला.',
+    descriptionEn: 'Hand-curated spices ground with high-pungency red chillies. Imparts heat and brilliant red natural oil separation to curries and preparations.',
     category: 'masala',
     spiceLevel: 5,
-    badgeMr: 'आगरी-कोळी स्पेशल • झणझणीत',
-    badgeEn: 'Agri Koli Coastal Special',
+    badgeMr: 'आगरी-कोळी स्पेशल',
+    badgeEn: 'Coastal Special',
     rating: 4.95,
     reviewCount: 310,
     imageUrl: '/products/kanda-lasun.jpg',
-    ingredientsMr: ['कोल्हापुरी लवंगी मिरची', 'काश्मिरी मिरची', 'नाकेश्वर', 'दगडफूल', 'काळी मिरी', 'जिरे', 'धने', 'जायफळ', 'बडीशेप', 'दालचिनी'],
-    ingredientsEn: ['Kolhapuri Lavangi Chilli', 'Kashmiri Chilli', 'Nagkeshar', 'Stone Flower', 'Black Pepper', 'Cumin', 'Coriander', 'Nutmeg', 'Fennel', 'Cinnamon'],
-    pairingRecommendationsMr: ['कोळंबी मसाला', 'खेकडा करी', 'सुकट-वांग्याची उसळ', 'आगरी मटण'],
-    pairingRecommendationsEn: ['Spicy Prawn Masala', 'Crab Curry', 'Dry Shrimp & Brinjal Fry', 'Agri Mutton'],
+    ingredientsMr: ['लवंगी मिरची', 'काश्मिरी मिरची', 'नाकेश्वर', 'दगडफूल', 'काळी मिरी', 'जिरे', 'धने', 'जायफळ', 'बडीशेप', 'दालचिनी'],
+    ingredientsEn: ['Lavangi Chilli', 'Kashmiri Chilli', 'Nagkeshar', 'Stone Flower', 'Black Pepper', 'Cumin', 'Coriander', 'Nutmeg', 'Fennel', 'Cinnamon'],
+    pairingRecommendationsMr: ['कोळंबी मसाला', 'खेकडा करी', 'सुकट उसळ', 'उसळ रस्सा'],
+    pairingRecommendationsEn: ['Spicy Prawn Masala', 'Crab Curry', 'Dry Shrimp Fry', 'Spiced Curry'],
     whereToUseMr: [
-      'कोळंबी किंवा खेकडा मसाला करताना कांदा-टोमॅटोच्या ग्रेव्हीत २ चमचे परता.',
-      'आगरी पद्धतीचे मटण किंवा चिकन बनवताना मुख्य मसाला म्हणून वापरा.'
+      'मसाला करताना कांदा-टोमॅटोच्या ग्रेव्हीत २ चमचे परता.',
+      'चिकन किंवा उसळ बनवताना मुख्य मसाला म्हणून वापरा.'
     ],
     whereToUseEn: [
-      'Saute 2 tbsp with onions, tomatoes and garlic for seafood curries.',
-      'The core seasoning for hearty Sunday mutton feasts across coastal Maharashtra.'
+      'Saute 2 tbsp with onions, tomatoes and garlic for curries.',
+      'The core seasoning for hearty curries and feasts.'
     ],
     storageTipsMr: 'थंड व कोरड्या जागी हवाबंद बरणीत ठेवा. १ वर्ष टिकते.',
     storageTipsEn: 'Store sealed in a dry dark cabinet. Good for 12 months.',
@@ -1121,17 +1161,17 @@ export const PRODUCTS: Product[] = [
     ],
     isBestSeller: false,
     isRegionalSpecialty: true,
-    regionOriginMr: 'रायगड, अलिबाग व ठाणे',
-    regionOriginEn: 'Raigad & Thane Coast'
+    regionOriginMr: 'रायगड व ठाणे',
+    regionOriginEn: 'Raigad & Thane'
   },
   {
     id: 'prod-puneri-garam-masala',
-    nameMr: 'पुणेरी शाही गरम मसाला (Puneri Royal Whole Garam Masala)',
-    nameEn: 'Puneri Shahi Garam Masala (Royal Whole Spice Blend)',
+    nameMr: 'शाही गरम मसाला',
+    nameEn: 'Shahi Garam Masala',
     taglineMr: 'हिरवी वेलची, जावित्री, लवंग व दालचिनीची समृद्ध सुगंधित पूड',
     taglineEn: 'Hand-sorted green cardamom, mace, cloves & cinnamon powder',
-    descriptionMr: 'हजारो वर्षांची परंपरा असलेला अस्सल शाही गरम मसाला! हिरवी वेलची, मोठी काळी वेलची, जावित्री, लवंग, चक्रीफूल आणि दालचिनी यांना सूर्यप्रकाशात वाळवून कमी वेगावर कुटले जाते, ज्यामुळे यातील नैसर्गिक बाष्पीभवन होणारे तेलाचे घटक (Essential Oils) जसेच तसे टिकून राहतात.',
-    descriptionEn: 'The pinnacle of whole-spice aromatics. Green cardamom pods, black cardamom, royal mace (javitri), whole cloves, star anise, and Ceylon cinnamon ground at ultra-low speeds to preserve natural essential oils. Elevates royal biryanis, gravies, and festive curries with a pinch.',
+    descriptionMr: 'सुगंधित खडे मसाल्यांची पूड. हिरवी वेलची, मोठी काळी वेलची, जावित्री, लवंग, चक्रीफूल आणि दालचिनी यांना सूर्यप्रकाशात वाळवून कमी वेगावर कुटले जाते, ज्यामुळे यातील नैसर्गिक सुवास जसाच्या तसा टिकून राहतो.',
+    descriptionEn: 'Whole-spice aromatics blend. Green cardamom pods, black cardamom, royal mace (javitri), whole cloves, star anise, and Ceylon cinnamon ground at ultra-low speeds to preserve natural essential oils. Elevates biryanis, gravies, and curries with a pinch.',
     category: 'masala',
     spiceLevel: 3,
     badgeMr: 'शाही सुगंध • 100% Whole Spices',
@@ -1163,35 +1203,35 @@ export const PRODUCTS: Product[] = [
     ],
     isBestSeller: false,
     isRegionalSpecialty: false,
-    regionOriginMr: 'पुणे',
-    regionOriginEn: 'Pune'
+    regionOriginMr: 'नैसर्गिक',
+    regionOriginEn: 'Natural'
   },
   {
     id: 'prod-kolhapuri-misal-kat-masala',
-    nameMr: 'कोल्हापुरी तांबडा रस्सा व मिसळ कट मसाला',
-    nameEn: 'Kolhapuri Misal Kat & Tambda Rassa Masala (Fiery Tarri Blend)',
-    taglineMr: 'अस्सल कोल्हापुरी तर्री व मिसळच्या कटसाठी खास लवंगी मिरची मसाला',
-    taglineEn: 'Signature high-heat spice blend for authentic Kolhapuri Misal Kat & Rassa',
-    descriptionMr: 'कोल्हापूरच्या मिसळची झणझणीत तर्री आणि तांबड्या रश्शाची चव ज्या मसाल्यामुळे येते, तो हा खास कोल्हापुरी कट मसाला! संकेश्वरी व लवंगी मिरची, खडे मसाले आणि दगडफूल एकत्र करून तयार केलेला हा मसाला रश्शाला खोल लाल रंग आणि घशाला पाणी सुटणारा अस्सल कोल्हापुरी तिखटपणा देतो.',
-    descriptionEn: 'The secret behind the fiery crimson oil float (Kat/Tarri) of legendary Kolhapuri Misal. Built around high-heat Sankeshwari & Lavangi red chillies and slow-roasted whole spices. Creates the intoxicating aroma and authentic Kolhapuri punch that food lovers travel miles to experience.',
+    nameMr: 'मिसळ कट व तर्री मसाला',
+    nameEn: 'Misal Kat & Tarri Masala',
+    taglineMr: 'झणझणीत तर्री व कट रश्शासाठी खास लाल मिरची मसाला',
+    taglineEn: 'Signature high-heat spice blend for fiery Misal Kat & Rassa',
+    descriptionMr: 'मिसळची झणझणीत तर्री आणि रश्शाची चव ज्या मसाल्यामुळे येते, तो हा खास कट मसाला! संकेश्वरी व लवंगी मिरची, खडे मसाले आणि दगडफूल एकत्र करून तयार केलेला हा मसाला रश्शाला खोल लाल रंग आणि चव देतो.',
+    descriptionEn: 'The secret behind the fiery crimson oil float (Kat/Tarri) of misal. Built around high-heat Sankeshwari & Lavangi red chillies and slow-roasted whole spices. Creates rich aroma and appetizing punch for spicy dishes.',
     category: 'masala',
     spiceLevel: 5,
-    badgeMr: 'कोल्हापुरी तर्री स्पेशल • High Heat',
-    badgeEn: 'Fiery Kolhapuri Tarri Special',
+    badgeMr: 'तर्री स्पेशल • High Heat',
+    badgeEn: 'Fiery Tarri Special',
     rating: 4.97,
     reviewCount: 450,
     imageUrl: '/products/kanda-lasun.jpg',
     ingredientsMr: ['संकेश्वरी मिरची', 'लवंगी मिरची', 'दगडफूल', 'तमालपत्र', 'जिरे', 'धने', 'काळी मिरी', 'लवंग', 'तीळ'],
     ingredientsEn: ['Sankeshwari Chilli', 'Lavangi Chilli', 'Stone Flower', 'Bay Leaf', 'Cumin', 'Coriander', 'Black Pepper', 'Cloves', 'Sesame'],
-    pairingRecommendationsMr: ['कोल्हापुरी झणझणीत मिसळ', 'तांबडा रस्सा', 'कट वडा', 'अंडा करी'],
-    pairingRecommendationsEn: ['Kolhapuri Misal', 'Tambda Rassa', 'Kat Vada', 'Spicy Egg Curry'],
+    pairingRecommendationsMr: ['झणझणीत मिसळ', 'तांबडा रस्सा', 'कट वडा', 'अंडा करी'],
+    pairingRecommendationsEn: ['Spicy Misal', 'Red Curry (Rassa)', 'Kat Vada', 'Spicy Egg Curry'],
     whereToUseMr: [
-      'मिसळचा रस्सा (कट) बनवताना भरपूर तेलात २ चमचे मसाला परतून उकळते पाणी घाला.',
-      'तांबडा रस्सा बनवताना मटणाच्या स्टॉकमध्ये घालून उकळा.'
+      'मिसळचा रस्सा (कट) बनवताना तेलात २ चमचे मसाला परतून उकळते पाणी घाला.',
+      'रस्सा बनवताना स्टॉकमध्ये घालून उकळा.'
     ],
     whereToUseEn: [
       'Bloom 2 tbsp in hot oil before adding hot water to release the crimson Kat layer.',
-      'Simmer directly in mutton or legume broth for unmistakable Kolhapuri warmth.'
+      'Simmer directly in broth for warmth and rich aroma.'
     ],
     storageTipsMr: 'हवाबंद डब्यात ठेवा. १ वर्ष उत्तम टिकते.',
     storageTipsEn: 'Store airtight in a cool dry cabinet. Fresh for 12 months.',
@@ -1205,35 +1245,35 @@ export const PRODUCTS: Product[] = [
     ],
     isBestSeller: true,
     isRegionalSpecialty: true,
-    regionOriginMr: 'कोल्हापूर',
-    regionOriginEn: 'Kolhapur'
+    regionOriginMr: 'नैसर्गिक',
+    regionOriginEn: 'Natural'
   },
   {
     id: 'prod-saoji-masala',
-    nameMr: 'विदर्भ सावजी मसाला (Nagpur Saoji Extreme Masala)',
-    nameEn: 'Vidarbha Saoji Extreme Hot Masala (Nagpur Signature)',
-    taglineMr: 'काळी मिरी, दगडफूल व खसखसचा अस्सल सावजी झणझणीत मसाला • नागपूर स्पेशल',
-    taglineEn: 'Fiery Vidarbha spice blend with heavy black pepper, poppy seeds & cloves',
-    descriptionMr: 'विदर्भाची शान! नागपूरच्या हलबा कोष्टी समाजाची गोपनीय सावजी रेसिपी. ३२ प्रकारच्या मसाल्यांचे अचूक मिश्रण ज्यात काळी मिरी, लवंग, खसखस आणि दगडफुलाचा प्रभावी वापर केला जातो. सावजी मटण, चिकन किंवा सावजी पनीरमध्ये तोंडात चव रेंगाळत राहणारा हा जगप्रसिद्ध मसाला आहे.',
-    descriptionEn: 'The world-renowned fiery pride of Vidarbha and Nagpur. Sourced from the heritage recipe of the Halba Koshti community. Features an intense symphony of 32 spices highlighted by Tellicherry black peppercorns, poppy seeds, stone flower, and cloves for a slow, deep, lingering rustic heat.',
+    nameMr: 'सावजी मसाला',
+    nameEn: 'Saoji Masala',
+    taglineMr: 'काळी मिरी, दगडफूल व खसखसचा झणझणीत मसाला',
+    taglineEn: 'Fiery spice blend with black pepper, poppy seeds & cloves',
+    descriptionMr: 'मसाल्यांचे अचूक मिश्रण ज्यात काळी मिरी, लवंग, खसखस आणि दगडफुलाचा वापर केला जातो. उसळ, रस्सा आणि भाजीमध्ये तोंडात चव रेंगाळत राहणारा हा मसाला आहे.',
+    descriptionEn: 'Intense spice blend highlighted by black peppercorns, poppy seeds, stone flower, and cloves for a slow, deep, lingering heat for curries and vegetables.',
     category: 'masala',
     spiceLevel: 5,
-    badgeMr: 'नागपूर सावजी • Extreme Spice',
-    badgeEn: 'Nagpur Saoji Extreme Spice',
+    badgeMr: 'सावजी मसाला',
+    badgeEn: 'Saoji Spice',
     rating: 4.94,
     reviewCount: 340,
     imageUrl: '/products/kala-masala.jpg',
     ingredientsMr: ['काळी मिरी', 'खसखस', 'दगडफूल', 'लवंग', 'बडीशेप', 'दालचिनी', 'धने', 'जायफळ', 'शहाजिरे', 'लवंगी मिरची'],
     ingredientsEn: ['Black Peppercorns', 'Poppy Seeds', 'Stone Flower', 'Cloves', 'Fennel', 'Cinnamon', 'Coriander', 'Nutmeg', 'Shahjeera', 'Lavangi Chilli'],
-    pairingRecommendationsMr: ['सावजी मटण रस्सा', 'सावजी चिकन', 'सावजी पनीर भुर्जी', 'खुर खुर रस्सा'],
-    pairingRecommendationsEn: ['Saoji Mutton Rassa', 'Saoji Chicken Gravy', 'Saoji Paneer', 'Rustic Trotter Soup'],
+    pairingRecommendationsMr: ['सावजी रस्सा', 'सावजी पनीर', 'उसळ रस्सा'],
+    pairingRecommendationsEn: ['Saoji Rassa', 'Saoji Paneer', 'Sprouted Curry'],
     whereToUseMr: [
-      'सावजी ग्रेव्हीत कांद्याची पेस्ट भाजल्यावर २ चमचे मसाला घालून मंद आचेवर तेल सुटेपर्यंत परता.',
-      'नागपुरी सावजी उसळ किंवा अंड्याच्या भाजीमध्ये वापरा.'
+      'कांद्याची पेस्ट भाजल्यावर २ चमचे मसाला घालून मंद आचेवर तेल सुटेपर्यंत परता.',
+      'उसळ किंवा भाजीमध्ये वापरा.'
     ],
     whereToUseEn: [
       'Fry 2 tbsp with browned onion paste over low heat until deeply aromatic.',
-      'Use for Nagpur-style spicy sprouted curries and slow-cooked rustic meats.'
+      'Use for spicy sprouted curries and slow-cooked preparations.'
     ],
     storageTipsMr: 'काचेच्या बरणीत बंद करून ठेवा. १२ महिने टिकते.',
     storageTipsEn: 'Seal tightly in glass container away from humidity. Fresh for 12 months.',
@@ -1247,35 +1287,35 @@ export const PRODUCTS: Product[] = [
     ],
     isBestSeller: false,
     isRegionalSpecialty: true,
-    regionOriginMr: 'नागपूर (विदर्भ)',
-    regionOriginEn: 'Nagpur (Vidarbha)'
+    regionOriginMr: 'नागपूर',
+    regionOriginEn: 'Nagpur'
   },
   {
     id: 'prod-pav-bhaji-masala',
-    nameMr: 'मुंबई स्ट्रीट स्पेशल पाव भाजी मसाला (Tawa Pav Bhaji Masala)',
-    nameEn: 'Mumbai Street Special Pav Bhaji Masala',
-    taglineMr: 'आमचूर, बडीशेप व भाजलेल्या धन्याची खमंग मुंबई पावभाजी चव',
+    nameMr: 'पाव भाजी मसाला',
+    nameEn: 'Pav Bhaji Masala',
+    taglineMr: 'आमचूर, बडीशेप व भाजलेल्या धन्याची खमंग चव',
     taglineEn: 'Slow-roasted coriander, fennel, star anise & dried mango tawa blend',
-    descriptionMr: 'मुंबईच्या चौपाटी व रस्त्यावरील तव्यावर बनणाऱ्या अस्सल पावभाजीचा सुगंध या मसाल्यात सामावलेला आहे! आंबट आमचूर पावडर, बडीशेप, धने, काश्मिरी लाल मिरची आणि दगडफूल यांचे अचूक गुणोत्तर भाजीला दाट टेक्स्चर, अप्रतिम लाल रंग आणि खमंग चव देते.',
-    descriptionEn: 'The quintessential aroma of Mumbai street-side iron tawas. Slow-roasted coriander seeds, fennel, dried green mango (amchur), Kashmiri chillies, and star anise ground to perfection. Produces rich, butter-loving red bhaji with zesty depth.',
+    descriptionMr: 'तव्यावर बनणाऱ्या पावभाजीसाठी खास तयार केलेला मसाला. आंबट आमचूर पावडर, बडीशेप, धने, काश्मिरी लाल मिरची आणि दगडफूल यांचे अचूक गुणोत्तर भाजीला दाट टेक्स्चर, लाल रंग आणि खमंग चव देते.',
+    descriptionEn: 'Slow-roasted coriander seeds, fennel, dried green mango (amchur), Kashmiri chillies, and star anise ground to perfection. Produces rich red bhaji with zesty depth.',
     category: 'masala',
     spiceLevel: 3,
-    badgeMr: 'मुंबई स्ट्रीट स्वाद • Tawa Special',
-    badgeEn: 'Mumbai Street Tawa Special',
+    badgeMr: 'तवा स्पेशल',
+    badgeEn: 'Tawa Special',
     rating: 4.96,
     reviewCount: 510,
     imageUrl: '/products/vada-pav-lasun.jpg',
     ingredientsMr: ['धने', 'काश्मिरी मिरची', 'बडीशेप', 'आमचूर', 'जिरे', 'काळी मिरी', 'दालचिनी', 'लवंग', 'चक्रीफूल'],
     ingredientsEn: ['Coriander Seeds', 'Kashmiri Chillies', 'Fennel', 'Dry Mango Powder (Amchur)', 'Cumin', 'Black Pepper', 'Cinnamon', 'Cloves', 'Star Anise'],
     pairingRecommendationsMr: ['बटर पाव भाजी', 'तवा पुलाव', 'मसाला पाव', 'रगडा पॅटीस'],
-    pairingRecommendationsEn: ['Butter Pav Bhaji', 'Mumbai Tawa Pulao', 'Masala Pav', 'Ragda Pattice'],
+    pairingRecommendationsEn: ['Butter Pav Bhaji', 'Tawa Pulao', 'Masala Pav', 'Ragda Pattice'],
     whereToUseMr: [
-      'उकळलेल्या भाज्या मॅश करताना भरपूर बटरमध्ये २ मोठे चमचे पाव भाजी मसाला घाला.',
+      'उकळलेल्या भाज्या मॅश करताना बटरमध्ये २ मोठे चमचे पाव भाजी मसाला घाला.',
       'उरलेल्या भातापासून झटपट तवा पुलाव बनवण्यासाठी १ चमचा वापरा.'
     ],
     whereToUseEn: [
-      'Add 2 tbsp along with generous butter while mashing boiled vegetables on high flame.',
-      'Sprinkle over butter-toasted pav or use for authentic Mumbai street Tawa Pulao.'
+      'Add 2 tbsp along with butter while mashing boiled vegetables.',
+      'Sprinkle over butter-toasted pav or use for quick Tawa Pulao.'
     ],
     storageTipsMr: 'थंड जागी हवाबंद बरणीत ठेवा. ९ महिने उत्तम टिकते.',
     storageTipsEn: 'Store in an airtight jar in a cool place. Fresh for 9 months.',
@@ -1289,35 +1329,35 @@ export const PRODUCTS: Product[] = [
     ],
     isBestSeller: true,
     isRegionalSpecialty: false,
-    regionOriginMr: 'मुंबई',
-    regionOriginEn: 'Mumbai'
+    regionOriginMr: 'नैसर्गिक',
+    regionOriginEn: 'Natural'
   },
   {
     id: 'prod-chai-masala',
-    nameMr: 'शाही चहा व काढा मसाला (Royal Sun-Dried Chai & Kadha Masala)',
-    nameEn: 'Royal Herbal Chai & Kadha Masala (Ayurvedic Blend)',
-    taglineMr: 'गावरान सुंठ, हिरवी वेलची, काळी मिरी, लवंग व दालचिनी • आरोग्यदायी',
-    taglineEn: 'Desi dry ginger, green cardamom, pepper, cloves & cinnamon tea booster',
-    descriptionMr: 'थंडीच्या दिवसात आणि पावसाळ्यात शरीराला उब व उत्साह देणारा अस्सल गावरान चहा मसाला! सेंद्रिय सुंठ (Sonth), लहान हिरवी वेलची, काळी मिरी, दालचिनी आणि लवंग यांचे सुवर्ण मिश्रण. १ चिमूट मसाला तुमच्या रोजच्या चहाचे रूपांतर शाही अमृततुल्य चहामध्ये करतो.',
-    descriptionEn: 'An immunity-boosting Ayurvedic tea elixir. Features organic sun-cured dry ginger (sonth), fragrant green cardamom, Tellicherry black pepper, Ceylon cinnamon, and cloves. A mere pinch transforms everyday milk chai into aromatic Maharashtrian Amrittulya chai.',
+    nameMr: 'चहा व काढा मसाला',
+    nameEn: 'Chai & Kadha Masala',
+    taglineMr: 'सुंठ, हिरवी वेलची, काळी मिरी, लवंग व दालचिनी • आरोग्यदायी',
+    taglineEn: 'Dry ginger, green cardamom, pepper, cloves & cinnamon tea booster',
+    descriptionMr: 'शरीराला उब व उत्साह देणारा चहा मसाला. सुंठ, लहान हिरवी वेलची, काळी मिरी, दालचिनी आणि लवंग यांचे उत्तम मिश्रण. १ चिमूट मसाला तुमच्या रोजच्या चहाची चव व सुवास वाढवतो.',
+    descriptionEn: 'An aromatic tea blend featuring sun-cured dry ginger (sonth), fragrant green cardamom, black pepper, Ceylon cinnamon, and cloves. A pinch transforms everyday milk chai into aromatic tea.',
     category: 'masala',
     spiceLevel: 2,
-    badgeMr: 'आरोग्यदायी • Immunity Booster',
-    badgeEn: 'Royal Amrittulya Chai Blend',
+    badgeMr: 'आरोग्यदायी',
+    badgeEn: 'Herbal Blend',
     rating: 4.99,
     reviewCount: 480,
     imageUrl: '/products/metkut-rice.jpg',
-    ingredientsMr: ['गावरान सुंठ', 'हिरवी वेलची', 'काळी मिरी', 'दालचिनी', 'लवंग', 'जायफळ'],
-    ingredientsEn: ['Desi Dry Ginger (Sonth)', 'Green Cardamom', 'Black Pepper', 'Cinnamon', 'Cloves', 'Nutmeg'],
-    pairingRecommendationsMr: ['सकाळचा अमृततुल्य चहा', 'रोगप्रतिकारक काढा', 'मसाला दूध'],
-    pairingRecommendationsEn: ['Morning Amrittulya Chai', 'Ayurvedic Herbal Kadha', 'Festive Masala Milk'],
+    ingredientsMr: ['सुंठ', 'हिरवी वेलची', 'काळी मिरी', 'दालचिनी', 'लवंग', 'जायफळ'],
+    ingredientsEn: ['Dry Ginger (Sonth)', 'Green Cardamom', 'Black Pepper', 'Cinnamon', 'Cloves', 'Nutmeg'],
+    pairingRecommendationsMr: ['सकाळचा चहा', 'काढा', 'मसाला दूध'],
+    pairingRecommendationsEn: ['Morning Chai', 'Herbal Kadha', 'Masala Milk'],
     whereToUseMr: [
       '२ कप चहा उकळताना केवळ १/४ चमचा चहा मसाला घाला.',
       'खोकला किंवा सर्दी असल्यास मध व गरम पाण्यात चिमूटभर मिसळून काढा म्हणून प्या.'
     ],
     whereToUseEn: [
       'Add just 1/4 tsp per 2 cups while tea is vigorously boiling.',
-      'Sip with warm water and raw honey as a soothing throat elixir.'
+      'Sip with warm water and honey as a soothing throat tea.'
     ],
     storageTipsMr: 'काचेच्या लहान बाटलीत ठेवा. १ वर्ष सुवास तसाच राहतो.',
     storageTipsEn: 'Store sealed in an airtight glass container. Retains peak aroma for 12 months.',
@@ -1331,35 +1371,35 @@ export const PRODUCTS: Product[] = [
     ],
     isBestSeller: true,
     isRegionalSpecialty: false,
-    regionOriginMr: 'महाराष्ट्र',
-    regionOriginEn: 'Maharashtra Heritage'
+    regionOriginMr: 'नैसर्गिक',
+    regionOriginEn: 'Natural'
   },
   {
     id: 'prod-biryani-masala',
-    nameMr: 'मराठमोळा शाही बिर्याणी व पुलाव मसाला',
-    nameEn: 'Maharashtrian Shahi Dum Biryani & Pulao Masala',
-    taglineMr: 'केसर, दगडफूल, शहाजिरे व जावित्रीची शाही बिर्याणी सुगंध',
-    taglineEn: 'Royal dum aroma blend with shahjeera, mace, nutmeg & star anise',
-    descriptionMr: 'घरोघरी हॉटेलसारखी अस्सल मराठमोळी दम बिर्याणी बनवण्यासाठी खास तयार केलेला शाही मसाला. काश्मिरी केसर, शहाजिरे, जावित्री, मोठी वेलची आणि दगडफूल यांचे अनोखे मिश्रण बिर्याणीच्या प्रत्येक दाण्याला सुगंधित आणि चवदार बनवते.',
-    descriptionEn: 'The secret to authentic royal Dum Biryani and celebratory pulavs. Rich with royal caraway (shahjeera), Kashmiri saffron strands, mace, black cardamom, star anise, and stone flower. Imparts irresistible royal fragrance to every grain of rice.',
+    nameMr: 'बिर्याणी व पुलाव मसाला',
+    nameEn: 'Dum Biryani & Pulao Masala',
+    taglineMr: 'केसर, दगडफूल, शहाजिरे व जावित्रीचा सुगंधी मसाला',
+    taglineEn: 'Dum aroma blend with shahjeera, mace, nutmeg & star anise',
+    descriptionMr: 'दम बिर्याणी बनवण्यासाठी खास तयार केलेला मसाला. काश्मिरी केसर, शहाजिरे, जावित्री, मोठी वेलची आणि दगडफूल यांचे मिश्रण बिर्याणीच्या प्रत्येक दाण्याला सुगंधित आणि चवदार बनवते.',
+    descriptionEn: 'The secret to delicious Dum Biryani and celebratory pulavs. Rich with caraway (shahjeera), saffron, mace, black cardamom, star anise, and stone flower. Imparts fragrance to rice dishes.',
     category: 'masala',
     spiceLevel: 3,
-    badgeMr: 'शाही दम बिर्याणी स्पेशल',
-    badgeEn: 'Royal Dum Biryani Special',
+    badgeMr: 'दम बिर्याणी स्पेशल',
+    badgeEn: 'Dum Biryani Special',
     rating: 4.95,
     reviewCount: 315,
     imageUrl: '/products/kala-masala.jpg',
     ingredientsMr: ['शहाजिरे', 'जावित्री', 'दगडफूल', 'चक्रीफूल', 'मोठी वेलची', 'दालचिनी', 'लवंग', 'तमालपत्र', 'केशर'],
-    ingredientsEn: ['Royal Caraway (Shahjeera)', 'Mace (Javitri)', 'Stone Flower', 'Star Anise', 'Black Cardamom', 'Cinnamon', 'Cloves', 'Bay Leaf', 'Saffron'],
-    pairingRecommendationsMr: ['दम मटण बिर्याणी', 'चिकन दम बिर्याणी', 'मटार पुलाव', 'पनीर टिक्का बिर्याणी'],
-    pairingRecommendationsEn: ['Dum Mutton Biryani', 'Chicken Dum Biryani', 'Matar Pulav', 'Paneer Tikka Biryani'],
+    ingredientsEn: ['Caraway (Shahjeera)', 'Mace (Javitri)', 'Stone Flower', 'Star Anise', 'Black Cardamom', 'Cinnamon', 'Cloves', 'Bay Leaf', 'Saffron'],
+    pairingRecommendationsMr: ['दम बिर्याणी', 'चिकन बिर्याणी', 'मटार पुलाव', 'पनीर पुलाव'],
+    pairingRecommendationsEn: ['Dum Biryani', 'Chicken Biryani', 'Matar Pulav', 'Paneer Pulav'],
     whereToUseMr: [
       'मॅरिनेशनमध्ये २ चमचे आणि तांदळाच्या थरावर १ चमचा तूप व दुधासोबत घाला.',
-      'मटार पुलाव किंवा व्हेजिटेबल बिर्याणीमध्ये वापरा.'
+      'मटार पुलाव किंवा व्हेज बिर्याणीमध्ये वापरा.'
     ],
     whereToUseEn: [
-      'Mix 2 tbsp in meat or veg marinade and sprinkle 1 tsp over rice layers before Dum.',
-      'Perfect fragrance enhancer for festive peas pulav and vegetable biryani.'
+      'Mix 2 tbsp in marinade and sprinkle 1 tsp over rice layers before Dum.',
+      'Perfect fragrance enhancer for peas pulav and vegetable biryani.'
     ],
     storageTipsMr: 'काचेच्या बरणीत घट्ट झाकून ठेवा. १ वर्ष सुगंध टिकतो.',
     storageTipsEn: 'Store sealed in an airtight glass container. Stays fresh for 12 months.',
@@ -1373,45 +1413,45 @@ export const PRODUCTS: Product[] = [
     ],
     isBestSeller: false,
     isRegionalSpecialty: false,
-    regionOriginMr: 'पुणे व मराठवाडा',
-    regionOriginEn: 'Maharashtra'
+    regionOriginMr: 'नैसर्गिक',
+    regionOriginEn: 'Natural'
   }
 ];
 
 export const INITIAL_CATEGORIES: ProductCategory[] = [
   {
-    id: 'masala',
-    nameMr: 'अस्सल मसाले (Pure Masales)',
-    nameEn: 'Authentic Masalas & Blends',
-    descriptionMr: 'दगडी खलबत्त्यात कुटलेले, खमंग भाजलेले पारंपारिक मसाले व गरम मसाले',
-    descriptionEn: 'Stone-crushed slow-roasted authentic gravy, rassa and seasoning masalas',
-    icon: 'Flame',
+    id: 'chutney',
+    nameMr: 'चटण्या (Chutneys)',
+    nameEn: 'Chutneys',
+    descriptionMr: 'शेंगदाणा, कांदा-लसूण, सुके खोबरे-लसूण, तीळ, जवस व हिरवी मिरची ठेचा',
+    descriptionEn: 'Stone-pounded peanut, dry coconut garlic, sesame, flaxseed & kanda-lasun chutneys',
+    icon: 'Sparkles',
     sortOrder: 1
   },
   {
-    id: 'chutney',
-    nameMr: 'पारंपरिक चटण्या (Chutneys)',
-    nameEn: 'Traditional Dry Chutneys',
-    descriptionMr: 'सोलापुरी शेंगदाणा, कोल्हापुरी कांदा-लसूण, जवस, तीळ व कारळे चटण्या',
-    descriptionEn: 'Stone-pounded peanut, flaxseed, sesame and roasted garlic dry chutneys',
-    icon: 'Sparkles',
+    id: 'pickle',
+    nameMr: 'लोणचे (Pickles)',
+    nameEn: 'Pickles',
+    descriptionMr: 'आंब्याचे लोणचे, लिंबाचे लोणचे, लसणाचे लोणचे व मिरचीचे लोणचे',
+    descriptionEn: 'Traditional Pickles: Mango, Lemon, Garlic & Green Chilli Pickles',
+    icon: 'Jar',
     sortOrder: 2
   },
   {
-    id: 'pickle',
-    nameMr: 'गावरान लोणची (Pickles)',
-    nameEn: 'Heritage Pickles (Lonche)',
-    descriptionMr: 'राईच्या डाळीत व लाकडी घाण्याच्या तेलात मुरवलेली गावरान लोणची',
-    descriptionEn: 'Aged in earthen jars with wood-pressed oil and cracked mustard seeds',
-    icon: 'Jar',
+    id: 'masala',
+    nameMr: 'मसाले (Masalas)',
+    nameEn: 'Masalas & Blends',
+    descriptionMr: 'दगडी खलबत्त्यात कुटलेले, खमंग भाजलेले मसाले व गरम मसाले',
+    descriptionEn: 'Stone-crushed slow-roasted gravy, rassa and seasoning masalas',
+    icon: 'Flame',
     sortOrder: 3
   },
   {
     id: 'specialty',
-    nameMr: 'खास मेतकूट व पाचक (Specialties)',
-    nameEn: 'Metkut & Digestive Powders',
-    descriptionMr: 'पाचक मेतकूट, पंचामृत आणि बहुगुणी पारंपरिक मिश्रण',
-    descriptionEn: 'Nutritious roasted lentil powders, Panchamrut and Ayurvedic relishes',
+    nameMr: 'मेतकूट व पाचक (Specialties)',
+    nameEn: 'Metkut & Specialties',
+    descriptionMr: 'पाचक मेतकूट, पंचामृत आणि बहुगुणी मिश्रण',
+    descriptionEn: 'Nutritious roasted lentil powders, Panchamrut and natural relishes',
     icon: 'Award',
     sortOrder: 4
   }
@@ -1420,32 +1460,32 @@ export const INITIAL_CATEGORIES: ProductCategory[] = [
 export const INITIAL_RAW_STOCKS: RawIngredientStock[] = [
   {
     id: 'stock-peanuts',
-    nameMr: 'सोलापुरी टपोरे शेंगदाणे',
-    nameEn: 'Solapuri Jumbo Peanuts',
+    nameMr: 'टपोरे शेंगदाणे',
+    nameEn: 'Jumbo Peanuts',
     currentStockKg: 340,
     lowStockThresholdKg: 100,
     unitCostPerKg: 130,
-    sourceRegion: 'Solapur APMC',
+    sourceRegion: 'Farmers Mandi',
     lastProcuredDate: '2026-08-10'
   },
   {
     id: 'stock-coconut',
-    nameMr: 'कोकणी सुके खोबरे वाट्या',
-    nameEn: 'Konkani Dry Copra Kernels',
+    nameMr: 'सुके खोबरे वाट्या',
+    nameEn: 'Dry Copra Kernels',
     currentStockKg: 185,
     lowStockThresholdKg: 75,
     unitCostPerKg: 210,
-    sourceRegion: 'Ratnagiri Orchards',
+    sourceRegion: 'Orchards',
     lastProcuredDate: '2026-08-11'
   },
   {
     id: 'stock-garlic',
-    nameMr: 'गावरान रानटी गावरान लसूण',
-    nameEn: 'Desi Pungent Garlic Bulbs',
+    nameMr: 'गावरान लसूण',
+    nameEn: 'Pungent Garlic Bulbs',
     currentStockKg: 120,
     lowStockThresholdKg: 50,
     unitCostPerKg: 190,
-    sourceRegion: 'Satara & Junnar',
+    sourceRegion: 'Local Farms',
     lastProcuredDate: '2026-08-12'
   },
   {
@@ -1455,27 +1495,27 @@ export const INITIAL_RAW_STOCKS: RawIngredientStock[] = [
     currentStockKg: 210,
     lowStockThresholdKg: 80,
     unitCostPerKg: 240,
-    sourceRegion: 'Kolhapur Spice Yard',
+    sourceRegion: 'Spice Yard',
     lastProcuredDate: '2026-08-09'
   },
   {
     id: 'stock-sesame',
-    nameMr: 'गावरान पांढरे व तपकिरी तीळ',
-    nameEn: 'Desi Natural Sesame Seeds',
+    nameMr: 'पांढरे व तपकिरी तीळ',
+    nameEn: 'Natural Sesame Seeds',
     currentStockKg: 145,
     lowStockThresholdKg: 60,
     unitCostPerKg: 175,
-    sourceRegion: 'Latur Mandi',
+    sourceRegion: 'Mandi',
     lastProcuredDate: '2026-08-08'
   },
   {
     id: 'stock-flaxseed',
-    nameMr: 'गावरान गावठी जवस',
-    nameEn: 'Organic Brown Flaxseed',
+    nameMr: 'जवस',
+    nameEn: 'Brown Flaxseed',
     currentStockKg: 160,
     lowStockThresholdKg: 50,
     unitCostPerKg: 120,
-    sourceRegion: 'Beed Organic Farms',
+    sourceRegion: 'Farms',
     lastProcuredDate: '2026-08-12'
   },
   {
@@ -1495,7 +1535,7 @@ export const INITIAL_RAW_STOCKS: RawIngredientStock[] = [
     currentStockKg: 310,
     lowStockThresholdKg: 100,
     unitCostPerKg: 220,
-    sourceRegion: 'Traditional Wood Ghani Sangli',
+    sourceRegion: 'Wood Ghani',
     lastProcuredDate: '2026-08-13'
   }
 ];
@@ -1527,7 +1567,7 @@ export const INITIAL_ORDERS: Order[] = [
         totalPrice: 385,
         customDetails: {
           customName: 'रेश्माच्या हातची खास चटणी',
-          tagline: 'अस्सल सोलापुरी चव',
+          tagline: 'खमंग चव',
           baseIngredients: {
             peanuts: 60,
             dryCoconut: 20,
@@ -1582,8 +1622,8 @@ export const INITIAL_ORDERS: Order[] = [
       phone: '+91 94231 88201',
       email: 'anagha.joshi@example.com',
       addressLine1: 'बंगलो नं. १२, शांतिनिकेतन सोसायटी, ताराबाई पार्क',
-      landmark: 'महालक्ष्मी मंदिर परिसर',
-      talukaDistrict: 'कोल्हापूर (Kolhapur)',
+      landmark: 'मंदिर परिसर',
+      talukaDistrict: 'पुणे (Pune)',
       pincode: '416003',
       state: 'Maharashtra'
     },
@@ -1591,8 +1631,8 @@ export const INITIAL_ORDERS: Order[] = [
       {
         id: 'item-3',
         isCustomRecipe: false,
-        titleMr: 'गावरान कांदा-लसूण चटणी (कोल्हापुरी स्पेशल)',
-        titleEn: 'Gavran Kanda-Lasun Chutney (Spicy Kolhapuri)',
+        titleMr: 'कांदा-लसूण चटणी',
+        titleEn: 'Kanda-Lasun Chutney',
         size: '1kg',
         quantity: 1,
         unitPrice: 590,
@@ -1602,7 +1642,7 @@ export const INITIAL_ORDERS: Order[] = [
         id: 'item-4',
         isCustomRecipe: false,
         titleMr: 'गावरान तिळाची चटणी',
-        titleEn: 'Authentic Roasted Sesame Seed Chutney',
+        titleEn: 'Roasted Sesame Seed Chutney',
         size: '500g',
         quantity: 1,
         unitPrice: 290,
@@ -1641,8 +1681,8 @@ export const INITIAL_ORDERS: Order[] = [
       {
         id: 'item-5',
         isCustomRecipe: false,
-        titleMr: 'अस्सल जवसाची चटणी (ओमेगा-३)',
-        titleEn: 'Authentic Flaxseed Chutney',
+        titleMr: 'जवसाची चटणी (ओमेगा-३)',
+        titleEn: 'Flaxseed Chutney',
         size: '500g',
         quantity: 1,
         unitPrice: 300,

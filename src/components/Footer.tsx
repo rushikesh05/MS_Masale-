@@ -12,7 +12,7 @@ export const Footer: React.FC = () => {
           <div className="space-y-3">
             <BrandLogo size="md" inverted={false} />
             <p className="text-xs text-stone-600 leading-relaxed max-w-sm">
-              Authentic Maharashtrian spices, masalas, and condiments made with quality ingredients and traditional recipes.
+              Handcrafted spices, masalas, and condiments made with quality ingredients and traditional recipes.
             </p>
             <div className="text-[11px] text-amber-900 font-mono font-bold">
               FSSAI Lic. No: 11524036000492
@@ -25,11 +25,11 @@ export const Footer: React.FC = () => {
               Popular Items
             </h4>
             <ul className="text-xs text-stone-600 space-y-2">
-              <li>• Kolhapuri Kanda Lasun Masala</li>
+              <li>• Special Kanda Lasun Masala</li>
               <li>• Gavran Kala Masala</li>
-              <li>• Solapuri Shengdana Chutney</li>
+              <li>• Special Shengdana Chutney</li>
               <li>• Malvani Masala</li>
-              <li>• Authentic Goda Masala</li>
+              <li>• Traditional Goda Masala</li>
               <li>• Traditional Mango Pickle</li>
             </ul>
           </div>
@@ -49,7 +49,7 @@ export const Footer: React.FC = () => {
               <div className="flex items-start gap-2.5 text-stone-600">
                 <MapPin className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
                 <span>
-                  Pune, Maharashtra, India
+                  Pune, India
                 </span>
               </div>
               <div className="flex items-center gap-2.5 text-stone-600">

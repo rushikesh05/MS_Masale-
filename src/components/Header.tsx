@@ -55,7 +55,7 @@ export const Header: React.FC = () => {
           <span>MS Masale</span>
         </div>
         <div className="hidden sm:block text-[11px] text-stone-700 font-medium">
-          Free Delivery across Maharashtra on orders above ₹499
+          Free Delivery on orders above ₹499
         </div>
         <div className="flex items-center gap-1.5 text-xs font-bold text-amber-900 hover:text-amber-950 transition-colors">
           <PhoneCall className="w-3.5 h-3.5 text-amber-800" />
@@ -121,6 +121,28 @@ export const Header: React.FC = () => {
             <span className="hidden sm:inline font-bold">WhatsApp</span>
           </button>
 
+          {/* Admin Panel Quick Access Button */}
+          <button
+            onClick={async () => {
+              if (role === 'admin') {
+                await updateUserRole('customer');
+                showToast('Switched to Customer Storefront');
+              } else {
+                await updateUserRole('admin');
+                showToast('Switched to Admin Panel (Firebase Realtime)');
+              }
+            }}
+            className={`px-3 py-1.5 rounded-full text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer border shadow-2xs ${
+              role === 'admin'
+                ? 'bg-amber-800 text-amber-50 border-amber-900 shadow-xs ring-2 ring-amber-400'
+                : 'bg-white hover:bg-amber-50 text-stone-700 border-amber-200'
+            }`}
+            title="Toggle Admin Panel & CRUD"
+          >
+            <BarChart3 className="w-3.5 h-3.5 text-amber-600" />
+            <span className="hidden sm:inline">{role === 'admin' ? 'Exit Admin' : 'Admin Panel'}</span>
+          </button>
+
           {/* User Auth / Account Dropdown */}
           {currentUser ? (
             <div className="relative">
@@ -140,7 +162,7 @@ export const Header: React.FC = () => {
                     {(currentUser.displayName || currentUser.email || 'U')[0].toUpperCase()}
                   </div>
                 )}
-                <span className="max-w-[80px] sm:max-w-[100px] truncate hidden xs:inline font-semibold">
+                <span className="max-w-[80px] sm:max-w-[100px] truncate hidden sm:inline font-semibold">
                   {currentUser.displayName || currentUser.email?.split('@')[0]}
                 </span>
                 <ChevronDown className="w-3 h-3 text-stone-500" />

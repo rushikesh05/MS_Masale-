@@ -22,11 +22,11 @@
     --theme-gradient: linear-gradient(135deg, #FFFDF9 0%, #FAF5EE 50%, #FFF1E6 100%);
   }
 
-  [data-theme="kolhapuri"] {
+  [data-theme="crimson"] {
     --font-heading: 'Rozha One', 'Yatra One', 'Tiro Devanagari Marathi', serif;
     --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
     
-    /* Royal Kolhapuri Crimson Terracotta Theme */
+    /* Royal Crimson Terracotta Theme */
     --theme-header-bg: #1C1917;
     --theme-header-sub: #2E221E;
     --theme-primary: #B91C1C;
@@ -154,7 +154,7 @@
   background: #A33A22;
 }
 
-/* Authentic Indian artisanal texture overlay effect */
+/* Artisanal texture card effect */
 .bg-clay-card {
   background-color: #FFFFFF;
   border: 1px solid #EFE4D8;

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Order, Language, LiveDeliveryLocation } from '../types';
+import { RealLeafletMap } from './RealLeafletMap';
 import {
   Navigation,
   MapPin,
@@ -27,7 +28,7 @@ interface Props {
 export const LiveDeliveryTrackerModal: React.FC<Props> = ({ order, language, onClose }) => {
   const isMr = language === 'mr';
 
-  // Live simulated coordinates starting near Pune/Kolhapur workshop to customer address
+  // Live simulated coordinates starting near Pune workshop to customer address
   const [progressPct, setProgressPct] = useState<number>(() => {
     if (order.orderStatus === 'delivered') return 100;
     if (order.orderStatus === 'out_for_delivery') return 65;
@@ -114,7 +115,7 @@ export const LiveDeliveryTrackerModal: React.FC<Props> = ({ order, language, onC
       titleMr: 'ताजी तयारी (Preparation)',
       titleEn: 'Fresh Preparation',
       descMr: 'पारंपरिक पद्धतीने ताजी तयारी',
-      descEn: 'Handcrafted with authentic recipe',
+      descEn: 'Handcrafted with traditional recipe',
       completed: ['blending_in_workshop', 'packed_in_airtight_jar', 'out_for_delivery', 'delivered'].includes(order.orderStatus),
       active: order.orderStatus === 'blending_in_workshop'
     },
@@ -140,8 +141,8 @@ export const LiveDeliveryTrackerModal: React.FC<Props> = ({ order, language, onC
       id: 'delivered',
       titleMr: 'घरी पोहोचली (Delivered)',
       titleEn: 'Safely Delivered',
-      descMr: 'अस्सल गावरान मेजवानी!',
-      descEn: 'Enjoy authentic Maharashtrian taste',
+      descMr: 'पारंपरिक मेजवानी!',
+      descEn: 'Enjoy traditional home taste',
       completed: order.orderStatus === 'delivered',
       active: order.orderStatus === 'delivered'
     }
@@ -281,102 +282,16 @@ export const LiveDeliveryTrackerModal: React.FC<Props> = ({ order, language, onC
             </div>
           </div>
 
-          {/* Interactive Simulated Map Viewport */}
-          <div className="relative w-full h-64 sm:h-72 rounded-3xl bg-[#EBE4D8] border-2 border-[#DFD3C3] overflow-hidden shadow-inner flex flex-col justify-between p-4">
-            {/* Background Map Grid & Roads SVG Simulation */}
-            <div className="absolute inset-0 pointer-events-none opacity-40">
-              <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                  <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                    <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#C9B8A4" strokeWidth="1" />
-                  </pattern>
-                </defs>
-                <rect width="100%" height="100%" fill="url(#grid)" />
-                {/* Curved simulated road */}
-                <path
-                  d="M 50 200 C 180 230, 260 90, 480 140 S 680 110, 750 60"
-                  fill="none"
-                  stroke="#C84B31"
-                  strokeWidth="8"
-                  strokeDasharray="10, 8"
-                  strokeLinecap="round"
-                  className="animate-pulse"
-                />
-                <path
-                  d="M 50 200 C 180 230, 260 90, 480 140 S 680 110, 750 60"
-                  fill="none"
-                  stroke="#FFFFFF"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                />
-              </svg>
-            </div>
-
-            {/* Map Top Floating Overlay */}
-            <div className="relative z-10 flex items-center justify-between">
-              <div className="bg-white/95 backdrop-blur-md border border-stone-200 shadow-lg px-3.5 py-2 rounded-2xl flex items-center gap-3">
-                <div className="w-8 h-8 rounded-xl bg-amber-100 flex items-center justify-center text-amber-800">
-                  <Compass className="w-4 h-4 animate-spin text-[#C84B31]" />
-                </div>
-                <div>
-                  <div className="text-[10px] uppercase font-bold text-stone-400">
-                    {isMr ? 'चालू वेग & दिशा' : 'Speed & Bearing'}
-                  </div>
-                  <div className="text-xs font-bold text-stone-800">
-                    {deliveryBoyLocation.speedKmH} km/h • {deliveryBoyLocation.heading}° North-East
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white/95 backdrop-blur-md border border-stone-200 shadow-lg px-3.5 py-2 rounded-2xl flex items-center gap-2 text-xs font-bold text-stone-800">
-                <BatteryCharging className="w-4 h-4 text-emerald-600" />
-                <span>{deliveryBoyLocation.batteryPct.toFixed(0)}% Fleet Battery</span>
-              </div>
-            </div>
-
-            {/* Vehicle Moving Marker */}
-            <div
-              className="absolute z-10 transition-all duration-1000 ease-out"
-              style={{
-                left: `${Math.min(85, Math.max(15, progressPct))}%`,
-                top: `${45 + Math.sin(progressPct / 10) * 20}%`
-              }}
-            >
-              <div className="relative -translate-x-1/2 -translate-y-1/2 flex flex-col items-center">
-                {/* Ripple */}
-                <div className="absolute w-12 h-12 rounded-full bg-[#C84B31]/30 animate-ping" />
-                <div className="relative w-11 h-11 rounded-full bg-gradient-to-tr from-[#C84B31] to-[#E97777] text-white flex items-center justify-center shadow-2xl border-2 border-white ring-4 ring-[#C84B31]/20">
-                  <Navigation className="w-5 h-5 -rotate-45" />
-                </div>
-                <div className="mt-1 bg-stone-900/90 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow whitespace-nowrap">
-                  {order.assignedDeliveryPerson?.name?.split(' ')[0] || 'डिलिव्हरी रायडर'}
-                </div>
-              </div>
-            </div>
-
-            {/* Destination Target Marker */}
-            <div className="absolute right-8 top-12 z-10 flex flex-col items-center">
-              <div className="w-10 h-10 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shadow-lg border-2 border-white animate-bounce">
-                <MapPin className="w-5 h-5" />
-              </div>
-              <div className="mt-1 bg-emerald-950/90 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow whitespace-nowrap">
-                {isMr ? 'तुमचा पत्ता (Home)' : 'Your Address'}
-              </div>
-            </div>
-
-            {/* Map Bottom Status Bar */}
-            <div className="relative z-10 flex flex-wrap items-center justify-between gap-2 bg-stone-900/85 backdrop-blur-md text-white p-3 rounded-2xl text-xs">
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
-                <span className="font-medium text-stone-200">
-                  {isMr ? 'सध्याचे स्थान:' : 'Current Hub:'} <strong className="text-white">{deliveryBoyLocation.currentStop}</strong>
-                </span>
-              </div>
-              <div className="text-amber-400 font-mono text-xs">
-                {isMr ? 'अपडेट वेळ:' : 'Updated:'} {deliveryBoyLocation.updatedAt}
-              </div>
-            </div>
-          </div>
+          {/* Real Leaflet Map with Live OpenStreetMap GPS & NH-48 Waypoint Transit */}
+          <RealLeafletMap
+            orderStatus={order.orderStatus}
+            orderId={order.id}
+            customerCity={order.customer?.talukaDistrict || 'Pune'}
+            riderName={order.assignedDeliveryPerson?.name || 'विक्रम मोहिते (Vikram Mohite)'}
+            riderPhone={order.assignedDeliveryPerson?.phone || '+91 98901 12345'}
+            vehicleNumber={order.assignedDeliveryPerson?.vehicleNumber || 'MH 09 DX 7712'}
+            deliveryOtp={order.deliveryOtp}
+          />
 
           {/* AI Route & Traffic Engine Advice */}
           <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-amber-600/10 border border-amber-300/40 flex items-start gap-3">

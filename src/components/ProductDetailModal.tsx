@@ -1,23 +1,27 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Star, Flame, ShoppingBag, Check, ShieldCheck, Heart, Sparkles, ChefHat, Leaf } from 'lucide-react';
+import { X, Star, ShoppingBag, Check, ShieldCheck, Heart, Sparkles, ChefHat, Leaf, Clock, AlertTriangle } from 'lucide-react';
 import { Product } from '../types';
 import { useApp } from '../context/AppContext';
 import { ProductVisual } from './ProductVisual';
+import { StockBadge } from './StockBadge';
+import { getProductStockInfo } from '../lib/stockHelper';
 
 export const ProductDetailModal: React.FC = () => {
-  const { selectedProductDetail, setSelectedProductDetail, addToCart } = useApp();
-  const isMr = false; // Strictly English as requested
+  const { selectedProductDetail, setSelectedProductDetail, addToCart, language } = useApp();
+  const isMr = language === 'mr';
 
-  const [selectedSize, setSelectedSize] = useState<'250g' | '500g' | '1kg'>('500g');
+  const [selectedSize, setSelectedSize] = useState<string>('500g');
   const [quantity, setQuantity] = useState<number>(1);
   const [isAdding, setIsAdding] = useState<boolean>(false);
 
   if (!selectedProductDetail) return null;
   const product = selectedProductDetail;
   const activeSizeObj = product.sizes.find(s => s.size === selectedSize) || product.sizes[0];
+  const stockInfo = getProductStockInfo(product, selectedSize);
 
   const handleAdd = () => {
+    if (stockInfo.isOutOfStock) return;
     setIsAdding(true);
     addToCart({
       isCustomRecipe: false,
@@ -52,7 +56,7 @@ export const ProductDetailModal: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2">
             {/* Left Image / Real Food Photography */}
-            <div className="relative h-72 md:h-full bg-stone-900 min-h-[340px]">
+            <div className="relative aspect-square md:aspect-auto md:h-full bg-gradient-to-b from-[#FDFBF7] via-[#F7EFE4] to-[#EFE5D5] min-h-[280px] sm:min-h-[360px] overflow-hidden border-b md:border-b-0 md:border-r border-amber-100/90">
               <ProductVisual 
                 product={product} 
                 isMarathi={isMr} 
@@ -86,26 +90,8 @@ export const ProductDetailModal: React.FC = () => {
                   {isMr ? product.taglineMr : product.taglineEn}
                 </p>
 
-                {/* Spice Meter */}
-                <div className="flex items-center gap-2 my-3 p-2.5 rounded-xl bg-gradient-to-r from-amber-50/60 to-orange-50/60 border border-amber-200/70">
-                  <span className="text-xs font-bold text-[#2D2424]">
-                    {isMr ? 'तिखटपणा:' : 'Spice Heat:'}
-                  </span>
-                  <div className="flex items-center gap-1">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <Flame
-                        key={i}
-                        className={`w-4 h-4 ${i < product.spiceLevel ? 'text-[#DC2626] fill-[#DC2626]' : 'text-gray-300'}`}
-                      />
-                    ))}
-                  </div>
-                  <span className="text-xs text-gray-500 font-medium">
-                    (Level {product.spiceLevel}/5)
-                  </span>
-                </div>
-
                 {/* Description */}
-                <p className="text-xs text-[#574B4B] leading-relaxed my-3">
+                <p className="text-xs sm:text-sm text-[#574B4B] leading-relaxed my-3">
                   {isMr ? product.descriptionMr : product.descriptionEn}
                 </p>
 
@@ -215,26 +201,45 @@ export const ProductDetailModal: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Size Selector */}
+                {/* Size Selector with Live Stock Availability */}
                 <div className="my-4">
-                  <label className="block text-xs font-bold text-[#2D2424] mb-2 uppercase tracking-wide">
-                    {isMr ? 'पॅक वजन निवडा (Choose Size):' : 'Select Pack Size:'}
-                  </label>
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="block text-xs font-bold text-[#2D2424] uppercase tracking-wide">
+                      {isMr ? 'पॅक वजन निवडा (Choose Size):' : 'Select Pack Size:'}
+                    </label>
+                    <StockBadge stockInfo={stockInfo} isMarathi={isMr} variant="detailed" />
+                  </div>
                   <div className="grid grid-cols-3 gap-2">
-                    {product.sizes.map(s => (
-                      <button
-                        key={s.size}
-                        onClick={() => setSelectedSize(s.size)}
-                        className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer ${
-                          selectedSize === s.size
-                            ? 'border-amber-500 bg-amber-50 text-amber-900 ring-2 ring-amber-500/20 font-bold'
-                            : 'border-amber-200/80 bg-white text-stone-700 hover:bg-amber-50/40'
-                        }`}
-                      >
-                        <div className="text-sm font-extrabold">{s.size}</div>
-                        <div className="text-xs font-bold text-stone-900 mt-0.5">₹{s.price}</div>
-                      </button>
-                    ))}
+                    {product.sizes.map(s => {
+                      const sStock = getProductStockInfo(product, s.size);
+                      return (
+                        <button
+                          key={s.size}
+                          onClick={() => setSelectedSize(s.size)}
+                          className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer relative ${
+                            selectedSize === s.size
+                              ? 'border-amber-500 bg-amber-50 text-amber-900 ring-2 ring-amber-500/20 font-bold'
+                              : 'border-amber-200/80 bg-white text-stone-700 hover:bg-amber-50/40'
+                          }`}
+                        >
+                          <div className="text-sm font-extrabold">{s.size}</div>
+                          <div className="text-xs font-bold text-stone-900 mt-0.5">₹{s.price}</div>
+                          {sStock.isLowStock && (
+                            <div className="text-[9px] text-amber-700 font-bold mt-1">
+                              {isMr ? `फक्त ${sStock.stockCount} शिल्लक` : `Only ${sStock.stockCount} left`}
+                            </div>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Contextual stock urgency message */}
+                  <div className="mt-2.5 px-3 py-2 rounded-xl text-xs flex items-center gap-2 border bg-stone-50/70 border-stone-200/70">
+                    <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: stockInfo.isLowStock ? '#D97706' : stockInfo.isOutOfStock ? '#A8A29E' : '#059669' }} />
+                    <span className="text-stone-700 font-medium">
+                      {isMr ? stockInfo.detailTextMr : stockInfo.detailTextEn}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -245,14 +250,16 @@ export const ProductDetailModal: React.FC = () => {
                 <div className="flex items-center border border-amber-200/80 rounded-xl bg-white overflow-hidden">
                   <button
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="px-3 py-2 text-sm font-bold hover:bg-amber-50 text-stone-900 transition-colors cursor-pointer"
+                    disabled={stockInfo.isOutOfStock}
+                    className="px-3 py-2 text-sm font-bold hover:bg-amber-50 text-stone-900 transition-colors cursor-pointer disabled:opacity-50"
                   >
                     -
                   </button>
                   <span className="px-3 text-sm font-extrabold text-stone-900">{quantity}</span>
                   <button
                     onClick={() => setQuantity(quantity + 1)}
-                    className="px-3 py-2 text-sm font-bold hover:bg-amber-50 text-stone-900 transition-colors cursor-pointer"
+                    disabled={stockInfo.isOutOfStock}
+                    className="px-3 py-2 text-sm font-bold hover:bg-amber-50 text-stone-900 transition-colors cursor-pointer disabled:opacity-50"
                   >
                     +
                   </button>
@@ -260,20 +267,27 @@ export const ProductDetailModal: React.FC = () => {
 
                 {/* Add to Cart Button with Pop animation */}
                 <motion.button
-                  whileTap={{ scale: 0.94 }}
+                  whileTap={stockInfo.isOutOfStock ? undefined : { scale: 0.94 }}
+                  disabled={stockInfo.isOutOfStock}
                   animate={
                     isAdding
                       ? { scale: [1, 1.08, 0.95, 1], backgroundColor: '#059669' }
                       : { scale: 1 }
                   }
                   onClick={handleAdd}
-                  className="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-extrabold text-sm sm:text-base transition-all shadow-md shadow-orange-500/20 flex items-center justify-center gap-2 cursor-pointer relative overflow-hidden"
+                  className={`flex-1 py-3 px-4 rounded-xl text-white font-extrabold text-sm sm:text-base transition-all shadow-md flex items-center justify-center gap-2 relative overflow-hidden ${
+                    stockInfo.isOutOfStock
+                      ? 'bg-stone-400 cursor-not-allowed opacity-75 shadow-none'
+                      : 'bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 shadow-orange-500/20 cursor-pointer'
+                  }`}
                 >
                   {isAdding ? (
                     <>
                       <Check className="w-5 h-5 text-emerald-200 animate-bounce" />
-                      <span className="text-white">Added to Basket!</span>
+                      <span className="text-white">{isMr ? 'बास्केटमध्ये जोडले!' : 'Added to Basket!'}</span>
                     </>
+                  ) : stockInfo.isOutOfStock ? (
+                    <span>{isMr ? 'साठा संपला (Out of Stock)' : 'Out of Stock'}</span>
                   ) : (
                     <>
                       <ShoppingBag className="w-4 h-4 text-amber-100" />

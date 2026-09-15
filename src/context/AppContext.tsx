@@ -11,7 +11,7 @@ import {
   seedCatalogToFirestore 
 } from '../lib/firestoreService';
 
-export type AppTheme = 'express' | 'kolhapuri' | 'sahyadri' | 'konkan';
+export type AppTheme = 'express' | 'crimson' | 'sahyadri' | 'konkan';
 
 interface AppContextType {
   role: UserRole;

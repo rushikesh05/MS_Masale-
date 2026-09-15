@@ -110,6 +110,15 @@ export interface ProductCategory {
   sortOrder?: number;
 }
 
+export interface ProductSize {
+  size: '100g' | '250g' | '500g' | '1kg' | string;
+  grams: number;
+  price: number;
+  originalPrice: number;
+  inStock: boolean;
+  stockCount?: number;
+}
+
 export interface Product {
   id: string;
   nameMr: string;
@@ -148,7 +157,10 @@ export interface Product {
     price: number;
     originalPrice: number;
     inStock: boolean;
+    stockCount?: number;
   }[];
+  stockCount?: number;
+  isLowStock?: boolean;
   isBestSeller?: boolean;
   isRegionalSpecialty?: boolean;
   regionOriginMr?: string;
@@ -246,6 +258,21 @@ export interface WhatsAppNotification {
   status: 'sent' | 'delivered' | 'read';
 }
 
+export interface SmsNotification {
+  id: string;
+  orderId: string;
+  recipientPhone: string;
+  recipientName: string;
+  type: 'order_confirmed' | 'dispatched' | 'delivered';
+  messageText: string;
+  otp?: string;
+  deviceSmsUri?: string;
+  whatsAppUri?: string;
+  timestamp: string;
+  status: 'sent' | 'delivered';
+  gateway?: string;
+}
+
 export interface Inquiry {
   id: string;
   name: string;
@@ -289,7 +316,7 @@ export interface WholesaleProductRequirement {
   productNameMr: string;
   productNameEn: string;
   quantityKg: number;
-  spiceLevelPreference: 'mild_kolhapuri' | 'medium_gavran' | 'extra_spicy_thecha' | 'custom_blend';
+  spiceLevelPreference: 'mild_blend' | 'medium_gavran' | 'extra_spicy_thecha' | 'custom_blend';
   packagingPreference: PackagingPreference;
   customNotes?: string;
 }

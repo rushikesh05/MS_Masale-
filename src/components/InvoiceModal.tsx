@@ -332,7 +332,7 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
 
   // 3. Copy Summary to Clipboard
   const handleCopySummary = () => {
-    const textSummary = `📜 अस्सल गावरान चटणी - अधिकृत कर पावती (Tax Invoice)
+    const textSummary = `📜 एमएस मसाले - अधिकृत कर पावती (Tax Invoice)
 📄 Invoice No: ${invoiceNumber}
 🔢 Order ID: #${order.id}
 👤 Customer: ${order.customer.fullName} (${order.customer.phone})

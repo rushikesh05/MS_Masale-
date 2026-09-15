@@ -1,6 +1,6 @@
 {
   "name": "MS Masale",
-  "description": "MS Masale - Traditional Maharashtrian Spices, Masalas, and Condiments. Contact: 8591254237.",
+  "description": "MS Masale - Quality Spices, Masalas, Chutneys, and Condiments. Contact: 8591254237.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

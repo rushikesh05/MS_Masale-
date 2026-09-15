@@ -36,7 +36,7 @@ export const CustomChutneyBuilder: React.FC = () => {
 
   // Configuration State
   const [customName, setCustomName] = useState<string>('माझ्या हातची स्पेशल चटणी');
-  const [tagline, setTagline] = useState<string>('अस्सल गावरान पारंपरिक चव');
+  const [tagline, setTagline] = useState<string>('पारंपरिक गावरान चव');
   
   // Base Ingredients Percentages (must sum up to 100)
   const [percentages, setPercentages] = useState<Record<string, number>>({
@@ -93,14 +93,14 @@ export const CustomChutneyBuilder: React.FC = () => {
   };
 
   // Recipe Presets for quick start
-  const applyPreset = (presetType: 'solapuri' | 'vada_pav' | 'omega_fit' | 'satvik') => {
-    if (presetType === 'solapuri') {
+  const applyPreset = (presetType: 'shengdana' | 'vada_pav' | 'omega_fit' | 'satvik') => {
+    if (presetType === 'shengdana') {
       setPercentages({ peanuts: 70, dryCoconut: 10, sesameSeeds: 10, flaxseed: 0, redChilliBase: 10 });
       setSpiceLevel(4);
       setGarlicLevel('extra');
       setSaltType('sendhav');
       setOilType('groundnut_cold_pressed');
-      setCustomName('अस्सल सोलापुरी खमंग शेंगदाणा');
+      setCustomName('खमंग शेंगदाणा चटणी');
       setTagline('जाडसर कुटलेली व गरमागरम भाकरी स्पेशल');
     } else if (presetType === 'vada_pav') {
       setPercentages({ peanuts: 10, dryCoconut: 60, sesameSeeds: 10, flaxseed: 0, redChilliBase: 20 });
@@ -109,7 +109,7 @@ export const CustomChutneyBuilder: React.FC = () => {
       setSaltType('regular');
       setOilType('none');
       setCustomName('वडापाव स्पेशल कुरकुरीत लाल चटणी');
-      setTagline('मुंबई-पुणे अस्सल स्ट्रीट स्टाईल');
+      setTagline('मुंबई-पुणे स्ट्रीट स्टाईल');
     } else if (presetType === 'omega_fit') {
       setPercentages({ peanuts: 20, dryCoconut: 10, sesameSeeds: 30, flaxseed: 35, redChilliBase: 5 });
       setSpiceLevel(2);
@@ -164,7 +164,7 @@ export const CustomChutneyBuilder: React.FC = () => {
   const handleAddToCart = () => {
     const recipeConfig: CustomChutneyConfig = {
       customName: customName || (isMr ? 'माझ्या हातची स्पेशल चटणी' : 'My Custom Chutney Jar'),
-      tagline: tagline || (isMr ? 'अस्सल गावरान चव' : 'Authentic Maharashtrian Taste'),
+      tagline: tagline || (isMr ? 'पारंपरिक गावरान चव' : 'Traditional Recipe Taste'),
       baseIngredients: {
         peanuts: percentages.peanuts || 0,
         dryCoconut: percentages.dryCoconut || 0,
@@ -224,10 +224,10 @@ export const CustomChutneyBuilder: React.FC = () => {
           {isMr ? 'लोकप्रिय रेसिपी निवडा:' : 'Quick Presets:'}
         </span>
         <button
-          onClick={() => applyPreset('solapuri')}
+          onClick={() => applyPreset('shengdana')}
           className="px-3 py-1.5 rounded-full text-xs font-medium bg-[#FFF2ED] hover:bg-[#FDE4DB] text-[#C84B31] border border-[#F3C9BF] transition-all flex items-center gap-1 cursor-pointer"
         >
-          🥜 {isMr ? 'सोलापुरी शेंगदाणा' : 'Solapuri Peanut'}
+          🥜 {isMr ? 'खमंग शेंगदाणा' : 'Crunchy Peanut'}
         </button>
         <button
           onClick={() => applyPreset('vada_pav')}
@@ -259,7 +259,7 @@ export const CustomChutneyBuilder: React.FC = () => {
           <div className="flex items-center justify-between mb-8 border-b border-[#F5EDE4] pb-4">
             {[
               { num: 1, labelMr: '१. मुख्य घटक', labelEn: '1. Base Blend' },
-              { num: 2, labelMr: '२. तिखटपणा', labelEn: '2. Spice' },
+              { num: 2, labelMr: '२. मसाला चव', labelEn: '2. Spice Blend' },
               { num: 3, labelMr: '३. लसूण व तेल', labelEn: '3. Garlic & Oil' },
               { num: 4, labelMr: '४. जार व नाव', labelEn: '4. Size & Label' }
             ].map(step => (
@@ -401,10 +401,10 @@ export const CustomChutneyBuilder: React.FC = () => {
             >
               <div>
                 <h3 className="text-lg font-bold text-[#2D2424] font-brand">
-                  {isMr ? 'पाऊल २: तिखटपणा (Spice Heat Meter)' : 'Step 2: Choose Spice Heat Level'}
+                  {isMr ? 'पाऊल २: मिरची व मसाला चव (Chilli & Spice Blend)' : 'Step 2: Choose Chilli & Spice Blend'}
                 </h3>
                 <p className="text-xs text-[#7A6E6E]">
-                  {isMr ? 'साजूक ते अस्सल कोल्हापुरी लवंगी ठसका — तुमची तिखट सहनशीलता निवडा.' : 'From delicate mild spice to fiery Kolhapuri Lavangi.'}
+                  {isMr ? 'साजूक ते झणझणीत लवंगी ठसका — तुमची आवडती चव निवडा.' : 'From delicate mild aroma to fiery Lavangi.'}
                 </p>
               </div>
 
@@ -417,7 +417,7 @@ export const CustomChutneyBuilder: React.FC = () => {
                   {[
                     { id: 'bedgi', titleMr: 'बेडगी मिरची', titleEn: 'Bedgi Chilli', descMr: 'सुरेख लाल रंग, मध्यम तिखट' },
                     { id: 'lavangi', titleMr: 'लवंगी मिरची', titleEn: 'Lavangi Hot', descMr: 'लहान आकाराची पण तीव्र तिखट' },
-                    { id: 'sankeshwari', titleMr: 'संकेश्वरी गावरान', titleEn: 'Sankeshwari', descMr: 'कोल्हापुरी अस्सल ठसकेबाज' }
+                    { id: 'sankeshwari', titleMr: 'संकेश्वरी गावरान', titleEn: 'Sankeshwari', descMr: 'गावरान झणझणीत ठसकेबाज' }
                   ].map(c => (
                     <button
                       key={c.id}
@@ -493,7 +493,7 @@ export const CustomChutneyBuilder: React.FC = () => {
                   {isMr ? 'पाऊल ३: लसूण, मीठ व लाकडी घाण्याचे तेल' : 'Step 3: Garlic, Salt & Wood-Pressed Oil'}
                 </h3>
                 <p className="text-xs text-[#7A6E6E]">
-                  {isMr ? 'अस्सल गावरान लसूण व सेंधव मिठाने चटणीला खरी चव व पोषकता मिळते.' : 'Enhance taste with roasted desi garlic and cold-pressed oil drizzle.'}
+                  {isMr ? 'गावरान लसूण व सेंधव मिठाने चटणीला खरी चव व पोषकता मिळते.' : 'Enhance taste with roasted desi garlic and cold-pressed oil drizzle.'}
                 </p>
               </div>
 
@@ -686,7 +686,7 @@ export const CustomChutneyBuilder: React.FC = () => {
 
                 <div>
                   <label htmlFor={customTaglineInputId} className="block text-xs text-[#6B5E5E] mb-1 font-medium">
-                    {isMr ? 'उपशीर्षक / मेसेज (उदा. "अस्सल गावरान चव", "हृदयापासून प्रेमाने बनवलेली"):' : 'Subtitle / Tagline:'}
+                    {isMr ? 'उपशीर्षक / मेसेज (उदा. "गावरान चव", "हृदयापासून प्रेमाने बनवलेली"):' : 'Subtitle / Tagline:'}
                   </label>
                   <input
                     id={customTaglineInputId}
@@ -694,7 +694,7 @@ export const CustomChutneyBuilder: React.FC = () => {
                     maxLength={45}
                     value={tagline}
                     onChange={(e) => setTagline(e.target.value)}
-                    placeholder="उदा. अस्सल गावरान पारंपरिक चव"
+                    placeholder="उदा. पारंपरिक गावरान चव"
                     className="w-full px-3.5 py-2 text-sm bg-white border border-[#EADFD5] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C84B31] text-[#6B5E5E]"
                   />
                 </div>
@@ -832,7 +832,7 @@ export const CustomChutneyBuilder: React.FC = () => {
                 {/* Printed Custom Label Badge on the Jar */}
                 <div className="absolute inset-x-2 top-10 bg-[#FFF8EE]/95 text-[#2D2424] rounded-lg p-2.5 border border-[#D5BFA8] shadow-lg text-center z-20">
                   <div className="text-[9px] uppercase tracking-widest text-[#C84B31] font-bold">
-                    🚩 अस्सल गावरान चटणी
+                    🌶️ एम एस मसाले (MS Masale)
                   </div>
                   <div className="font-extrabold text-xs text-[#2D2424] font-brand truncate mt-0.5">
                     {customName || 'माझ्या हातची स्पेशल चटणी'}
@@ -856,7 +856,7 @@ export const CustomChutneyBuilder: React.FC = () => {
             <div className="grid grid-cols-2 gap-2 mt-4 pt-3 border-t border-[#443838] text-xs">
               <div className="bg-[#382F2F] p-2 rounded-lg">
                 <span className="text-gray-400 block text-[10px] uppercase">
-                  {isMr ? 'तिखटपणा (Spice):' : 'Spice Level:'}
+                  {isMr ? 'मसाला चव (Spice):' : 'Spice Blend:'}
                 </span>
                 <span className="font-bold text-[#F3C9BF]">
                   Level {spiceLevel} ({chilliVariety.toUpperCase()})

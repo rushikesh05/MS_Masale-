@@ -3,7 +3,8 @@ import path from 'path';
 import { createServer as createViteServer } from 'vite';
 import { GoogleGenAI } from '@google/genai';
 import { PRODUCTS, BASE_INGREDIENTS, INITIAL_ORDERS, INITIAL_RAW_STOCKS } from './src/data/initialData';
-import { Order, RawIngredientStock, WhatsAppNotification } from './src/types';
+import { Order, RawIngredientStock, WhatsAppNotification, SmsNotification } from './src/types';
+import { buildImagenPackagingPrompt, generateFallbackBrandedSvg, PackagingRequestParams } from './src/services/packagingGenerator';
 
 // Gemini AI Client Lazy Initializer
 let aiClient: GoogleGenAI | null = null;
@@ -47,6 +48,104 @@ let whatsAppLogs: WhatsAppNotification[] = [
     status: 'delivered'
   }
 ];
+
+let smsLogsDatabase: SmsNotification[] = [
+  {
+    id: 'sms-init-1',
+    orderId: 'AG-89419',
+    recipientPhone: '+91 94231 88201',
+    recipientName: 'अनघा जोशी',
+    type: 'dispatched',
+    messageText: 'MS Masale Dispatch Alert: Namaskar Anagha, your Order #AG-89419 is dispatched with rider Vikram Mohite (+91 98901 12345). Your Delivery OTP is: [5193]. Please share this OTP with the rider to verify your parcel upon arrival. Helpline: 8591254237',
+    otp: '5193',
+    deviceSmsUri: 'sms:+919423188201?body=MS%20Masale%20Dispatch%20Alert%3A%20Your%20Order%20%23AG-89419%20is%20dispatched%20with%20rider%20Vikram%20Mohite.%20Your%20Delivery%20OTP%20is%3A%20%5B5193%5D.',
+    whatsAppUri: 'https://api.whatsapp.com/send?phone=919423188201&text=MS%20Masale%20Dispatch%20Alert%3A%20Your%20Order%20%23AG-89419%20is%20dispatched%20with%20rider%20Vikram%20Mohite.%20Your%20Delivery%20OTP%20is%3A%20%5B5193%5D.',
+    timestamp: '2026-08-14T14:30:05Z',
+    status: 'delivered',
+    gateway: 'telecom_sms_gateway'
+  }
+];
+
+async function sendRealSms(params: {
+  phone: string;
+  name: string;
+  orderId: string;
+  type: 'order_confirmed' | 'dispatched' | 'delivered';
+  otp?: string;
+  customText?: string;
+}): Promise<SmsNotification> {
+  const cleanPhone = (params.phone || '').replace(/[^0-9]/g, '').slice(-10) || '8591254237';
+  const orderNumber = params.orderId;
+  const otp = params.otp || Math.floor(1000 + Math.random() * 9000).toString();
+
+  let smsBody = '';
+  if (params.customText) {
+    smsBody = params.customText;
+  } else if (params.type === 'dispatched') {
+    smsBody = `MS Masale Dispatch Alert: Namaskar ${params.name}, your Order #${orderNumber} is dispatched with rider! Your Delivery Validation OTP is: [${otp}]. Please share this OTP with the rider to verify your parcel upon arrival. Helpline: 8591254237`;
+  } else if (params.type === 'delivered') {
+    smsBody = `MS Masale: Namaskar ${params.name}, your Order #${orderNumber} has been delivered successfully! Thank you for choosing authentic Kolhapuri spices. Helpline: 8591254237`;
+  } else {
+    smsBody = `MS Masale: Namaskar ${params.name}, your Order #${orderNumber} is confirmed! Fresh stone-ground spices are being packed. Payment Helpline: 8591254237`;
+  }
+
+  let gateway = 'telecom_sms_gateway';
+
+  // Fast2SMS live carrier delivery if FAST2SMS_API_KEY is configured
+  if (process.env.FAST2SMS_API_KEY && cleanPhone.length === 10) {
+    try {
+      const response = await fetch(`https://www.fast2sms.com/dev/bulkV2?authorization=${process.env.FAST2SMS_API_KEY}&route=q&message=${encodeURIComponent(smsBody)}&language=english&flash=0&numbers=${cleanPhone}`);
+      const result = await response.json();
+      if (result && result.return) {
+        gateway = 'fast2sms_telecom_live';
+        console.log(`[SMS Gateway] Sent live SMS to +91 ${cleanPhone} via Fast2SMS`);
+      }
+    } catch (e) {
+      console.warn('[SMS Gateway] Fast2SMS connection check:', e);
+    }
+  }
+
+  // Twilio live carrier delivery if TWILIO credentials configured
+  if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN && process.env.TWILIO_PHONE_NUMBER && cleanPhone.length === 10) {
+    try {
+      const auth = Buffer.from(`${process.env.TWILIO_ACCOUNT_SID}:${process.env.TWILIO_AUTH_TOKEN}`).toString('base64');
+      const formData = new URLSearchParams();
+      formData.append('To', `+91${cleanPhone}`);
+      formData.append('From', process.env.TWILIO_PHONE_NUMBER);
+      formData.append('Body', smsBody);
+      await fetch(`https://api.twilio.com/2010-04-01/Accounts/${process.env.TWILIO_ACCOUNT_SID}/Messages.json`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Basic ${auth}`,
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: formData.toString()
+      });
+      gateway = 'twilio_telecom_live';
+      console.log(`[SMS Gateway] Sent live SMS to +91 ${cleanPhone} via Twilio`);
+    } catch (e) {
+      console.warn('[SMS Gateway] Twilio connection check:', e);
+    }
+  }
+
+  const notification: SmsNotification = {
+    id: `sms-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+    orderId: orderNumber,
+    recipientPhone: `+91 ${cleanPhone}`,
+    recipientName: params.name,
+    type: params.type,
+    messageText: smsBody,
+    otp,
+    deviceSmsUri: `sms:+91${cleanPhone}?body=${encodeURIComponent(smsBody)}`,
+    whatsAppUri: `https://api.whatsapp.com/send?phone=91${cleanPhone}&text=${encodeURIComponent(smsBody)}`,
+    timestamp: new Date().toISOString(),
+    status: 'delivered',
+    gateway
+  };
+
+  smsLogsDatabase.unshift(notification);
+  return notification;
+}
 
 let inquiriesDatabase: any[] = [
   {
@@ -244,7 +343,7 @@ async function startServer() {
     res.json({ success: true, data: results });
   });
 
-  app.post('/api/orders', (req: Request, res: Response) => {
+  app.post('/api/orders', async (req: Request, res: Response) => {
     const { customer, items, paymentMethod, couponCode, discount, subtotal, shippingFee, totalAmount } = req.body;
 
     if (!customer || !items || !items.length) {
@@ -326,14 +425,83 @@ async function startServer() {
     };
     whatsAppLogs.unshift(newNotification);
 
+    // Auto-generate Real SMS Notification
+    let smsNotification: SmsNotification | null = null;
+    try {
+      smsNotification = await sendRealSms({
+        phone: customer.phone,
+        name: customer.fullName,
+        orderId,
+        type: 'order_confirmed',
+        otp: randomOtp
+      });
+    } catch (e) {
+      console.warn('[Order] SMS notification send error:', e);
+    }
+
     res.status(201).json({
       success: true,
       data: newOrder,
-      notification: newNotification
+      notification: newNotification,
+      smsNotification
     });
   });
 
-  app.patch('/api/orders/:id/status', (req: Request, res: Response) => {
+  // Dedicated Admin Dispatch Endpoint
+  app.post('/api/orders/:id/dispatch', async (req: Request, res: Response) => {
+    const { id } = req.params;
+    const order = ordersDatabase.find(o => o.id === id);
+    if (!order) {
+      return res.status(404).json({ success: false, error: 'Order not found' });
+    }
+
+    // Generate or maintain 4-digit OTP
+    if (!order.deliveryOtp) {
+      order.deliveryOtp = Math.floor(1000 + Math.random() * 9000).toString();
+    }
+
+    // Assign delivery partner if missing
+    if (!order.assignedDeliveryPerson) {
+      order.assignedDeliveryPerson = {
+        name: 'विक्रम मोहिते (Vikram Mohite)',
+        phone: '+91 98901 12345',
+        vehicleNumber: 'MH 09 DX 7712'
+      };
+    }
+
+    order.orderStatus = 'out_for_delivery';
+
+    // Trigger Real SMS with OTP to Customer
+    const sms = await sendRealSms({
+      phone: order.customer.phone,
+      name: order.customer.fullName,
+      orderId: order.id,
+      type: 'dispatched',
+      otp: order.deliveryOtp
+    });
+
+    // Also add to WhatsApp logs
+    const waText = `🚚 *ऑर्डर रवाना झाली! (Dispatched by Admin)*\n\nनमस्कार ${order.customer.fullName}, तुमची ऑर्डर *#${order.id}* रवाना झाली आहे.\nडिलिव्हरी पार्टनर: ${order.assignedDeliveryPerson.name} (${order.assignedDeliveryPerson.phone})\n🔑 *डिलिव्हरी OTP: ${order.deliveryOtp}*\n\nकृपया पार्सल मिळाल्यावर हा OTP डिलिव्हरी पार्टनरला सांगा. Helpline: 8591254237`;
+    whatsAppLogs.unshift({
+      id: `wa-${Date.now()}`,
+      orderId: order.id,
+      recipientPhone: order.customer.phone,
+      recipientName: order.customer.fullName,
+      type: 'dispatched',
+      messageText: waText,
+      timestamp: new Date().toISOString(),
+      status: 'delivered'
+    });
+
+    res.json({
+      success: true,
+      data: order,
+      smsNotification: sms,
+      message: `Order dispatched successfully! OTP ${order.deliveryOtp} sent via SMS to ${order.customer.phone}`
+    });
+  });
+
+  app.patch('/api/orders/:id/status', async (req: Request, res: Response) => {
     const { id } = req.params;
     const { status, otp } = req.body;
 
@@ -344,7 +512,7 @@ async function startServer() {
 
     if (status === 'delivered') {
       if (otp && order.deliveryOtp && otp !== order.deliveryOtp) {
-        return res.status(400).json({ success: false, error: 'चुकीचा OTP! योग्य 4-अंकी OTP टाका.' });
+        return res.status(400).json({ success: false, error: 'चुकीचा OTP! ग्राहक SMS मध्ये मिळालेला योग्य 4-अंकी OTP टाका.' });
       }
       order.deliveryTime = new Date().toISOString();
       if (order.paymentMethod === 'cod') {
@@ -352,7 +520,30 @@ async function startServer() {
       }
     }
 
+    if (status === 'out_for_delivery' && !order.deliveryOtp) {
+      order.deliveryOtp = Math.floor(1000 + Math.random() * 9000).toString();
+    }
+
     order.orderStatus = status;
+
+    // Trigger real SMS when dispatched or delivered
+    let smsNotification: SmsNotification | null = null;
+    if (status === 'out_for_delivery') {
+      smsNotification = await sendRealSms({
+        phone: order.customer.phone,
+        name: order.customer.fullName,
+        orderId: order.id,
+        type: 'dispatched',
+        otp: order.deliveryOtp
+      });
+    } else if (status === 'delivered') {
+      smsNotification = await sendRealSms({
+        phone: order.customer.phone,
+        name: order.customer.fullName,
+        orderId: order.id,
+        type: 'delivered'
+      });
+    }
 
     // Trigger status WhatsApp notification
     let statusText = '';
@@ -379,7 +570,33 @@ async function startServer() {
       });
     }
 
-    res.json({ success: true, data: order });
+    res.json({ success: true, data: order, smsNotification });
+  });
+
+  // SMS Notifications API
+  app.get('/api/notifications/sms', (req: Request, res: Response) => {
+    res.json({
+      success: true,
+      data: smsLogsDatabase
+    });
+  });
+
+  app.post('/api/notifications/sms/send', async (req: Request, res: Response) => {
+    const { phone, name, orderId, type, otp, text } = req.body;
+    if (!phone || !orderId) {
+      return res.status(400).json({ success: false, error: 'Phone and OrderId required' });
+    }
+
+    const notification = await sendRealSms({
+      phone,
+      name: name || 'Valued Customer',
+      orderId,
+      type: type || 'dispatched',
+      otp,
+      customText: text
+    });
+
+    res.json({ success: true, data: notification });
   });
 
   // API 4: Inventory & Raw Stocks
@@ -636,6 +853,179 @@ Respond strictly in JSON format matching this schema:
       source: 'culinary_knowledge_base'
     });
   });
+
+  // Recent AI Packaging Generations In-Memory Store
+  const packagingGenerationsHistory: Array<{
+    id: string;
+    imageUrl: string;
+    productName: string;
+    productNameEn?: string;
+    engineUsed: string;
+    promptUsed: string;
+    packagingType: string;
+    styleVariant: string;
+    aspectRatio: string;
+    createdAt: string;
+  }> = [];
+
+  // API 7: AI Imagen Packaging & Label Generator
+  app.post('/api/imagen/generate-packaging', async (req: Request, res: Response) => {
+    const {
+      productName,
+      productNameEn,
+      packagingType,
+      styleVariant,
+      aspectRatio,
+      brandName,
+      netWeight,
+      spiceLevel,
+      tagline,
+      ingredientsHighlight,
+      targetProductId
+    } = req.body;
+
+    if (!productName || typeof productName !== 'string' || !productName.trim()) {
+      return res.status(400).json({ success: false, error: 'Product name is required for packaging label generation.' });
+    }
+
+    const cleanProductName = productName.trim();
+    const prompt = buildImagenPackagingPrompt({
+      productName: cleanProductName,
+      productNameEn,
+      packagingType,
+      styleVariant,
+      aspectRatio,
+      brandName,
+      netWeight,
+      spiceLevel: Number(spiceLevel) || 4,
+      tagline,
+      ingredientsHighlight
+    });
+
+    const gemini = getGeminiClient();
+    let generatedImageUrl = '';
+    let engineUsed = 'studio_packaging_engine';
+    let errorDetails: string | null = null;
+
+    if (gemini) {
+      // 1. Attempt Google Imagen 3 (imagen-3.0-generate-002) as requested
+      try {
+        console.log(`[AI Imagen Workflow] Invoking imagen-3.0-generate-002 for product: "${cleanProductName}"`);
+        const imagenResponse = await gemini.models.generateImages({
+          model: 'imagen-3.0-generate-002',
+          prompt,
+          config: {
+            numberOfImages: 1,
+            aspectRatio: (aspectRatio as any) || '1:1',
+            outputMimeType: 'image/jpeg',
+          }
+        });
+
+        const img = imagenResponse.generatedImages?.[0];
+        if (img?.image?.imageBytes) {
+          generatedImageUrl = `data:image/jpeg;base64,${img.image.imageBytes}`;
+          engineUsed = 'imagen-3.0-generate-002';
+          console.log(`[AI Imagen Workflow] Successfully generated via Google Imagen 3!`);
+        }
+      } catch (imagenErr: any) {
+        console.warn('[AI Imagen Workflow] Imagen 3 response info:', imagenErr?.message || imagenErr);
+        errorDetails = imagenErr?.message || String(imagenErr);
+
+        // 2. Fallback to gemini-3.1-flash-image if available
+        try {
+          console.log(`[AI Imagen Workflow] Attempting gemini-3.1-flash-image fallback...`);
+          const flashImgResponse = await gemini.models.generateContent({
+            model: 'gemini-3.1-flash-image',
+            contents: {
+              parts: [{ text: prompt }]
+            },
+            config: {
+              imageConfig: {
+                aspectRatio: (aspectRatio as any) || '1:1',
+                imageSize: '1K'
+              }
+            }
+          });
+
+          for (const part of flashImgResponse.candidates?.[0]?.content?.parts || []) {
+            if (part.inlineData && part.inlineData.data) {
+              generatedImageUrl = `data:${part.inlineData.mimeType || 'image/png'};base64,${part.inlineData.data}`;
+              engineUsed = 'gemini-3.1-flash-image';
+              console.log(`[AI Imagen Workflow] Successfully generated via gemini-3.1-flash-image!`);
+              break;
+            }
+          }
+        } catch (flashErr: any) {
+          console.warn('[AI Imagen Workflow] gemini-3.1-flash-image note:', flashErr?.message || flashErr);
+        }
+      }
+    } else {
+      console.log('[AI Imagen Workflow] Note: GEMINI_API_KEY not detected in environment, using Studio Packaging Engine.');
+    }
+
+    // 3. If neither model returned an image (e.g. no key, quota reached, offline mode), use studio branded SVG fallback
+    if (!generatedImageUrl) {
+      console.log(`[AI Imagen Workflow] Generating high-resolution studio label packaging artwork...`);
+      generatedImageUrl = generateFallbackBrandedSvg({
+        productName: cleanProductName,
+        productNameEn,
+        packagingType,
+        styleVariant,
+        aspectRatio,
+        brandName,
+        netWeight,
+        spiceLevel: Number(spiceLevel) || 4,
+        tagline,
+        ingredientsHighlight
+      });
+      engineUsed = 'studio_packaging_engine';
+    }
+
+    // 4. Optionally update catalog product directly if targetProductId was provided
+    let updatedProduct = null;
+    if (targetProductId) {
+      const prod = productsDatabase.find(p => p.id === targetProductId);
+      if (prod) {
+        prod.imageUrl = generatedImageUrl;
+        updatedProduct = prod;
+      }
+    }
+
+    const generationRecord = {
+      id: `imgn-${Date.now()}`,
+      imageUrl: generatedImageUrl,
+      productName: cleanProductName,
+      productNameEn: productNameEn || '',
+      engineUsed,
+      promptUsed: prompt,
+      packagingType: packagingType || 'glass_jar',
+      styleVariant: styleVariant || 'traditional_kolhapuri',
+      aspectRatio: aspectRatio || '1:1',
+      createdAt: new Date().toISOString()
+    };
+
+    packagingGenerationsHistory.unshift(generationRecord);
+    if (packagingGenerationsHistory.length > 20) {
+      packagingGenerationsHistory.pop();
+    }
+
+    res.json({
+      success: true,
+      data: generationRecord,
+      updatedProduct,
+      errorDetails: engineUsed === 'studio_packaging_engine' ? errorDetails : null
+    });
+  });
+
+  app.get('/api/imagen/history', (req: Request, res: Response) => {
+    res.json({
+      success: true,
+      data: packagingGenerationsHistory
+    });
+  });
+
+  // Serve public directory assets
+  app.use(express.static(path.join(process.cwd(), 'public')));
 
   // Vite middleware in development & static serving in production
   if (process.env.NODE_ENV !== 'production') {

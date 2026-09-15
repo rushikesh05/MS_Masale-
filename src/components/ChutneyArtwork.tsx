@@ -16,12 +16,12 @@ export const ChutneyArtwork: React.FC<ChutneyArtworkProps> = ({
 }) => {
   const id = product.id;
 
-  // Custom visual configurations per original Maharashtrian chutney product
+  // Custom visual configurations per chutney product
   const getProductConfig = () => {
     switch (id) {
       case 'prod-kanda-lasun':
         return {
-          primaryColor: '#991b1b', // Deep fiery Kolhapuri red
+          primaryColor: '#991b1b', // Deep fiery red
           secondaryColor: '#dc2626',
           granuleColor1: '#7f1d1d',
           granuleColor2: '#b91c1c',
@@ -30,11 +30,11 @@ export const ChutneyArtwork: React.FC<ChutneyArtworkProps> = ({
           jarChutneyGrad: ['#450a0a', '#991b1b', '#b91c1c', '#7f1d1d'],
           bgGradient: ['#1c0707', '#2e0a0a', '#140505'],
           glowColor: '#ef4444',
-          labelMarathi: 'अस्सल कोल्हापुरी कांदा-लसूण चटणी',
-          labelEn: 'KOLHAPURI KANDA-LASUN CHUTNEY',
-          subLabelMr: 'कोल्हापूरचे मुख्य वैशिष्ट्य • अस्सल पारंपरिक पद्धत',
-          subLabelEn: 'FLAGSHIP KOLHAPURI RECIPE • PURE & AUTHENTIC',
-          badgeText: 'KOLHAPUR #1',
+          labelMarathi: 'कांदा-लसूण चटणी',
+          labelEn: 'KANDA-LASUN CHUTNEY',
+          subLabelMr: 'पारंपरिक पद्धत • जाडसर कुटलेली',
+          subLabelEn: 'TRADITIONAL RECIPE • PURE & FRESH',
+          badgeText: 'POPULAR #1',
           heatLevel: '🌶️🌶️🌶️🌶️ (Fiery 4/5)',
           textureType: 'Coarse Hand-Pounded Powder',
           textureTypeMr: 'जाडसर खलबत्त्यातील मसाला',
@@ -61,11 +61,11 @@ export const ChutneyArtwork: React.FC<ChutneyArtworkProps> = ({
           jarChutneyGrad: ['#78350f', '#b45309', '#d97706', '#92400e'],
           bgGradient: ['#1f1406', '#2b1b08', '#120c04'],
           glowColor: '#f59e0b',
-          labelMarathi: 'सोलापुरी खमंग शेंगदाणा चटणी',
-          labelEn: 'SOLAPURI SHENGDANA CHUTNEY',
+          labelMarathi: 'खमंग शेंगदाणा चटणी',
+          labelEn: 'SHENGDANA CHUTNEY',
           subLabelMr: 'टपोरे शेंगदाणे व गावरान लसूण • जाडसर कुटलेली',
           subLabelEn: 'SLOW ROASTED PEANUTS & GARLIC • COARSE DRY POWDER',
-          badgeText: 'SOLAPURI ORIGINAL',
+          badgeText: 'ORIGINAL RECIPE',
           heatLevel: '🌶️🌶️🌶️ (Medium 3/5)',
           textureType: 'Crunchy Roasted Peanut Chunks',
           textureTypeMr: 'खमंग दाणेदार शेंगदाणा कूट',
@@ -92,8 +92,8 @@ export const ChutneyArtwork: React.FC<ChutneyArtworkProps> = ({
           jarChutneyGrad: ['#14532d', '#15803d', '#16a34a', '#166534'],
           bgGradient: ['#051c0d', '#0b2b16', '#031208'],
           glowColor: '#22c55e',
-          labelMarathi: 'अस्सल कोल्हापुरी लवंगी मिरची ठेचा',
-          labelEn: 'KOLHAPURI GREEN CHILLI THECHA',
+          labelMarathi: 'गावरान लवंगी मिरची ठेचा',
+          labelEn: 'GREEN CHILLI THECHA',
           subLabelMr: 'गावरान लवंगी मिरची व लसूण ठेचा',
           subLabelEn: 'TRADITIONAL RECIPE • DESI GARLIC & PEANUTS',
           badgeText: 'RUSTIC THECHA',
@@ -216,7 +216,7 @@ export const ChutneyArtwork: React.FC<ChutneyArtworkProps> = ({
           jarChutneyGrad: ['#0c0a09', '#1c1917', '#292524', '#1c1917'],
           bgGradient: ['#0c0a09', '#171514', '#080707'],
           glowColor: '#78716c',
-          labelMarathi: 'अस्सल कारळे (खुरासणी) चटणी',
+          labelMarathi: 'गावरान कारळे (खुरासणी) चटणी',
           labelEn: 'KARALE / KHURASANI CHUTNEY',
           subLabelMr: 'खान्देशी व नाशिकची खास चव • गावरान खुरासणी',
           subLabelEn: 'DESI NIGER SEED & CUMIN RUSTIC CHUTNEY',
@@ -248,8 +248,8 @@ export const ChutneyArtwork: React.FC<ChutneyArtworkProps> = ({
           jarChutneyGrad: ['#170e09', '#2b1b11', '#3b2518', '#26170e'],
           bgGradient: ['#120b07', '#1f130c', '#0a0604'],
           glowColor: '#b45309',
-          labelMarathi: 'अस्सल खान्देशी काळा मसाला',
-          labelEn: 'KHANDESHI ROASTED KALA MASALA',
+          labelMarathi: 'पारंपरिक काळा मसाला',
+          labelEn: 'ROASTED KALA MASALA',
           subLabelMr: '२४ खडे मसाले मंद आचेवर भाजून तयार',
           subLabelEn: '24 AROMATIC SPICES WOOD-ROASTED BLEND',
           badgeText: '24-SPICE GODA',
@@ -324,7 +324,7 @@ export const ChutneyArtwork: React.FC<ChutneyArtworkProps> = ({
             <stop offset="100%" stopColor="#ffffff" stopOpacity="0.3" />
           </linearGradient>
 
-          {/* Authentic Chutney Mound Shadow */}
+          {/* Chutney Mound Shadow */}
           <radialGradient id={`chutney-heap-glow-${id}`} cx="50%" cy="40%" r="50%">
             <stop offset="0%" stopColor={cfg.secondaryColor} stopOpacity="0.9" />
             <stop offset="60%" stopColor={cfg.primaryColor} stopOpacity="1" />
@@ -423,7 +423,7 @@ export const ChutneyArtwork: React.FC<ChutneyArtworkProps> = ({
           </g>
 
           {/* ========================================================== */}
-          {/* AUTHENTIC VINTAGE BRAND LABEL ON THE GLASS JAR */}
+          {/* VINTAGE BRAND LABEL ON THE GLASS JAR */}
           {/* ========================================================== */}
           <g id="jar-label" transform="translate(23, 88)">
             {/* Parchment Label Background */}
@@ -436,7 +436,7 @@ export const ChutneyArtwork: React.FC<ChutneyArtworkProps> = ({
               ★ M.S. MASALE ★
             </text>
             <text x="62" y="23" textAnchor="middle" fill="#92400e" fontSize="5" fontWeight="700" letterSpacing="0.5">
-              KOLHAPUR • MAHARASHTRA
+              PURE & NATURAL • FRESH GROUND
             </text>
 
             {/* Subtle Divider */}
@@ -458,7 +458,7 @@ export const ChutneyArtwork: React.FC<ChutneyArtworkProps> = ({
               100% PURE INGREDIENTS • NO PRESERVATIVES
             </text>
             <text x="62" y="71" textAnchor="middle" fill="#78350f" fontSize="4" fontWeight="700">
-              {isMarathi ? 'अस्सल पारंपरिक पद्धत' : 'Authentic Desi Taste & Aroma'}
+              {isMarathi ? 'पारंपरिक पद्धत' : 'Natural Taste & Aroma'}
             </text>
 
             {/* Net Weight & Origin Badge */}
@@ -482,7 +482,7 @@ export const ChutneyArtwork: React.FC<ChutneyArtworkProps> = ({
         </g>
 
         {/* ==================================================================== */}
-        {/* 4. FOREGROUND AUTHENTIC CHUTNEY BOWL / MORTAR WITH HEAPING POWDER */}
+        {/* 4. FOREGROUND CHUTNEY BOWL / MORTAR WITH HEAPING POWDER */}
         {/* ==================================================================== */}
         <g id="chutney-bowl-and-powder" transform="translate(200, 180)">
           {/* Heavy Stone / Brass Mortar Katori Bowl */}
@@ -541,10 +541,10 @@ export const ChutneyArtwork: React.FC<ChutneyArtworkProps> = ({
         </g>
 
         {/* ==================================================================== */}
-        {/* 5. AUTHENTIC RAW INGREDIENTS AROUND THE BASE */}
+        {/* 5. RAW INGREDIENTS AROUND THE BASE */}
         {/* ==================================================================== */}
         <g id="raw-ingredients" transform="translate(0, 0)">
-          {/* Whole Dried Kolhapuri Red Chilli (Curved Lavangi Chilli with green stem) */}
+          {/* Whole Dried Red Chilli (Curved Lavangi Chilli with green stem) */}
           <g id="red-chilli" transform="translate(60, 315) rotate(-15)">
             {/* Chilli Body */}
             <path
@@ -618,15 +618,15 @@ export const ChutneyArtwork: React.FC<ChutneyArtworkProps> = ({
       {/* Floating Informational Glass Overlays */}
       {showDetails && (
         <>
-          {/* Top-Left Authentic Product Origin Stamp */}
+          {/* Top-Left Product Badge Stamp */}
           <div className="absolute top-3 left-3 z-10 pointer-events-none flex flex-col gap-1">
             <span className="px-2.5 py-1 rounded-full bg-stone-900/90 backdrop-blur-md border border-amber-400/40 text-amber-300 text-[10px] font-black tracking-wider uppercase shadow-lg flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
-              <span>{id === 'prod-kanda-lasun' ? '★ KOLHAPUR FLAGSHIP' : cfg.badgeText}</span>
+              <span>{id === 'prod-kanda-lasun' ? '★ SPECIAL RECIPE' : cfg.badgeText}</span>
             </span>
           </div>
 
-          {/* Top-Right Authentic Texture & Heat Indicator */}
+          {/* Top-Right Heat Indicator */}
           <div className="absolute top-3 right-3 z-10 pointer-events-none flex flex-col items-end gap-1">
             <span className="px-2.5 py-0.5 rounded-full bg-black/75 backdrop-blur-md border border-white/20 text-white text-[10px] font-bold shadow-md">
               {cfg.heatLevel}
@@ -642,7 +642,7 @@ export const ChutneyArtwork: React.FC<ChutneyArtworkProps> = ({
               </span>
             </div>
             <span className="text-[10px] text-amber-400 font-extrabold uppercase tracking-wider">
-              {isMarathi ? '१००% अस्सल बरणी' : 'Artisanal Jar'}
+              {isMarathi ? '१००% शुद्ध बरणी' : 'Artisanal Jar'}
             </span>
           </div>
         </>

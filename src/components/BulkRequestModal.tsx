@@ -49,23 +49,23 @@ interface SelectedBulkItem {
 const BULK_PRODUCT_CATALOG = [
   {
     id: 'shengdana-chutney',
-    nameMr: 'सोलापुरी खमंग शेंगदाणा चटणी',
-    nameEn: 'Solapuri Roasted Peanut Chutney',
+    nameMr: 'खमंग शेंगदाणा चटणी',
+    nameEn: 'Roasted Peanut Chutney',
     basePricePerKg: 420,
     minKg: 5,
-    descriptionMr: 'दगडी खलबत्त्यात कुटलेली अस्सल सोलापुरी चव. हॉटेल्स व थाळीसाठी सर्वाधिक पसंती.',
-    descriptionEn: 'Stone-pounded with roasted Solapur peanuts. Highest reorder rate for Maharashtrian thalis.',
+    descriptionMr: 'दगडी खलबत्त्यात कुटलेली खमंग चव. हॉटेल्स व थाळीसाठी सर्वाधिक पसंती.',
+    descriptionEn: 'Stone-pounded with roasted peanuts. Highest reorder rate for traditional thalis.',
     tag: 'Bestseller'
   },
   {
     id: 'kanda-lasun-masala',
-    nameMr: 'कोल्हापुरी अस्सल कांदा-लसूण मसाला / चटणी',
-    nameEn: 'Kolhapuri Kanda-Lasun Chutney / Masala',
+    nameMr: 'स्पेशल कांदा-लसूण मसाला / चटणी',
+    nameEn: 'Special Kanda-Lasun Chutney / Masala',
     basePricePerKg: 460,
     minKg: 5,
     descriptionMr: 'गावरान कांदा व लासलगाव लसणाचा खमंग ठसका. मटण, चिकन व मिसळ रस्स्यासाठी परिपूर्ण.',
-    descriptionEn: 'Authentic fiery red onion & garlic blend for gravies, misal rassa, and spicy curries.',
-    tag: 'Kolhapur Special'
+    descriptionEn: 'Rich fiery red onion & garlic blend for gravies, misal rassa, and spicy curries.',
+    tag: 'Chef Special'
   },
   {
     id: 'sukha-coconut-garlic',
@@ -100,21 +100,21 @@ const BULK_PRODUCT_CATALOG = [
   {
     id: 'karale-niger',
     nameMr: 'गावरान कारळे (Niger Seeds) चटणी',
-    nameEn: 'Authentic Karale (Niger Seed) Chutney',
+    nameEn: 'Handcrafted Karale (Niger Seed) Chutney',
     basePricePerKg: 430,
     minKg: 5,
-    descriptionMr: 'अस्सल मराठवाडी कारळे चटणी. ज्वारीच्या गरम भाकरीसोबत उत्कृष्ट संगम.',
-    descriptionEn: 'Rare artisanal black seed delicacy deeply rooted in rural Maharashtra cuisine.',
+    descriptionMr: 'पारंपरिक कारळे चटणी. ज्वारीच्या गरम भाकरीसोबत उत्कृष्ट संगम.',
+    descriptionEn: 'Rare artisanal black seed delicacy crafted with traditional methods.',
     tag: 'Artisan'
   },
   {
-    id: 'kolhapuri-thecha-dry',
+    id: 'red-thecha-dry',
     nameMr: 'झणझणीत गावरान लाल खर्डा / ठेचा',
     nameEn: 'Fiery Gavran Dry Red Chilli Thecha',
     basePricePerKg: 480,
     minKg: 5,
-    descriptionMr: 'लवंगी मिरची व भरपूर लसूण. मिसळ, मटण भाकरी व धाब्यांसाठी अस्सल तडका.',
-    descriptionEn: 'Heavy stone-crushed red chillies with garlic cloves for authentic dhaba spice levels.',
+    descriptionMr: 'लवंगी मिरची व भरपूर लसूण. मिसळ, मटण भाकरी व धाब्यांसाठी ठसकेबाज तडका.',
+    descriptionEn: 'Heavy stone-crushed red chillies with garlic cloves for traditional dhaba spice levels.',
     tag: 'Ultra Spicy'
   }
 ];
@@ -150,7 +150,7 @@ export const BulkRequestModal: React.FC = () => {
       quantityKg: 20,
       packagingPreference: 'bulk_buckets_10kg',
       spiceLevelPreference: 'medium_gavran',
-      customNotes: 'Extra roasted Solapuri aroma'
+      customNotes: 'Extra roasted crunchy aroma'
     },
     'sukha-coconut-garlic': {
       quantityKg: 10,
@@ -666,7 +666,7 @@ export const BulkRequestModal: React.FC = () => {
 
                             <div>
                               <label className="text-stone-400 block mb-1 font-semibold">
-                                {isMr ? 'तिखटपणा / चव:' : 'Spice Level:'}
+                                {isMr ? 'मसाला चव श्रेणी:' : 'Flavor Profile:'}
                               </label>
                               <select
                                 value={itemState.spiceLevelPreference}
@@ -674,7 +674,7 @@ export const BulkRequestModal: React.FC = () => {
                                 className="w-full px-2.5 py-1.5 rounded-lg bg-[#131921] border border-stone-700 text-white focus:outline-none focus:border-amber-400"
                               >
                                 <option value="medium_gavran">मध्यम गावरान (Medium Gavran - Standard)</option>
-                                <option value="mild_kolhapuri">कमी तिखट (Mild - Family Dining)</option>
+                                <option value="mild_blend">कमी तिखट (Mild - Family Dining)</option>
                                 <option value="extra_spicy_thecha">अति झणझणीत (Extra Spicy - Dhaba Style)</option>
                                 <option value="custom_blend">जैन / विना लसूण (No Garlic / Jain)</option>
                               </select>
@@ -772,7 +772,7 @@ export const BulkRequestModal: React.FC = () => {
                     <input
                       type="text"
                       required
-                      placeholder={isMr ? 'उदा. पुणे, कोल्हापूर, मुंबई' : 'e.g. Pune, Kolhapur, Mumbai'}
+                      placeholder={isMr ? 'उदा. पुणे, मुंबई, नाशिक' : 'e.g. Pune, Mumbai, Nashik'}
                       value={city}
                       onChange={(e) => setCity(e.target.value)}
                       className="w-full px-3.5 py-2.5 rounded-xl bg-[#131921] border border-stone-600 text-white focus:outline-none focus:border-amber-400"

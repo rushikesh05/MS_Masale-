@@ -78,7 +78,7 @@ export const SmartCartDrawer: React.FC = () => {
                     {isMr ? 'तुमचे कार्ट रिकामे आहे' : 'Your cart is empty'}
                   </h4>
                   <p className="text-xs text-[#7A6E6E] max-w-xs mx-auto">
-                    {isMr ? 'आमच्या लोकप्रिय गावरान चटण्या किंवा स्वतःचा कस्टमाईज्ड जार तयार करा!' : 'Explore our authentic chutneys or design your custom blend jar!'}
+                    {isMr ? 'आमच्या लोकप्रिय गावरान चटण्या किंवा स्वतःचा कस्टमाईज्ड जार तयार करा!' : 'Explore our delicious chutneys or design your custom blend jar!'}
                   </p>
                 </div>
               ) : (

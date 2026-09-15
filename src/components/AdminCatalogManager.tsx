@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   Plus, 
@@ -7,7 +7,6 @@ import {
   Check, 
   X, 
   Sparkles, 
-  Flame, 
   Database, 
   RefreshCw, 
   Search, 
@@ -19,27 +18,150 @@ import {
   PackageX,
   Layers,
   Award,
-  ChevronDown
+  ChevronDown,
+  UploadCloud,
+  Copy,
+  ExternalLink,
+  ShoppingBag,
+  SlidersHorizontal,
+  CheckCircle2
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
-import { Product, ProductCategory } from '../types';
+import { Product, ProductCategory, ProductSize } from '../types';
 import { ProductVisual } from './ProductVisual';
+import { AIImagenPackagingStudio } from './AIImagenPackagingStudio';
 
-const AVAILABLE_IMAGE_PRESETS = [
-  { label: 'Kala Masala / Dark Gravy', value: '/products/kala-masala.jpg' },
-  { label: 'Kanda Lasun / Kolhapuri Red', value: '/products/kanda-lasun.jpg' },
-  { label: 'Shengdana / Solapur Peanut', value: '/products/shengdana-peanuts.jpg' },
-  { label: 'Vada Pav Lasun / Coconut Red', value: '/products/vada-pav-lasun.jpg' },
-  { label: 'Til / White Sesame', value: '/products/til-sesame.jpg' },
-  { label: 'Javas / Flaxseed Roasted', value: '/products/javas-flaxseed.jpg' },
-  { label: 'Thecha / Spicy Green Chilli', value: '/products/thecha-green.jpg' },
-  { label: 'Karale / Niger Seed Black', value: '/products/karale-niger.jpg' },
-  { label: 'Metkut / Golden Roasted Pulses', value: '/products/metkut-rice.jpg' },
-  { label: 'Mango Pickle / Ambyache Lonche', value: '/products/mango-pickle.jpg' },
-  { label: 'Lemon Pickle / Limbache Lonche', value: '/products/lemon-pickle.jpg' },
-  { label: 'Chilli Pickle / Hirvi Mirchi', value: '/products/chilli-pickle.jpg' },
-  { label: 'Panchamrut / Sweet Zesty Relish', value: '/products/panchamrut.jpg' }
+export interface ImagePresetItem {
+  id: string;
+  labelEn: string;
+  labelMr: string;
+  value: string;
+  category: string;
+  sizeLabel: string;
+}
+
+export const AVAILABLE_IMAGE_PRESETS: ImagePresetItem[] = [
+  { 
+    id: 'kanda-lasun', 
+    labelEn: 'Kanda Lasun Masala', 
+    labelMr: 'कांदा लसूण मसाला', 
+    value: '/products/kanda-lasun.jpg', 
+    category: 'masala', 
+    sizeLabel: '500g Standup Pouch' 
+  },
+  { 
+    id: 'shengdana-peanuts', 
+    labelEn: 'Roasted Shengdana Chutney', 
+    labelMr: 'खमंग शेंगदाणा चटणी', 
+    value: '/products/shengdana-peanuts.jpg', 
+    category: 'chutney', 
+    sizeLabel: '500g Standup Pouch' 
+  },
+  { 
+    id: 'vada-pav-lasun', 
+    labelEn: 'Vada Pav Lasun Coconut Chutney', 
+    labelMr: 'वडापाव लसूण खोबरे चटणी', 
+    value: '/products/vada-pav-lasun.jpg', 
+    category: 'chutney', 
+    sizeLabel: '500g Standup Pouch' 
+  },
+  { 
+    id: 'kala-masala', 
+    labelEn: 'Roasted Kala Masala', 
+    labelMr: 'पारंपरिक काळा मसाला', 
+    value: '/products/kala-masala.jpg', 
+    category: 'masala', 
+    sizeLabel: '500g Standup Pouch' 
+  },
+  { 
+    id: 'til-sesame', 
+    labelEn: 'Gavran Til (Sesame) Chutney', 
+    labelMr: 'गावरान तीळ चटणी', 
+    value: '/products/til-sesame.jpg', 
+    category: 'chutney', 
+    sizeLabel: '500g Standup Pouch' 
+  },
+  { 
+    id: 'javas-flaxseed', 
+    labelEn: 'Omega-3 Roasted Javas Chutney', 
+    labelMr: 'खमंग जवस चटणी', 
+    value: '/products/javas-flaxseed.jpg', 
+    category: 'chutney', 
+    sizeLabel: '500g Standup Pouch' 
+  },
+  { 
+    id: 'thecha-green', 
+    labelEn: 'Hirvi Mirchi Thecha', 
+    labelMr: 'झणझणीत मिरची ठेचा', 
+    value: '/products/thecha-green.jpg', 
+    category: 'thecha', 
+    sizeLabel: '500g Standup Pouch' 
+  },
+  { 
+    id: 'karale-niger', 
+    labelEn: 'Gavran Karale (Niger Seed) Chutney', 
+    labelMr: 'गावरान कारळे चटणी', 
+    value: '/products/karale-niger.jpg', 
+    category: 'chutney', 
+    sizeLabel: '500g Standup Pouch' 
+  },
+  { 
+    id: 'metkut-rice', 
+    labelEn: 'Paushtik 12-Grain Metkut Powder', 
+    labelMr: 'पौष्टिक पारंपरिक मेतकूट', 
+    value: '/products/metkut-rice.jpg', 
+    category: 'metkut', 
+    sizeLabel: '500g Standup Pouch' 
+  },
+  { 
+    id: 'mango-pickle', 
+    labelEn: 'Gavran Ambyache Lonche (Mango Pickle)', 
+    labelMr: 'गावरान आंब्याचे लोणचे', 
+    value: '/products/mango-pickle.jpg', 
+    category: 'pickle', 
+    sizeLabel: '500g Glass Jar' 
+  },
+  { 
+    id: 'lemon-pickle', 
+    labelEn: 'Chatpatit Limbache Lonche (Lemon Pickle)', 
+    labelMr: 'चटपटीत लिंबाचे लोणचे', 
+    value: '/products/lemon-pickle.jpg', 
+    category: 'pickle', 
+    sizeLabel: '500g Glass Jar' 
+  },
+  { 
+    id: 'chilli-pickle', 
+    labelEn: 'Hirvi Mirchi Lonche (Green Chilli Pickle)', 
+    labelMr: 'हिरवी मिरची लोणचे', 
+    value: '/products/chilli-pickle.jpg', 
+    category: 'pickle', 
+    sizeLabel: '500g Glass Jar' 
+  },
+  { 
+    id: 'garlic-pickle', 
+    labelEn: 'Lasun Mirchi Lonche (Garlic Pickle)', 
+    labelMr: 'लसूण मिरची लोणचे', 
+    value: '/products/garlic-pickle.jpg', 
+    category: 'pickle', 
+    sizeLabel: '500g Glass Jar' 
+  },
+  { 
+    id: 'panchamrut', 
+    labelEn: 'Panchamrut Sweet Relish', 
+    labelMr: 'पारंपरिक पंचामृत', 
+    value: '/products/panchamrut.jpg', 
+    category: 'relish', 
+    sizeLabel: '500g Glass Jar' 
+  }
 ];
+
+export interface UploadedImageItem {
+  id: string;
+  name: string;
+  url: string;
+  uploadedAt: string;
+  size?: string;
+}
 
 export const AdminCatalogManager: React.FC = () => {
   const { 
@@ -56,21 +178,39 @@ export const AdminCatalogManager: React.FC = () => {
     showToast 
   } = useApp();
 
-  const [activeSubTab, setActiveSubTab] = useState<'products' | 'categories'>('products');
+  const [activeSubTab, setActiveSubTab] = useState<'products' | 'categories' | 'images'>('products');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState('all');
+  const [stockStatusFilter, setStockStatusFilter] = useState<'all' | 'in_stock' | 'out_of_stock'>('all');
 
-  // Product Modal State
+  // Media & Uploaded Images
+  const [uploadedImages, setUploadedImages] = useState<UploadedImageItem[]>(() => {
+    try {
+      const saved = localStorage.getItem('ms_admin_uploaded_images_v2');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const galleryFileInputRef = useRef<HTMLInputElement | null>(null);
+
+  // Modal State for Products
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+  const [isAiPackagingModalOpen, setIsAiPackagingModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [productToDelete, setProductToDelete] = useState<Product | null>(null);
 
-  // Category Modal State
+  // Modal State for Categories
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState<ProductCategory | null>(null);
   const [categoryToDelete, setCategoryToDelete] = useState<ProductCategory | null>(null);
 
-  // Form State for Product
+  // Image source picker tabs in Product Modal
+  const [imagePickerTab, setImagePickerTab] = useState<'presets' | 'upload' | 'url'>('presets');
+
+  // Product Form State
   const [formData, setFormData] = useState<Partial<Product>>({
     nameMr: '',
     nameEn: '',
@@ -79,10 +219,9 @@ export const AdminCatalogManager: React.FC = () => {
     descriptionMr: '',
     descriptionEn: '',
     category: 'masala',
-    spiceLevel: 3,
     badgeMr: '',
     badgeEn: '',
-    imageUrl: '/products/kala-masala.jpg',
+    imageUrl: '/products/kanda-lasun.jpg',
     regionOriginMr: '',
     regionOriginEn: '',
     rating: 4.9,
@@ -107,7 +246,7 @@ export const AdminCatalogManager: React.FC = () => {
     }
   });
 
-  // Stringified inputs for easy array editing
+  // Stringified inputs for array fields
   const [ingredientsMrText, setIngredientsMrText] = useState('');
   const [ingredientsEnText, setIngredientsEnText] = useState('');
   const [pairingsMrText, setPairingsMrText] = useState('');
@@ -120,83 +259,150 @@ export const AdminCatalogManager: React.FC = () => {
     nameEn: '',
     descriptionMr: '',
     descriptionEn: '',
-    icon: 'Flame',
+    icon: 'Tag',
     sortOrder: 1
   });
 
-  const openNewProductModal = () => {
+  // Open New Product Form
+  const openNewProductModal = (prefillImage?: string) => {
     setEditingProduct(null);
     setFormData({
-      id: `prod-${Date.now()}`,
       nameMr: '',
       nameEn: '',
       taglineMr: '',
       taglineEn: '',
       descriptionMr: '',
       descriptionEn: '',
-      category: 'masala',
-      spiceLevel: 4,
-      badgeMr: 'अस्सल घरगुती',
-      badgeEn: 'Heritage Special',
-      imageUrl: '/products/kala-masala.jpg',
-      regionOriginMr: 'महाराष्ट्र',
-      regionOriginEn: 'Maharashtra',
-      rating: 4.95,
+      category: categories[0]?.id || 'masala',
+      badgeMr: '१००% शुद्ध',
+      badgeEn: 'Pure & Natural',
+      imageUrl: prefillImage || '/products/kanda-lasun.jpg',
+      regionOriginMr: 'स्थानिक',
+      regionOriginEn: 'Local Origin',
+      rating: 4.9,
       reviewCount: 120,
       isBestSeller: false,
       isRegionalSpecialty: true,
       sizes: [
-        { size: '100g', grams: 100, price: 95, originalPrice: 120, inStock: true },
-        { size: '250g', grams: 250, price: 190, originalPrice: 240, inStock: true },
-        { size: '500g', grams: 500, price: 360, originalPrice: 450, inStock: true },
-        { size: '1kg', grams: 1000, price: 680, originalPrice: 850, inStock: true }
-      ],
-      nutritionFacts: {
-        calories: '315 kcal / 100g',
-        protein: '11.5g',
-        healthyFats: '14.2g',
-        fiber: '22.0g'
-      }
+        { size: '100g', grams: 100, price: 90, originalPrice: 110, inStock: true },
+        { size: '250g', grams: 250, price: 180, originalPrice: 220, inStock: true },
+        { size: '500g', grams: 500, price: 340, originalPrice: 420, inStock: true },
+        { size: '1kg', grams: 1000, price: 650, originalPrice: 800, inStock: true }
+      ]
     });
-    setIngredientsMrText('धने, जिरे, लवंग, दालचिनी, दगडफूल');
-    setIngredientsEnText('Coriander Seeds, Cumin, Cloves, Cinnamon, Stone Flower');
-    setPairingsMrText('मटकी उसळ, रस्सा, शेव भाजी');
-    setPairingsEnText('Sprouted Lentil Usal, Rustic Gravy, Shev Bhaji');
+    setIngredientsMrText('धने, जिरे, लवंग, तमालपत्र, सुके खोबरे');
+    setIngredientsEnText('Coriander, Cumin, Cloves, Bay Leaf, Dry Coconut');
+    setPairingsMrText('मिसळ, भाजी, रस्सा, भात');
+    setPairingsEnText('Misal, Curries, Rassa, Steamed Rice');
     setIsProductModalOpen(true);
   };
 
-  const openEditProductModal = (prod: Product) => {
-    setEditingProduct(prod);
-    setFormData({ ...prod });
-    setIngredientsMrText(prod.ingredientsMr ? prod.ingredientsMr.join(', ') : '');
-    setIngredientsEnText(prod.ingredientsEn ? prod.ingredientsEn.join(', ') : '');
-    setPairingsMrText(prod.pairingRecommendationsMr ? prod.pairingRecommendationsMr.join(', ') : '');
-    setPairingsEnText(prod.pairingRecommendationsEn ? prod.pairingRecommendationsEn.join(', ') : '');
+  // Open Edit Product Form
+  const openEditProductModal = (product: Product) => {
+    setEditingProduct(product);
+    setFormData({
+      ...product,
+      sizes: product.sizes && product.sizes.length > 0 ? product.sizes : [
+        { size: '250g', grams: 250, price: 180, originalPrice: 220, inStock: true },
+        { size: '500g', grams: 500, price: 340, originalPrice: 420, inStock: true }
+      ]
+    });
+    setIngredientsMrText((product.ingredientsMr || []).join(', '));
+    setIngredientsEnText((product.ingredientsEn || []).join(', '));
+    setPairingsMrText((product.pairingRecommendationsMr || []).join(', '));
+    setPairingsEnText((product.pairingRecommendationsEn || []).join(', '));
     setIsProductModalOpen(true);
   };
 
+  // Handle Image File Upload (FileReader Base64)
+  const handleFileUpload = (file: File, isForGallery: boolean = false) => {
+    if (!file.type.startsWith('image/')) {
+      showToast('Please select a valid image file (JPG, PNG, WebP)');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const result = e.target?.result as string;
+      if (result) {
+        const newItem: UploadedImageItem = {
+          id: `img-${Date.now()}`,
+          name: file.name,
+          url: result,
+          uploadedAt: new Date().toLocaleDateString(),
+          size: `${Math.round(file.size / 1024)} KB`
+        };
+
+        const updated = [newItem, ...uploadedImages];
+        setUploadedImages(updated);
+        try {
+          localStorage.setItem('ms_admin_uploaded_images_v2', JSON.stringify(updated.slice(0, 20)));
+        } catch {
+          // LocalStorage quota fallback
+        }
+
+        if (!isForGallery) {
+          setFormData(prev => ({ ...prev, imageUrl: result }));
+        }
+
+        showToast(`Image "${file.name}" uploaded successfully!`);
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Product Size Modifier
+  const handleSizeChange = (index: number, field: keyof ProductSize, val: string | number | boolean) => {
+    const currentSizes = [...(formData.sizes || [])];
+    if (!currentSizes[index]) return;
+    currentSizes[index] = {
+      ...currentSizes[index],
+      [field]: val
+    };
+    setFormData({ ...formData, sizes: currentSizes });
+  };
+
+  const handleAddSizeTier = () => {
+    const currentSizes = [...(formData.sizes || [])];
+    currentSizes.push({
+      size: '250g',
+      grams: 250,
+      price: 180,
+      originalPrice: 220,
+      inStock: true
+    });
+    setFormData({ ...formData, sizes: currentSizes });
+  };
+
+  const handleRemoveSizeTier = (index: number) => {
+    const currentSizes = (formData.sizes || []).filter((_, i) => i !== index);
+    setFormData({ ...formData, sizes: currentSizes });
+  };
+
+  // Save Product (Create or Update)
   const handleSaveProduct = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!formData.nameEn || !formData.nameMr) {
-      showToast('Please enter both English and Marathi product names');
+      showToast('Please provide both English and Marathi product names');
       return;
     }
 
     const cleanedProduct: Product = {
-      id: editingProduct?.id || formData.id || `prod-${Date.now()}`,
-      nameMr: formData.nameMr || '',
-      nameEn: formData.nameEn || '',
+      id: editingProduct?.id || `prod-${Date.now()}`,
+      nameMr: formData.nameMr.trim(),
+      nameEn: formData.nameEn.trim(),
       taglineMr: formData.taglineMr || '',
       taglineEn: formData.taglineEn || '',
       descriptionMr: formData.descriptionMr || '',
       descriptionEn: formData.descriptionEn || '',
       category: formData.category || 'masala',
-      spiceLevel: Number(formData.spiceLevel) || 3,
+      spiceLevel: editingProduct?.spiceLevel || 3,
       badgeMr: formData.badgeMr || '',
       badgeEn: formData.badgeEn || '',
       rating: Number(formData.rating) || 4.9,
       reviewCount: Number(formData.reviewCount) || 100,
-      imageUrl: formData.imageUrl || '/products/kala-masala.jpg',
+      imageUrl: formData.imageUrl || '/products/kanda-lasun.jpg',
       regionOriginMr: formData.regionOriginMr || '',
       regionOriginEn: formData.regionOriginEn || '',
       isBestSeller: Boolean(formData.isBestSeller),
@@ -225,12 +431,14 @@ export const AdminCatalogManager: React.FC = () => {
     setIsProductModalOpen(false);
   };
 
+  // Delete Product
   const handleDeleteProductConfirm = async () => {
     if (!productToDelete) return;
     await deleteProduct(productToDelete.id);
     setProductToDelete(null);
   };
 
+  // In-line Quick Stock Toggle
   const handleToggleStock = async (prod: Product, sizeIndex: number) => {
     const updatedSizes = [...prod.sizes];
     updatedSizes[sizeIndex] = {
@@ -252,7 +460,7 @@ export const AdminCatalogManager: React.FC = () => {
       nameEn: '',
       descriptionMr: '',
       descriptionEn: '',
-      icon: 'Flame',
+      icon: 'Tag',
       sortOrder: (categories.length + 1)
     });
     setIsCategoryModalOpen(true);
@@ -301,6 +509,13 @@ export const AdminCatalogManager: React.FC = () => {
     if (selectedCategoryFilter !== 'all' && p.category !== selectedCategoryFilter) {
       return false;
     }
+    if (stockStatusFilter === 'in_stock') {
+      const hasStock = p.sizes.some(s => s.inStock);
+      if (!hasStock) return false;
+    } else if (stockStatusFilter === 'out_of_stock') {
+      const allOut = p.sizes.every(s => !s.inStock);
+      if (!allOut) return false;
+    }
     if (!searchQuery.trim()) return true;
     const q = searchQuery.toLowerCase();
     return (
@@ -314,101 +529,143 @@ export const AdminCatalogManager: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Top Banner & Control Bar */}
-      <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-3xl p-5 sm:p-6 shadow-xs">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      {/* Top Banner & Real-time Database Status */}
+      <div className="bg-white dark:bg-stone-900 border border-amber-200/80 dark:border-stone-800 rounded-3xl p-5 sm:p-6 shadow-xs">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div>
-            <div className="flex items-center gap-2">
-              <span className="p-2 rounded-xl bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400">
+            <div className="flex items-center gap-2.5">
+              <span className="p-2.5 rounded-2xl bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300">
                 <Database className="w-5 h-5" />
               </span>
               <div>
-                <h2 className="text-xl font-bold text-stone-900 dark:text-stone-100">
-                  Catalog & Product Management • वस्तू व मसाले व्यवस्थापन
-                </h2>
-                <p className="text-xs text-stone-500 dark:text-stone-400">
-                  Add, edit, delete, or toggle availability for products, masales, and categories in real-time.
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h2 className="text-xl font-bold text-stone-900 dark:text-stone-100 font-serif">
+                    Catalog & Real-time Database Management
+                  </h2>
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-300">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    <span>Live Firebase Firestore Connected</span>
+                  </span>
+                </div>
+                <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
+                  Full CRUD: Add products, upload images, update prices & sizes, delete, or sync changes directly with Firebase Firestore.
                 </p>
               </div>
             </div>
           </div>
 
+          {/* Action buttons */}
           <div className="flex items-center gap-2.5 flex-wrap">
             <button
               onClick={seedCatalog}
               disabled={isSyncingCatalog}
-              className="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-xl border border-stone-300 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 text-stone-700 dark:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-700/80 transition-colors disabled:opacity-50"
+              className="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-xl border border-stone-300 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 text-stone-700 dark:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-700/80 transition-colors disabled:opacity-50 cursor-pointer"
               title="Push all default catalog products to Cloud Firestore database"
             >
-              <RefreshCw className={`w-3.5 h-3.5 ${isSyncingCatalog ? 'animate-spin text-amber-500' : ''}`} />
-              {isSyncingCatalog ? 'Syncing...' : 'Sync All to Database'}
+              <RefreshCw className={`w-3.5 h-3.5 ${isSyncingCatalog ? 'animate-spin text-amber-500' : 'text-amber-600'}`} />
+              {isSyncingCatalog ? 'Syncing Firebase...' : 'Re-seed / Sync to Firebase'}
             </button>
 
-            {activeSubTab === 'products' ? (
+            {activeSubTab === 'products' && (
               <button
-                onClick={openNewProductModal}
-                className="inline-flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-xl bg-amber-600 hover:bg-amber-500 text-white shadow-xs transition-colors"
+                onClick={() => openNewProductModal()}
+                className="inline-flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-xl bg-amber-600 hover:bg-amber-500 text-white shadow-xs transition-colors cursor-pointer"
               >
                 <Plus className="w-4 h-4" />
-                Add New Product / Masala
-              </button>
-            ) : (
-              <button
-                onClick={openNewCategoryModal}
-                className="inline-flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-xl bg-amber-600 hover:bg-amber-500 text-white shadow-xs transition-colors"
-              >
-                <Plus className="w-4 h-4" />
-                Add New Category
+                Add Product
               </button>
             )}
+
+            {activeSubTab === 'categories' && (
+              <button
+                onClick={openNewCategoryModal}
+                className="inline-flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-xl bg-amber-600 hover:bg-amber-500 text-white shadow-xs transition-colors cursor-pointer"
+              >
+                <Plus className="w-4 h-4" />
+                Add Category
+              </button>
+            )}
+
+            {activeSubTab === 'images' && (
+              <button
+                onClick={() => galleryFileInputRef.current?.click()}
+                className="inline-flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-xl bg-amber-600 hover:bg-amber-500 text-white shadow-xs transition-colors cursor-pointer"
+              >
+                <UploadCloud className="w-4 h-4" />
+                Upload New Image
+              </button>
+            )}
+            <input
+              type="file"
+              ref={galleryFileInputRef}
+              onChange={(e) => {
+                if (e.target.files && e.target.files[0]) {
+                  handleFileUpload(e.target.files[0], true);
+                  e.target.value = '';
+                }
+              }}
+              accept="image/*"
+              className="hidden"
+            />
           </div>
         </div>
 
-        {/* Tab switcher: Products vs Categories */}
-        <div className="flex items-center gap-2 mt-5 border-b border-stone-200 dark:border-stone-800 pb-3">
+        {/* Tab switcher: Products vs Categories vs Images */}
+        <div className="flex items-center gap-2 mt-5 border-b border-stone-200 dark:border-stone-800 pb-3 overflow-x-auto">
           <button
             onClick={() => setActiveSubTab('products')}
-            className={`px-4 py-2 text-xs font-bold rounded-xl transition-all flex items-center gap-2 ${
+            className={`px-4 py-2 text-xs font-bold rounded-xl transition-all flex items-center gap-2 cursor-pointer ${
               activeSubTab === 'products'
                 ? 'bg-stone-900 text-white dark:bg-stone-100 dark:text-stone-900 shadow-xs'
                 : 'text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800'
             }`}
           >
-            <Flame className="w-3.5 h-3.5" />
-            Products & Masales ({products.length})
+            <ShoppingBag className="w-3.5 h-3.5" />
+            <span>Products & Masales ({products.length})</span>
+          </button>
+          <button
+            onClick={() => setActiveSubTab('images')}
+            className={`px-4 py-2 text-xs font-bold rounded-xl transition-all flex items-center gap-2 cursor-pointer ${
+              activeSubTab === 'images'
+                ? 'bg-stone-900 text-white dark:bg-stone-100 dark:text-stone-900 shadow-xs'
+                : 'text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800'
+            }`}
+          >
+            <ImageIcon className="w-3.5 h-3.5" />
+            <span>Images & Media Gallery ({AVAILABLE_IMAGE_PRESETS.length + uploadedImages.length})</span>
           </button>
           <button
             onClick={() => setActiveSubTab('categories')}
-            className={`px-4 py-2 text-xs font-bold rounded-xl transition-all flex items-center gap-2 ${
+            className={`px-4 py-2 text-xs font-bold rounded-xl transition-all flex items-center gap-2 cursor-pointer ${
               activeSubTab === 'categories'
                 ? 'bg-stone-900 text-white dark:bg-stone-100 dark:text-stone-900 shadow-xs'
                 : 'text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800'
             }`}
           >
             <Layers className="w-3.5 h-3.5" />
-            Categories ({categories.length})
+            <span>Categories ({categories.length})</span>
           </button>
         </div>
 
-        {/* Search & Category Filter (Products Tab Only) */}
+        {/* Search & Filters Bar (Products Tab Only) */}
         {activeSubTab === 'products' && (
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mt-4">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 mt-4">
             <div className="relative w-full sm:w-80">
               <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-stone-400" />
               <input
                 type="text"
-                placeholder="Search products by title, spice..."
+                placeholder="Search products by English or Marathi..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-stone-200 dark:border-stone-800 bg-stone-50 dark:bg-stone-900 text-stone-900 dark:text-stone-100 focus:outline-hidden focus:ring-2 focus:ring-amber-500"
               />
             </div>
 
-            <div className="flex items-center gap-2 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
+            <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0">
               <Filter className="w-3.5 h-3.5 text-stone-400 shrink-0" />
               <button
                 onClick={() => setSelectedCategoryFilter('all')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${
                   selectedCategoryFilter === 'all'
                     ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 font-bold'
                     : 'text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800'
@@ -416,93 +673,123 @@ export const AdminCatalogManager: React.FC = () => {
               >
                 All ({products.length})
               </button>
-              {categories.map((c) => {
-                const count = products.filter(p => p.category === c.id).length;
-                return (
-                  <button
-                    key={c.id}
-                    onClick={() => setSelectedCategoryFilter(c.id)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors ${
-                      selectedCategoryFilter === c.id
-                        ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 font-bold'
-                        : 'text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800'
-                    }`}
-                  >
-                    {c.nameEn} ({count})
-                  </button>
-                );
-              })}
+              {categories.map((cat) => (
+                <button
+                  key={cat.id}
+                  onClick={() => setSelectedCategoryFilter(cat.id)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${
+                    selectedCategoryFilter === cat.id
+                      ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 font-bold'
+                      : 'text-stone-600 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800'
+                  }`}
+                >
+                  {cat.nameEn}
+                </button>
+              ))}
+
+              <div className="h-4 w-px bg-stone-200 dark:bg-stone-700 mx-1 shrink-0" />
+
+              {/* Stock status filter */}
+              <button
+                onClick={() => setStockStatusFilter('all')}
+                className={`px-2.5 py-1 text-[11px] rounded-md font-medium cursor-pointer ${
+                  stockStatusFilter === 'all' ? 'bg-stone-200 text-stone-800 font-bold' : 'text-stone-500'
+                }`}
+              >
+                All Stock
+              </button>
+              <button
+                onClick={() => setStockStatusFilter('in_stock')}
+                className={`px-2.5 py-1 text-[11px] rounded-md font-medium cursor-pointer ${
+                  stockStatusFilter === 'in_stock' ? 'bg-emerald-100 text-emerald-800 font-bold' : 'text-stone-500'
+                }`}
+              >
+                In Stock
+              </button>
+              <button
+                onClick={() => setStockStatusFilter('out_of_stock')}
+                className={`px-2.5 py-1 text-[11px] rounded-md font-medium cursor-pointer ${
+                  stockStatusFilter === 'out_of_stock' ? 'bg-rose-100 text-rose-800 font-bold' : 'text-stone-500'
+                }`}
+              >
+                Out of Stock
+              </button>
             </div>
           </div>
         )}
       </div>
 
-      {/* PRODUCTS LIST VIEW */}
+      {/* SUB-TAB 1: PRODUCTS LIST VIEW (CRUD) */}
       {activeSubTab === 'products' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {filteredProducts.map((product) => {
+            const hasAnyInStock = product.sizes.some(s => s.inStock);
+
             return (
               <div
                 key={product.id}
-                className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-3xl p-4 sm:p-5 shadow-xs flex flex-col justify-between hover:border-amber-400/60 transition-all group"
+                className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-3xl p-5 shadow-xs flex flex-col justify-between hover:border-amber-400/60 transition-all group"
               >
                 <div>
-                  <div className="flex items-start justify-between gap-3 mb-3">
-                    <div className="w-16 h-16 rounded-2xl overflow-hidden border border-stone-200 dark:border-stone-800 shrink-0 bg-stone-100 dark:bg-stone-800">
-                      <img 
-                        src={product.imageUrl || '/products/kala-masala.jpg'} 
-                        alt={product.nameEn} 
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src = '/products/kala-masala.jpg';
-                        }}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform" 
+                  {/* Top visual & category tag */}
+                  <div className="flex gap-3 mb-3">
+                    <div className="w-20 h-20 rounded-2xl overflow-hidden bg-stone-100 dark:bg-stone-800 shrink-0 border border-stone-200 dark:border-stone-700 relative">
+                      <ProductVisual
+                        product={product}
+                        aspectRatio="square"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1.5">
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 border border-amber-200/50 dark:border-amber-800/40 uppercase">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300">
                           {product.category}
                         </span>
                         {product.isBestSeller && (
-                          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-400">
-                            ★ Bestseller
+                          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-amber-500 text-white flex items-center gap-0.5">
+                            <Award className="w-2.5 h-2.5" /> Best
                           </span>
                         )}
                       </div>
-                      <h3 className="font-bold text-sm text-stone-900 dark:text-stone-100 truncate mt-1">
+                      <h3 className="font-bold text-stone-900 dark:text-stone-100 text-sm mt-1 leading-snug line-clamp-1">
                         {product.nameEn}
                       </h3>
-                      <p className="text-xs text-stone-500 dark:text-stone-400 font-medium truncate">
+                      <div className="text-xs font-semibold text-amber-800 dark:text-amber-400 line-clamp-1">
                         {product.nameMr}
-                      </p>
+                      </div>
+                      <div className="text-[11px] text-stone-400 mt-1 flex items-center gap-2">
+                        <span>★ {product.rating}</span>
+                        <span>•</span>
+                        <span className="truncate">{product.regionOriginEn || 'Natural'}</span>
+                      </div>
                     </div>
                   </div>
 
-                  <p className="text-xs text-stone-600 dark:text-stone-300 line-clamp-2 mb-3">
-                    {product.descriptionEn}
-                  </p>
-
-                  {/* Sizes & Stock status */}
-                  <div className="bg-stone-50 dark:bg-stone-800/50 rounded-2xl p-2.5 mb-3 border border-stone-100 dark:border-stone-800">
-                    <div className="text-[10px] font-bold uppercase text-stone-400 mb-1 flex items-center justify-between">
+                  {/* Sizes & Stock status matrix */}
+                  <div className="bg-stone-50 dark:bg-stone-800/60 rounded-2xl p-3 mb-3 border border-stone-100 dark:border-stone-800">
+                    <div className="text-[10px] font-bold uppercase text-stone-500 dark:text-stone-400 mb-2 flex items-center justify-between">
                       <span>Available Sizes & Prices</span>
-                      <span>Stock Toggle</span>
+                      <span className="text-amber-700 dark:text-amber-400 font-normal">Click status to toggle</span>
                     </div>
                     <div className="space-y-1.5">
                       {product.sizes.map((s, idx) => (
-                        <div key={idx} className="flex items-center justify-between text-xs">
-                          <span className="font-semibold text-stone-800 dark:text-stone-200">
-                            {s.size} <span className="text-stone-400">({s.grams}g)</span>:
+                        <div
+                          key={idx}
+                          className="flex items-center justify-between text-xs py-1 px-1.5 rounded-lg hover:bg-stone-100 dark:hover:bg-stone-800"
+                        >
+                          <span className="font-medium text-stone-700 dark:text-stone-300">
+                            {s.size} ({s.grams}g)
                           </span>
                           <div className="flex items-center gap-2">
-                            <span className="font-bold text-amber-700 dark:text-amber-400">₹{s.price}</span>
+                            <span className="font-bold text-stone-900 dark:text-stone-100">₹{s.price}</span>
                             <button
                               onClick={() => handleToggleStock(product, idx)}
-                              className={`px-2 py-0.5 rounded-md text-[10px] font-bold transition-colors ${
+                              className={`px-2 py-0.5 rounded-md text-[10px] font-bold transition-colors cursor-pointer ${
                                 s.inStock
                                   ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 hover:bg-emerald-200'
                                   : 'bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 hover:bg-rose-200'
                               }`}
+                              title="Click to toggle in stock / out of stock in Firebase"
                             >
                               {s.inStock ? 'In Stock' : 'Out of Stock'}
                             </button>
@@ -515,20 +802,20 @@ export const AdminCatalogManager: React.FC = () => {
 
                 {/* Card Action Buttons */}
                 <div className="flex items-center justify-between pt-3 border-t border-stone-100 dark:border-stone-800">
-                  <span className="text-[11px] text-stone-400">
-                    Spice: {product.spiceLevel}/5
+                  <span className={`text-[11px] font-semibold ${hasAnyInStock ? 'text-emerald-600' : 'text-rose-500'}`}>
+                    {hasAnyInStock ? 'Available for Customers' : 'Currently Unavailable'}
                   </span>
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => openEditProductModal(product)}
-                      className="p-1.5 rounded-lg border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+                      className="p-1.5 rounded-lg border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors cursor-pointer"
                       title="Edit Product"
                     >
                       <Edit3 className="w-3.5 h-3.5" />
                     </button>
                     <button
                       onClick={() => setProductToDelete(product)}
-                      className="p-1.5 rounded-lg border border-rose-200 dark:border-rose-900/50 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors"
+                      className="p-1.5 rounded-lg border border-rose-200 dark:border-rose-900/50 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer"
                       title="Delete Product"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -541,7 +828,134 @@ export const AdminCatalogManager: React.FC = () => {
         </div>
       )}
 
-      {/* CATEGORIES LIST VIEW */}
+      {/* SUB-TAB 2: IMAGES & MEDIA GALLERY */}
+      {activeSubTab === 'images' && (
+        <div className="space-y-6">
+          {/* Upload Dropzone */}
+          <div 
+            onClick={() => galleryFileInputRef.current?.click()}
+            className="border-2 border-dashed border-amber-300 hover:border-amber-500 bg-amber-50/50 dark:bg-amber-950/20 rounded-3xl p-8 text-center cursor-pointer transition-colors"
+          >
+            <div className="w-12 h-12 rounded-2xl bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-300 flex items-center justify-center mx-auto mb-3">
+              <UploadCloud className="w-6 h-6" />
+            </div>
+            <h3 className="font-bold text-stone-900 dark:text-stone-100 text-sm">
+              Upload New Product Image
+            </h3>
+            <p className="text-xs text-stone-500 dark:text-stone-400 mt-1">
+              Click to select or drag and drop JPG, PNG, or WebP photo from your computer or phone.
+            </p>
+          </div>
+
+          {/* Preset Images Grid */}
+          <div>
+            <h3 className="font-bold text-stone-900 dark:text-stone-100 text-base mb-3 font-serif flex items-center gap-2">
+              <span>Product Packaging Photos ({AVAILABLE_IMAGE_PRESETS.length})</span>
+              <span className="text-xs font-normal text-stone-500">Standard 500g pouch & jar photos</span>
+            </h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {AVAILABLE_IMAGE_PRESETS.map((preset) => (
+                <div
+                  key={preset.id}
+                  className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl overflow-hidden shadow-xs flex flex-col justify-between group hover:border-amber-400 transition-all"
+                >
+                  <div className="aspect-square bg-stone-100 dark:bg-stone-800 overflow-hidden relative">
+                    <img
+                      src={preset.value}
+                      alt={preset.labelEn}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <span className="absolute bottom-2 left-2 text-[10px] font-bold px-2 py-0.5 rounded-md bg-black/70 text-white backdrop-blur-xs">
+                      {preset.sizeLabel}
+                    </span>
+                  </div>
+                  <div className="p-3.5">
+                    <div className="font-bold text-stone-900 dark:text-stone-100 text-xs">
+                      {preset.labelEn}
+                    </div>
+                    <div className="text-xs font-semibold text-amber-800 dark:text-amber-400 mt-0.5">
+                      {preset.labelMr}
+                    </div>
+                    <div className="text-[10px] text-stone-400 font-mono mt-1 truncate">
+                      {preset.value}
+                    </div>
+                    <div className="flex items-center gap-2 mt-3 pt-2.5 border-t border-stone-100 dark:border-stone-800">
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(preset.value);
+                          showToast('Image path copied to clipboard!');
+                        }}
+                        className="p-1.5 rounded-lg border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-300 hover:bg-stone-100 text-[11px] font-semibold flex items-center gap-1 cursor-pointer"
+                        title="Copy Image Path"
+                      >
+                        <Copy className="w-3 h-3" />
+                        <span>Copy</span>
+                      </button>
+                      <button
+                        onClick={() => {
+                          openNewProductModal(preset.value);
+                          setActiveSubTab('products');
+                        }}
+                        className="flex-1 py-1.5 px-2.5 rounded-lg bg-amber-600 hover:bg-amber-500 text-white text-[11px] font-bold flex items-center justify-center gap-1 cursor-pointer transition-colors"
+                      >
+                        <Plus className="w-3 h-3" />
+                        <span>Use in Product</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Uploaded User Images Section */}
+          {uploadedImages.length > 0 && (
+            <div>
+              <h3 className="font-bold text-stone-900 dark:text-stone-100 text-base mb-3 font-serif">
+                User Uploaded Media ({uploadedImages.length})
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                {uploadedImages.map((img) => (
+                  <div
+                    key={img.id}
+                    className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-2xl overflow-hidden shadow-xs flex flex-col justify-between"
+                  >
+                    <div className="aspect-square bg-stone-100 dark:bg-stone-800 overflow-hidden relative">
+                      <img
+                        src={img.url}
+                        alt={img.name}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="p-3.5">
+                      <div className="font-bold text-stone-900 dark:text-stone-100 text-xs truncate">
+                        {img.name}
+                      </div>
+                      <div className="text-[10px] text-stone-400 mt-0.5">
+                        Uploaded: {img.uploadedAt} • {img.size || 'Web'}
+                      </div>
+                      <div className="flex items-center gap-2 mt-3 pt-2.5 border-t border-stone-100 dark:border-stone-800">
+                        <button
+                          onClick={() => {
+                            openNewProductModal(img.url);
+                            setActiveSubTab('products');
+                          }}
+                          className="flex-1 py-1.5 px-2.5 rounded-lg bg-amber-600 hover:bg-amber-500 text-white text-[11px] font-bold flex items-center justify-center gap-1 cursor-pointer"
+                        >
+                          <Plus className="w-3 h-3" />
+                          <span>Use in Product</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* SUB-TAB 3: CATEGORIES LIST VIEW */}
       {activeSubTab === 'categories' && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {categories.map((cat) => {
@@ -579,14 +993,14 @@ export const AdminCatalogManager: React.FC = () => {
                 <div className="flex items-center justify-end gap-2 pt-4 border-t border-stone-100 dark:border-stone-800 mt-4">
                   <button
                     onClick={() => openEditCategoryModal(cat)}
-                    className="p-1.5 rounded-lg border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors"
+                    className="p-1.5 rounded-lg border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors cursor-pointer"
                     title="Edit Category"
                   >
                     <Edit3 className="w-3.5 h-3.5" />
                   </button>
                   <button
                     onClick={() => setCategoryToDelete(cat)}
-                    className="p-1.5 rounded-lg border border-rose-200 dark:border-rose-900/50 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors"
+                    className="p-1.5 rounded-lg border border-rose-200 dark:border-rose-900/50 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors cursor-pointer"
                     title="Delete Category"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
@@ -606,20 +1020,25 @@ export const AdminCatalogManager: React.FC = () => {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-3xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl space-y-4"
+              className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-3xl p-6 w-full max-w-3xl max-h-[92vh] overflow-y-auto shadow-2xl space-y-5"
             >
               <div className="flex items-center justify-between border-b border-stone-200 dark:border-stone-800 pb-3">
                 <div className="flex items-center gap-2">
                   <span className="p-2 rounded-xl bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300">
-                    <Flame className="w-5 h-5" />
+                    <ShoppingBag className="w-5 h-5" />
                   </span>
-                  <h3 className="font-bold text-lg text-stone-900 dark:text-stone-100">
-                    {editingProduct ? 'Edit Product / Masala' : 'Add New Product or Masala'}
-                  </h3>
+                  <div>
+                    <h3 className="font-bold text-lg text-stone-900 dark:text-stone-100">
+                      {editingProduct ? 'Edit Product & Pricing' : 'Add New Product or Masala'}
+                    </h3>
+                    <p className="text-[11px] text-stone-500">
+                      Updates are saved in real-time to Firebase Firestore.
+                    </p>
+                  </div>
                 </div>
                 <button
                   onClick={() => setIsProductModalOpen(false)}
-                  className="p-1.5 rounded-lg text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800"
+                  className="p-1.5 rounded-lg text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800 cursor-pointer"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -637,7 +1056,7 @@ export const AdminCatalogManager: React.FC = () => {
                       required
                       value={formData.nameEn}
                       onChange={(e) => setFormData({ ...formData, nameEn: e.target.value })}
-                      placeholder="e.g. Authentic Malvani Fish & Veg Masala"
+                      placeholder="e.g. Special Kanda Lasun Masala"
                       className="w-full px-3 py-2 text-xs rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 text-stone-900 dark:text-stone-100 focus:outline-hidden focus:ring-2 focus:ring-amber-500"
                     />
                   </div>
@@ -650,13 +1069,13 @@ export const AdminCatalogManager: React.FC = () => {
                       required
                       value={formData.nameMr}
                       onChange={(e) => setFormData({ ...formData, nameMr: e.target.value })}
-                      placeholder="e.g. अस्सल मालवणी मसाला"
+                      placeholder="उदा. स्पेशल कांदा लसूण मसाला"
                       className="w-full px-3 py-2 text-xs rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 text-stone-900 dark:text-stone-100 focus:outline-hidden focus:ring-2 focus:ring-amber-500"
                     />
                   </div>
                 </div>
 
-                {/* Category & Spice Level */}
+                {/* Category & Tagline */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs font-bold text-stone-700 dark:text-stone-300 mb-1">
@@ -676,49 +1095,238 @@ export const AdminCatalogManager: React.FC = () => {
                   </div>
                   <div>
                     <label className="block text-xs font-bold text-stone-700 dark:text-stone-300 mb-1">
-                      Spice Level (1 Mild - 5 Fiery)
+                      Origin Region (मूळ ठिकाण)
                     </label>
                     <input
-                      type="number"
-                      min={1}
-                      max={5}
-                      value={formData.spiceLevel}
-                      onChange={(e) => setFormData({ ...formData, spiceLevel: Number(e.target.value) })}
+                      type="text"
+                      value={formData.regionOriginEn}
+                      onChange={(e) => setFormData({ ...formData, regionOriginEn: e.target.value, regionOriginMr: e.target.value })}
+                      placeholder="e.g. Western Ghats / Konkan / Deccan"
                       className="w-full px-3 py-2 text-xs rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 text-stone-900 dark:text-stone-100 focus:outline-hidden focus:ring-2 focus:ring-amber-500"
                     />
                   </div>
                 </div>
 
-                {/* Image Selection */}
-                <div>
-                  <label className="block text-xs font-bold text-stone-700 dark:text-stone-300 mb-1">
-                    Product Real Photo / Texture
-                  </label>
-                  <div className="flex gap-2">
-                    <select
-                      value={formData.imageUrl}
-                      onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-                      className="flex-1 px-3 py-2 text-xs rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 text-stone-900 dark:text-stone-100 focus:outline-hidden focus:ring-2 focus:ring-amber-500"
-                    >
-                      {AVAILABLE_IMAGE_PRESETS.map((preset) => (
-                        <option key={preset.value} value={preset.value}>
-                          {preset.label} ({preset.value})
-                        </option>
-                      ))}
-                    </select>
-                    {formData.imageUrl && (
-                      <div className="w-10 h-10 rounded-xl overflow-hidden border border-stone-300 shrink-0">
-                        <img src={formData.imageUrl} alt="preview" className="w-full h-full object-cover" />
-                      </div>
-                    )}
+                {/* IMAGE SELECTION & UPLOAD SECTION */}
+                <div className="p-4 rounded-2xl bg-amber-50/60 dark:bg-stone-800/80 border border-amber-200/70 dark:border-stone-700 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <label className="block text-xs font-bold text-stone-800 dark:text-stone-200">
+                      Product Packaging Photo (चित्र निवडा किंवा अपलोड करा)
+                    </label>
+                    <div className="flex items-center gap-1 bg-white dark:bg-stone-900 p-1 rounded-xl border border-stone-200 dark:border-stone-700 text-[11px]">
+                      <button
+                        type="button"
+                        onClick={() => setImagePickerTab('presets')}
+                        className={`px-2.5 py-1 rounded-lg font-bold cursor-pointer transition-colors ${
+                          imagePickerTab === 'presets' ? 'bg-amber-500 text-white' : 'text-stone-600 dark:text-stone-300'
+                        }`}
+                      >
+                        Standard Presets (14)
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setImagePickerTab('upload')}
+                        className={`px-2.5 py-1 rounded-lg font-bold cursor-pointer transition-colors ${
+                          imagePickerTab === 'upload' ? 'bg-amber-500 text-white' : 'text-stone-600 dark:text-stone-300'
+                        }`}
+                      >
+                        Upload File
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setImagePickerTab('url')}
+                        className={`px-2.5 py-1 rounded-lg font-bold cursor-pointer transition-colors ${
+                          imagePickerTab === 'url' ? 'bg-amber-500 text-white' : 'text-stone-600 dark:text-stone-300'
+                        }`}
+                      >
+                        Custom URL
+                      </button>
+                    </div>
                   </div>
-                  <input
-                    type="text"
-                    placeholder="Or enter custom image URL / path"
-                    value={formData.imageUrl}
-                    onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-                    className="w-full mt-1.5 px-3 py-1.5 text-[11px] rounded-lg border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 text-stone-700 dark:text-stone-300 font-mono"
-                  />
+
+                  {/* Option 1: Preset Visual Grid */}
+                  {imagePickerTab === 'presets' && (
+                    <div className="space-y-2">
+                      <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-2 max-h-48 overflow-y-auto p-1">
+                        {AVAILABLE_IMAGE_PRESETS.map((preset) => (
+                          <button
+                            type="button"
+                            key={preset.id}
+                            onClick={() => setFormData({ ...formData, imageUrl: preset.value })}
+                            className={`rounded-xl overflow-hidden border-2 text-left transition-all p-1 bg-white dark:bg-stone-900 cursor-pointer ${
+                              formData.imageUrl === preset.value
+                                ? 'border-amber-600 ring-2 ring-amber-400'
+                                : 'border-stone-200 dark:border-stone-700 opacity-80 hover:opacity-100'
+                            }`}
+                          >
+                            <div className="aspect-square rounded-lg overflow-hidden mb-1">
+                              <img src={preset.value} alt={preset.labelEn} className="w-full h-full object-cover" />
+                            </div>
+                            <div className="text-[10px] font-bold text-stone-900 dark:text-stone-100 truncate">
+                              {preset.labelEn}
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Option 2: Upload from Device */}
+                  {imagePickerTab === 'upload' && (
+                    <div className="space-y-2">
+                      <div
+                        onClick={() => fileInputRef.current?.click()}
+                        className="border-2 border-dashed border-amber-300 hover:border-amber-500 bg-white dark:bg-stone-900 rounded-xl p-4 text-center cursor-pointer transition-colors"
+                      >
+                        <UploadCloud className="w-6 h-6 mx-auto text-amber-600 mb-1" />
+                        <span className="text-xs font-bold text-stone-800 dark:text-stone-200 block">
+                          Click to select photo from device
+                        </span>
+                        <span className="text-[10px] text-stone-400">
+                          File will be encoded and saved to Firestore product record
+                        </span>
+                      </div>
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        onChange={(e) => {
+                          if (e.target.files && e.target.files[0]) {
+                            handleFileUpload(e.target.files[0], false);
+                          }
+                        }}
+                        accept="image/*"
+                        className="hidden"
+                      />
+                    </div>
+                  )}
+
+                  {/* Option 3: Custom URL input */}
+                  {imagePickerTab === 'url' && (
+                    <div>
+                      <input
+                        type="text"
+                        placeholder="https://example.com/product.jpg or /products/kala-masala.jpg"
+                        value={formData.imageUrl}
+                        onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
+                        className="w-full px-3 py-2 text-xs rounded-xl border border-stone-200 dark:border-stone-700 bg-white dark:bg-stone-900 text-stone-900 dark:text-stone-100 font-mono"
+                      />
+                    </div>
+                  )}
+
+                  {/* Selected Preview Bar */}
+                  <div className="flex items-center justify-between gap-3 bg-white dark:bg-stone-900 p-2.5 rounded-xl border border-stone-200 dark:border-stone-700">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-12 h-12 rounded-xl overflow-hidden border border-stone-300 dark:border-stone-700 shrink-0 bg-stone-100">
+                        {formData.imageUrl && (
+                          <img src={formData.imageUrl} alt="preview" className="w-full h-full object-cover" />
+                        )}
+                      </div>
+                      <div>
+                        <div className="text-xs font-bold text-stone-900 dark:text-stone-100">
+                          Selected Packaging Photo
+                        </div>
+                        <div className="text-[10px] text-stone-400 font-mono truncate max-w-xs">
+                          {formData.imageUrl}
+                        </div>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setIsAiPackagingModalOpen(true)}
+                      className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-[#C84B31] text-white text-xs font-bold flex items-center gap-1 shadow-xs hover:shadow-md transition cursor-pointer shrink-0"
+                    >
+                      <Sparkles className="w-3.5 h-3.5" />
+                      <span>Generate with AI</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* SIZES & PRICING CONFIGURATION */}
+                <div className="p-4 rounded-2xl bg-stone-50 dark:bg-stone-800/80 border border-stone-200 dark:border-stone-700 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <label className="block text-xs font-bold text-stone-800 dark:text-stone-200">
+                        Packaging Sizes & Pricing (वजन व किमती)
+                      </label>
+                      <p className="text-[10px] text-stone-500">Configure prices and stock availability per size.</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={handleAddSizeTier}
+                      className="px-2.5 py-1 text-xs font-bold rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-800 dark:bg-amber-950 dark:text-amber-300 transition-colors cursor-pointer flex items-center gap-1"
+                    >
+                      <Plus className="w-3 h-3" />
+                      Add Size
+                    </button>
+                  </div>
+
+                  <div className="space-y-2">
+                    {(formData.sizes || []).map((sizeObj, idx) => (
+                      <div
+                        key={idx}
+                        className="grid grid-cols-12 gap-2 items-center bg-white dark:bg-stone-900 p-2.5 rounded-xl border border-stone-200 dark:border-stone-700 text-xs"
+                      >
+                        <div className="col-span-3">
+                          <label className="text-[10px] text-stone-400 block mb-0.5">Size Label</label>
+                          <input
+                            type="text"
+                            value={sizeObj.size}
+                            onChange={(e) => handleSizeChange(idx, 'size', e.target.value)}
+                            placeholder="e.g. 500g"
+                            className="w-full px-2 py-1 rounded-lg border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800"
+                          />
+                        </div>
+                        <div className="col-span-2">
+                          <label className="text-[10px] text-stone-400 block mb-0.5">Grams</label>
+                          <input
+                            type="number"
+                            value={sizeObj.grams}
+                            onChange={(e) => handleSizeChange(idx, 'grams', Number(e.target.value))}
+                            className="w-full px-2 py-1 rounded-lg border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800"
+                          />
+                        </div>
+                        <div className="col-span-2">
+                          <label className="text-[10px] text-stone-400 block mb-0.5">Selling (₹)</label>
+                          <input
+                            type="number"
+                            value={sizeObj.price}
+                            onChange={(e) => handleSizeChange(idx, 'price', Number(e.target.value))}
+                            className="w-full px-2 py-1 rounded-lg border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 font-bold text-amber-700"
+                          />
+                        </div>
+                        <div className="col-span-2">
+                          <label className="text-[10px] text-stone-400 block mb-0.5">MRP (₹)</label>
+                          <input
+                            type="number"
+                            value={sizeObj.originalPrice || sizeObj.price}
+                            onChange={(e) => handleSizeChange(idx, 'originalPrice', Number(e.target.value))}
+                            className="w-full px-2 py-1 rounded-lg border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800"
+                          />
+                        </div>
+                        <div className="col-span-2 flex items-center justify-center pt-3">
+                          <button
+                            type="button"
+                            onClick={() => handleSizeChange(idx, 'inStock', !sizeObj.inStock)}
+                            className={`px-2 py-1 rounded-lg text-[10px] font-bold cursor-pointer ${
+                              sizeObj.inStock ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
+                            }`}
+                          >
+                            {sizeObj.inStock ? 'In Stock' : 'Out of Stock'}
+                          </button>
+                        </div>
+                        <div className="col-span-1 flex items-center justify-center pt-3">
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveSizeTier(idx)}
+                            className="p-1 rounded-lg text-rose-500 hover:bg-rose-50 cursor-pointer"
+                            title="Remove size"
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
 
                 {/* Descriptions */}
@@ -728,10 +1336,10 @@ export const AdminCatalogManager: React.FC = () => {
                       Description (English)
                     </label>
                     <textarea
-                      rows={3}
+                      rows={2}
                       value={formData.descriptionEn}
                       onChange={(e) => setFormData({ ...formData, descriptionEn: e.target.value })}
-                      placeholder="Culinary background, preparation and aroma notes..."
+                      placeholder="Culinary notes, traditional recipe background..."
                       className="w-full px-3 py-2 text-xs rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 text-stone-900 dark:text-stone-100 focus:outline-hidden focus:ring-2 focus:ring-amber-500"
                     />
                   </div>
@@ -740,7 +1348,7 @@ export const AdminCatalogManager: React.FC = () => {
                       Description (मराठी)
                     </label>
                     <textarea
-                      rows={3}
+                      rows={2}
                       value={formData.descriptionMr}
                       onChange={(e) => setFormData({ ...formData, descriptionMr: e.target.value })}
                       placeholder="पारंपरिक पद्धत, चव आणि माहिती..."
@@ -749,7 +1357,7 @@ export const AdminCatalogManager: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Ingredients & Pairings */}
+                {/* Ingredients */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs font-bold text-stone-700 dark:text-stone-300 mb-1">
@@ -777,52 +1385,26 @@ export const AdminCatalogManager: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Region Origin & Badges */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <div>
-                    <label className="block text-xs font-bold text-stone-700 dark:text-stone-300 mb-1">
-                      Origin Region (English)
-                    </label>
+                {/* Bestseller & Regional Checkboxes */}
+                <div className="flex items-center gap-6 pt-2">
+                  <label className="flex items-center gap-2 text-xs font-bold text-stone-700 dark:text-stone-300 cursor-pointer">
                     <input
-                      type="text"
-                      value={formData.regionOriginEn}
-                      onChange={(e) => setFormData({ ...formData, regionOriginEn: e.target.value })}
-                      placeholder="e.g. Konkan / Kolhapur"
-                      className="w-full px-3 py-2 text-xs rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 text-stone-900 dark:text-stone-100"
+                      type="checkbox"
+                      checked={formData.isBestSeller}
+                      onChange={(e) => setFormData({ ...formData, isBestSeller: e.target.checked })}
+                      className="rounded-md text-amber-600 focus:ring-amber-500 w-4 h-4"
                     />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-bold text-stone-700 dark:text-stone-300 mb-1">
-                      मूळ ठिकाण (मराठी)
-                    </label>
+                    <span>Highlight as Bestseller (लोकप्रिय)</span>
+                  </label>
+                  <label className="flex items-center gap-2 text-xs font-bold text-stone-700 dark:text-stone-300 cursor-pointer">
                     <input
-                      type="text"
-                      value={formData.regionOriginMr}
-                      onChange={(e) => setFormData({ ...formData, regionOriginMr: e.target.value })}
-                      placeholder="उदा. सिंधुदुर्ग व मालवण"
-                      className="w-full px-3 py-2 text-xs rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 text-stone-900 dark:text-stone-100"
+                      type="checkbox"
+                      checked={formData.isRegionalSpecialty}
+                      onChange={(e) => setFormData({ ...formData, isRegionalSpecialty: e.target.checked })}
+                      className="rounded-md text-amber-600 focus:ring-amber-500 w-4 h-4"
                     />
-                  </div>
-                  <div className="flex items-center gap-4 pt-5">
-                    <label className="flex items-center gap-1.5 text-xs font-bold text-stone-700 dark:text-stone-300 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={formData.isBestSeller}
-                        onChange={(e) => setFormData({ ...formData, isBestSeller: e.target.checked })}
-                        className="rounded-sm text-amber-600"
-                      />
-                      Bestseller
-                    </label>
-                    <label className="flex items-center gap-1.5 text-xs font-bold text-stone-700 dark:text-stone-300 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={formData.isRegionalSpecialty}
-                        onChange={(e) => setFormData({ ...formData, isRegionalSpecialty: e.target.checked })}
-                        className="rounded-sm text-amber-600"
-                      />
-                      Regional
-                    </label>
-                  </div>
+                    <span>Regional Specialty (स्थानिक वैशिष्ट्य)</span>
+                  </label>
                 </div>
 
                 {/* Submit & Cancel */}
@@ -830,18 +1412,65 @@ export const AdminCatalogManager: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setIsProductModalOpen(false)}
-                    className="px-4 py-2 text-xs font-semibold rounded-xl border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800"
+                    className="px-4 py-2 text-xs font-semibold rounded-xl border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 cursor-pointer"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-5 py-2 text-xs font-bold rounded-xl bg-amber-600 hover:bg-amber-500 text-white shadow-xs"
+                    className="px-5 py-2 text-xs font-bold rounded-xl bg-amber-600 hover:bg-amber-500 text-white shadow-xs cursor-pointer flex items-center gap-1.5"
                   >
-                    {editingProduct ? 'Save Changes' : 'Create Product'}
+                    <CheckCircle2 className="w-4 h-4" />
+                    <span>{editingProduct ? 'Save to Firebase' : 'Create & Sync to Firebase'}</span>
                   </button>
                 </div>
               </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* AI IMAGEN PACKAGING MODAL */}
+      <AnimatePresence>
+        {isAiPackagingModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/75 backdrop-blur-sm overflow-y-auto">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.96 }}
+              className="bg-white rounded-3xl border border-stone-200 w-full max-w-5xl shadow-2xl overflow-hidden max-h-[92vh] flex flex-col"
+            >
+              <div className="flex items-center justify-between p-4 px-6 border-b border-stone-100 bg-stone-50/80">
+                <div className="flex items-center gap-2">
+                  <span className="p-1.5 rounded-lg bg-amber-500 text-white">
+                    <Sparkles className="w-4 h-4" />
+                  </span>
+                  <div>
+                    <h3 className="font-bold text-sm text-stone-900">AI Imagen Packaging Generator</h3>
+                    <p className="text-[11px] text-stone-500">Generating branded label packaging for "{formData.nameMr || 'Product'}"</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setIsAiPackagingModalOpen(false)}
+                  className="p-1.5 rounded-lg text-stone-400 hover:text-stone-700 hover:bg-stone-200 transition cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="p-4 sm:p-6 overflow-y-auto flex-1">
+                <AIImagenPackagingStudio
+                  compact={true}
+                  initialProductName={formData.nameMr || ''}
+                  initialProductId={editingProduct?.id || ''}
+                  onApplyToProduct={(url) => {
+                    setFormData(prev => ({ ...prev, imageUrl: url }));
+                    setIsAiPackagingModalOpen(false);
+                    showToast('AI packaging photo applied!');
+                  }}
+                />
+              </div>
             </motion.div>
           </div>
         )}
@@ -868,7 +1497,7 @@ export const AdminCatalogManager: React.FC = () => {
                 </div>
                 <button
                   onClick={() => setIsCategoryModalOpen(false)}
-                  className="p-1.5 rounded-lg text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800"
+                  className="p-1.5 rounded-lg text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800 cursor-pointer"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -888,7 +1517,6 @@ export const AdminCatalogManager: React.FC = () => {
                     placeholder="e.g. masala or regional-curries"
                     className="w-full px-3 py-2 text-xs rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 text-stone-900 dark:text-stone-100 disabled:opacity-60"
                   />
-                  <p className="text-[10px] text-stone-400 mt-0.5">Short URL slug used to link products to this category.</p>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -901,7 +1529,7 @@ export const AdminCatalogManager: React.FC = () => {
                       required
                       value={categoryFormData.nameEn}
                       onChange={(e) => setCategoryFormData({ ...categoryFormData, nameEn: e.target.value })}
-                      placeholder="e.g. Authentic Masalas & Blends"
+                      placeholder="e.g. Special Masalas & Blends"
                       className="w-full px-3 py-2 text-xs rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 text-stone-900 dark:text-stone-100"
                     />
                   </div>
@@ -914,49 +1542,23 @@ export const AdminCatalogManager: React.FC = () => {
                       required
                       value={categoryFormData.nameMr}
                       onChange={(e) => setCategoryFormData({ ...categoryFormData, nameMr: e.target.value })}
-                      placeholder="उदा. अस्सल मसाले"
+                      placeholder="उदा. स्पेशल मसाले"
                       className="w-full px-3 py-2 text-xs rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 text-stone-900 dark:text-stone-100"
                     />
                   </div>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-stone-700 dark:text-stone-300 mb-1">
-                    Description (English)
-                  </label>
-                  <textarea
-                    rows={2}
-                    value={categoryFormData.descriptionEn}
-                    onChange={(e) => setCategoryFormData({ ...categoryFormData, descriptionEn: e.target.value })}
-                    placeholder="Brief description for customer filter banner..."
-                    className="w-full px-3 py-2 text-xs rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 text-stone-900 dark:text-stone-100"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold text-stone-700 dark:text-stone-300 mb-1">
-                    Description (मराठी)
-                  </label>
-                  <textarea
-                    rows={2}
-                    value={categoryFormData.descriptionMr}
-                    onChange={(e) => setCategoryFormData({ ...categoryFormData, descriptionMr: e.target.value })}
-                    placeholder="मराठीत संक्षिप्त माहिती..."
-                    className="w-full px-3 py-2 text-xs rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 text-stone-900 dark:text-stone-100"
-                  />
                 </div>
 
                 <div className="flex items-center justify-end gap-3 pt-4 border-t border-stone-200 dark:border-stone-800">
                   <button
                     type="button"
                     onClick={() => setIsCategoryModalOpen(false)}
-                    className="px-4 py-2 text-xs font-semibold rounded-xl border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800"
+                    className="px-4 py-2 text-xs font-semibold rounded-xl border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-300 hover:bg-stone-100 dark:hover:bg-stone-800 cursor-pointer"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="px-5 py-2 text-xs font-bold rounded-xl bg-amber-600 hover:bg-amber-500 text-white shadow-xs"
+                    className="px-5 py-2 text-xs font-bold rounded-xl bg-amber-600 hover:bg-amber-500 text-white shadow-xs cursor-pointer"
                   >
                     {editingCategory ? 'Save Category' : 'Create Category'}
                   </button>
@@ -982,24 +1584,24 @@ export const AdminCatalogManager: React.FC = () => {
               </div>
               <div>
                 <h4 className="font-bold text-base text-stone-900 dark:text-stone-100">
-                  Delete Product?
+                  Delete Product from Firebase?
                 </h4>
                 <p className="text-xs text-stone-500 dark:text-stone-400 mt-1">
-                  Are you sure you want to delete <span className="font-bold text-stone-700 dark:text-stone-300">{productToDelete.nameEn}</span>? This will remove it from the online store.
+                  Are you sure you want to delete <span className="font-bold text-stone-700 dark:text-stone-300">{productToDelete.nameEn}</span>? This change will reflect in real-time across the storefront.
                 </p>
               </div>
               <div className="flex items-center justify-center gap-3 pt-2">
                 <button
                   onClick={() => setProductToDelete(null)}
-                  className="px-4 py-2 text-xs font-semibold rounded-xl border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-300"
+                  className="px-4 py-2 text-xs font-semibold rounded-xl border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-300 cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleDeleteProductConfirm}
-                  className="px-4 py-2 text-xs font-bold rounded-xl bg-rose-600 hover:bg-rose-500 text-white shadow-xs"
+                  className="px-4 py-2 text-xs font-bold rounded-xl bg-rose-600 hover:bg-rose-500 text-white shadow-xs cursor-pointer"
                 >
-                  Yes, Delete
+                  Yes, Delete from Firebase
                 </button>
               </div>
             </motion.div>
@@ -1025,19 +1627,19 @@ export const AdminCatalogManager: React.FC = () => {
                   Delete Category?
                 </h4>
                 <p className="text-xs text-stone-500 dark:text-stone-400 mt-1">
-                  Are you sure you want to delete <span className="font-bold text-stone-700 dark:text-stone-300">{categoryToDelete.nameEn}</span>? Products assigned to it will remain in database.
+                  Are you sure you want to delete <span className="font-bold text-stone-700 dark:text-stone-300">{categoryToDelete.nameEn}</span>?
                 </p>
               </div>
               <div className="flex items-center justify-center gap-3 pt-2">
                 <button
                   onClick={() => setCategoryToDelete(null)}
-                  className="px-4 py-2 text-xs font-semibold rounded-xl border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-300"
+                  className="px-4 py-2 text-xs font-semibold rounded-xl border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-300 cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleDeleteCategoryConfirm}
-                  className="px-4 py-2 text-xs font-bold rounded-xl bg-rose-600 hover:bg-rose-500 text-white shadow-xs"
+                  className="px-4 py-2 text-xs font-bold rounded-xl bg-rose-600 hover:bg-rose-500 text-white shadow-xs cursor-pointer"
                 >
                   Yes, Delete
                 </button>

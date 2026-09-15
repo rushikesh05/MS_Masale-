@@ -221,12 +221,11 @@ export const CheckoutModal: React.FC = () => {
                     className="w-full px-3 py-2 text-sm bg-white border border-[#EADFD5] rounded-xl focus:ring-2 focus:ring-[#C84B31] focus:outline-none"
                   >
                     <option value="पुणे (Pune)">पुणे (Pune)</option>
-                    <option value="कोल्हापूर (Kolhapur)">कोल्हापूर (Kolhapur)</option>
-                    <option value="सोलापूर (Solapur)">सोलापूर (Solapur)</option>
                     <option value="मुंबई / ठाणे (Mumbai / Thane)">मुंबई / ठाणे (Mumbai / Thane)</option>
                     <option value="सातारा (Satara)">सातारा (Satara)</option>
                     <option value="सांगली (Sangli)">सांगली (Sangli)</option>
                     <option value="नाशिक (Nashik)">नाशिक (Nashik)</option>
+                    <option value="अहमदनगर (Ahmednagar)">अहमदनगर (Ahmednagar)</option>
                     <option value="छत्रपती संभाजीनगर (Sambhaji Nagar)">छत्रपती संभाजीनगर</option>
                     <option value="नागपूर (Nagpur)">नागपूर (Nagpur)</option>
                     <option value="लातूर (Latur)">लातूर (Latur)</option>

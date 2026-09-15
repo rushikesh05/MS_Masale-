@@ -1,20 +1,20 @@
 import React, { useState } from 'react';
-import { Sparkles, MapPin, Eye, Camera } from 'lucide-react';
+import { Sparkles, MapPin } from 'lucide-react';
 import { Product } from '../types';
 
-interface ProductVisualProps {
+export interface ProductVisualProps {
   product?: Product | null;
   imageUrl?: string;
   name?: string;
   isMarathi?: boolean;
   className?: string;
   allowToggle?: boolean;
-  aspectRatio?: 'card' | 'modal' | 'thumb';
+  aspectRatio?: 'square' | 'card' | 'wide' | 'modal' | 'thumb';
+  defaultMode?: string;
 }
 
-// Strictly NON-TEXT authentic Maharashtrian culinary food photography
-// Inspired by traditional Maharashtrian dry chutneys & metkuts (ceramic/clay/stone/brass bowls)
-const REAL_FOOD_FALLBACKS: Record<string, string> = {
+// Packaging Images (JPG & SVG) for MS Masale
+const PACKAGING_IMAGES: Record<string, string> = {
   'prod-kanda-lasun': '/products/kanda-lasun.jpg',
   'prod-shengdana-chutney': '/products/shengdana-peanuts.jpg',
   'prod-vada-pav-coconut': '/products/vada-pav-lasun.jpg',
@@ -28,6 +28,7 @@ const REAL_FOOD_FALLBACKS: Record<string, string> = {
   'prod-limbache-lonche': '/products/lemon-pickle.jpg',
   'prod-panchamrut': '/products/panchamrut.jpg',
   'prod-hirvi-mirchi-lonche': '/products/chilli-pickle.jpg',
+  'prod-lasun-lonche': '/products/garlic-pickle.jpg',
   'prod-malvani-masala': '/products/kala-masala.jpg',
   'prod-khandeshi-kala-masala': '/products/kala-masala.jpg',
   'prod-goda-masala': '/products/til-sesame.jpg',
@@ -40,34 +41,25 @@ const REAL_FOOD_FALLBACKS: Record<string, string> = {
   'prod-biryani-masala': '/products/kala-masala.jpg'
 };
 
-// Coarse stone-ground macro spice textures & authentic stone grinding
-const TEXTURE_FALLBACKS: Record<string, string> = {
-  'prod-kanda-lasun': '/products/kanda-lasun.jpg',
-  'prod-shengdana-chutney': '/products/shengdana-peanuts.jpg',
-  'prod-vada-pav-coconut': '/products/vada-pav-lasun.jpg',
-  'prod-til-chutney': '/products/til-sesame.jpg',
-  'prod-javas-chutney': '/products/javas-flaxseed.jpg',
-  'prod-kolhapuri-thecha': '/products/thecha-green.jpg',
-  'prod-karale-khurasani': '/products/karale-niger.jpg',
-  'prod-kala-masala': '/products/kala-masala.jpg',
-  'prod-metkut': '/products/metkut-rice.jpg',
-  'prod-ambyache-lonche': '/products/mango-pickle.jpg',
-  'prod-limbache-lonche': '/products/lemon-pickle.jpg',
-  'prod-panchamrut': '/products/panchamrut.jpg',
-  'prod-hirvi-mirchi-lonche': '/products/chilli-pickle.jpg',
-  'prod-malvani-masala': '/products/kala-masala.jpg',
-  'prod-khandeshi-kala-masala': '/products/kala-masala.jpg',
-  'prod-goda-masala': '/products/til-sesame.jpg',
-  'prod-agri-koli-masala': '/products/kanda-lasun.jpg',
-  'prod-puneri-garam-masala': '/products/kala-masala.jpg',
-  'prod-kolhapuri-misal-kat-masala': '/products/kanda-lasun.jpg',
-  'prod-saoji-masala': '/products/kala-masala.jpg',
-  'prod-pav-bhaji-masala': '/products/vada-pav-lasun.jpg',
-  'prod-chai-masala': '/products/metkut-rice.jpg',
-  'prod-biryani-masala': '/products/kala-masala.jpg'
+// Vector SVG packaging fallbacks
+const PACKAGING_SVG_FALLBACKS: Record<string, string> = {
+  'prod-kanda-lasun': '/products/kanda-lasun.svg',
+  'prod-shengdana-chutney': '/products/shengdana-peanuts.svg',
+  'prod-vada-pav-coconut': '/products/vada-pav-lasun.svg',
+  'prod-til-chutney': '/products/til-sesame.svg',
+  'prod-javas-chutney': '/products/javas-flaxseed.svg',
+  'prod-kolhapuri-thecha': '/products/thecha-green.svg',
+  'prod-karale-khurasani': '/products/karale-niger.svg',
+  'prod-kala-masala': '/products/kala-masala.svg',
+  'prod-metkut': '/products/metkut-rice.svg',
+  'prod-ambyache-lonche': '/products/mango-pickle.svg',
+  'prod-limbache-lonche': '/products/lemon-pickle.svg',
+  'prod-panchamrut': '/products/panchamrut.svg',
+  'prod-hirvi-mirchi-lonche': '/products/chilli-pickle.svg',
+  'prod-lasun-lonche': '/products/garlic-pickle.svg'
 };
 
-const DEFAULT_REAL_FOOD = '/products/kanda-lasun.jpg';
+const DEFAULT_IMAGE = '/products/kanda-lasun.jpg';
 
 export const ProductVisual: React.FC<ProductVisualProps> = ({
   product,
@@ -75,151 +67,111 @@ export const ProductVisual: React.FC<ProductVisualProps> = ({
   name,
   isMarathi = false,
   className = '',
-  allowToggle = true,
-  aspectRatio = 'card'
+  aspectRatio = 'square'
 }) => {
-  // Toggle between 'culinary' bowl presentation and 'texture' macro shot (both 100% non-text)
-  const [viewMode, setViewMode] = useState<'culinary' | 'texture'>('culinary');
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
+  const [fallbackAttempted, setFallbackAttempted] = useState<boolean>(false);
 
   const productId = product?.id || '';
-  const fallbackUrl = productId ? (REAL_FOOD_FALLBACKS[productId] || DEFAULT_REAL_FOOD) : DEFAULT_REAL_FOOD;
-  const textureFallback = productId ? (TEXTURE_FALLBACKS[productId] || fallbackUrl) : fallbackUrl;
-  const directImage = product?.imageUrl || imageUrl || fallbackUrl;
 
-  const activeSrc = viewMode === 'culinary' 
-    ? directImage
-    : textureFallback;
+  // Determine initial image source: exact imageUrl first, then product.imageUrl, then mapped pack image, then default
+  const resolvedSrc = 
+    imageUrl || 
+    product?.imageUrl || 
+    (productId && PACKAGING_IMAGES[productId]) || 
+    DEFAULT_IMAGE;
 
-  const getBadgeInfo = () => {
+  const [currentSrc, setCurrentSrc] = useState<string>(resolvedSrc);
+
+  // Update src when props change
+  React.useEffect(() => {
+    const nextSrc = 
+      imageUrl || 
+      product?.imageUrl || 
+      (productId && PACKAGING_IMAGES[productId]) || 
+      DEFAULT_IMAGE;
+    setCurrentSrc(nextSrc);
+    setIsLoaded(false);
+    setFallbackAttempted(false);
+  }, [imageUrl, product?.imageUrl, productId]);
+
+  const getOriginInfo = () => {
     if (!product) {
-      return { emoji: '🌶️', tag: isMarathi ? 'अस्सल एमएस मसाले' : 'MS Masale Pure', region: isMarathi ? 'महाराष्ट्र' : 'Maharashtra' };
+      return { region: isMarathi ? 'पारंपरिक' : 'Traditional', isFlagship: false };
     }
-    switch (product.id) {
-      case 'prod-kanda-lasun':
-        return { emoji: '🧅', tag: isMarathi ? 'कोल्हापूरचे मुख्य वैशिष्ट्य' : 'Kolhapur Flagship Special', region: isMarathi ? 'कोल्हापूर' : 'Kolhapur' };
-      case 'prod-shengdana-chutney':
-        return { emoji: '🥜', tag: isMarathi ? 'सोलापुरी शेंगदाणा' : 'Solapuri Shenga', region: isMarathi ? 'सोलापूर' : 'Solapur' };
-      case 'prod-vada-pav-coconut':
-        return { emoji: '🥥', tag: isMarathi ? 'वडापाव लाल चटणी' : 'Vada Pav Red Chutney', region: isMarathi ? 'मुंबई/कोकण' : 'Konkan' };
-      case 'prod-til-chutney':
-        return { emoji: '✨', tag: isMarathi ? 'गावरान तीळ' : 'High-Calcium Til', region: isMarathi ? 'मराठवाडा' : 'Marathwada' };
-      case 'prod-javas-chutney':
-        return { emoji: '🌾', tag: isMarathi ? 'ओमेगा-३ जवस' : 'Omega-3 Flaxseed', region: isMarathi ? 'पश्चिम महाराष्ट्र' : 'W. Maharashtra' };
-      case 'prod-kolhapuri-thecha':
-        return { emoji: '🌶️', tag: isMarathi ? 'कोल्हापुरी ठेचा' : 'Kolhapuri Thecha', region: isMarathi ? 'कोल्हापूर' : 'Kolhapur' };
-      case 'prod-karale-khurasani':
-        return { emoji: '🖤', tag: isMarathi ? 'खुरासणी / कारळे' : 'Karale Niger Seed', region: isMarathi ? 'नाशिक' : 'Nashik' };
-      case 'prod-kala-masala':
-        return { emoji: '🍲', tag: isMarathi ? '२४ खडे मसाले' : '24-Spice Kala Masala', region: isMarathi ? 'खान्देश' : 'Khandesh' };
-      case 'prod-metkut':
-        return { emoji: '🥣', tag: isMarathi ? 'साजूक मेतकूट' : 'Heritage Metkut', region: isMarathi ? 'पुणे' : 'Pune' };
-      case 'prod-ambyache-lonche':
-        return { emoji: '🥭', tag: isMarathi ? 'आंब्याचे लोणचे' : 'Raw Mango Pickle', region: isMarathi ? 'कोकण' : 'Konkan' };
-      case 'prod-limbache-lonche':
-        return { emoji: '🍋', tag: isMarathi ? 'पाचक लिंबू लोणचे' : 'Digestive Lemon Pickle', region: isMarathi ? 'सातारा' : 'Satara' };
-      case 'prod-panchamrut':
-        return { emoji: '🪔', tag: isMarathi ? 'सणाचे पंचामृत' : 'Festive Panchamrut', region: isMarathi ? 'पश्चिम महाराष्ट्र' : 'W. Maharashtra' };
-      case 'prod-hirvi-mirchi-lonche':
-        return { emoji: '🌶️', tag: isMarathi ? 'मिरचीचे लोणचे' : 'Chilli Pickle', region: isMarathi ? 'खानदेश' : 'Khandesh' };
-      default:
-        return { emoji: '🏺', tag: isMarathi ? 'अस्सल गावरान' : 'Authentic Desi', region: product.regionOriginMr || 'महाराष्ट्र' };
+    if (product.id === 'prod-kanda-lasun') {
+      return { region: isMarathi ? 'विशेष मसाले' : 'Signature Blend', isFlagship: true };
     }
+    return {
+      region: isMarathi ? (product.regionOriginMr || 'पारंपरिक') : (product.regionOriginEn || 'Traditional'),
+      isFlagship: Boolean(product.isBestSeller)
+    };
   };
 
-  const badge = getBadgeInfo();
+  const origin = getOriginInfo();
   const displayName = isMarathi ? (product?.nameMr || name || 'MS Masale') : (product?.nameEn || name || 'MS Masale');
 
+  // Aspect ratio classes for responsive standard sizing
+  const aspectClass = 
+    aspectRatio === 'square' ? 'aspect-square w-full' :
+    aspectRatio === 'card' ? 'aspect-square w-full' :
+    aspectRatio === 'wide' ? 'aspect-[4/3] w-full' :
+    aspectRatio === 'modal' ? 'w-full h-full min-h-[280px] sm:min-h-[360px]' :
+    aspectRatio === 'thumb' ? 'w-16 h-16 aspect-square' :
+    'aspect-square w-full';
+
   return (
-    <div className={`relative w-full h-full overflow-hidden bg-stone-900 select-none group/visual ${className}`}>
+    <div
+      className={`relative overflow-hidden select-none group/visual bg-gradient-to-b from-[#FAF7F2] via-[#F4EDE2] to-[#E9DDCB] flex items-center justify-center p-3 sm:p-4 transition-colors ${aspectClass} ${className}`}
+    >
+      {/* Loading Skeleton */}
       {!isLoaded && (
-        <div className="absolute inset-0 bg-stone-800 animate-pulse flex items-center justify-center">
-          <div className="w-8 h-8 rounded-full border-2 border-amber-500/40 border-t-amber-500 animate-spin" />
+        <div className="absolute inset-0 bg-stone-200/50 animate-pulse flex items-center justify-center z-10">
+          <div className="w-6 h-6 rounded-full border-2 border-amber-600/30 border-t-amber-600 animate-spin" />
         </div>
       )}
 
-      {/* 100% Non-text Authentic Food Photograph with subtle zoom-in on hover */}
+      {/* Actual Product Packaging Image ("As It Is") */}
       <img
-        key={activeSrc}
-        src={activeSrc}
+        src={currentSrc}
         alt={displayName}
         referrerPolicy="no-referrer"
+        loading="lazy"
         onLoad={() => setIsLoaded(true)}
-        onError={(e) => {
-          const target = e.currentTarget;
-          if (target.src !== DEFAULT_REAL_FOOD && !target.src.endsWith(DEFAULT_REAL_FOOD)) {
-            target.src = DEFAULT_REAL_FOOD;
+        onError={() => {
+          if (!fallbackAttempted) {
+            setFallbackAttempted(true);
+            // Try SVG fallback for vector mockup or default image
+            if (productId && PACKAGING_SVG_FALLBACKS[productId]) {
+              setCurrentSrc(PACKAGING_SVG_FALLBACKS[productId]);
+            } else if (currentSrc !== DEFAULT_IMAGE) {
+              setCurrentSrc(DEFAULT_IMAGE);
+            }
           }
+          setIsLoaded(true);
         }}
-        className={`w-full h-full object-cover object-center transform transition-transform duration-500 ease-out will-change-transform group-hover:scale-108 group-hover/visual:scale-108 group-hover/card:scale-108 group-hover/hero:scale-108 group-hover/ai:scale-108 ${
+        className={`w-full h-full object-contain object-center transform transition-transform duration-500 ease-out will-change-transform drop-shadow-[0_8px_18px_rgba(45,28,15,0.18)] group-hover/visual:scale-105 group-hover/card:scale-105 ${
           isLoaded ? 'opacity-100' : 'opacity-0'
         }`}
       />
 
-      {/* Subtle Gradient Shadow for contrast */}
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none transition-opacity duration-500 group-hover:opacity-90 group-hover/card:opacity-90" />
-
-      {/* Top Left: Authentic Category label */}
-      <div className="absolute top-3 left-3 z-10 pointer-events-none">
-        <span className="px-2.5 py-0.5 rounded-full bg-amber-500/95 backdrop-blur-md text-stone-950 text-[10px] font-black uppercase tracking-wider shadow-sm flex items-center gap-1">
-          <Sparkles className="w-2.5 h-2.5" />
-          <span>
-            {product?.id === 'prod-kanda-lasun'
-              ? (isMarathi ? '★ कोल्हापूर फ्लॅगशिप' : '★ Kolhapur Flagship')
-              : product?.id === 'prod-kolhapuri-thecha'
-              ? (isMarathi ? 'अस्सल ठेचा' : 'Fresh Thecha')
-              : product?.id === 'prod-metkut'
-              ? (isMarathi ? 'अस्सल मेतकूट' : 'Heirloom Metkut')
-              : product?.category === 'pickle'
-              ? (isMarathi ? 'पारंपरिक लोणचे' : 'Heritage Pickle')
-              : product?.category === 'masala'
-              ? (isMarathi ? 'भाजलेला मसाला' : 'Roasted Masala')
-              : (isMarathi ? 'कोरडी चटणी' : 'Chutney Powder')}
-          </span>
-        </span>
-      </div>
-
-      {/* Top Heritage Region Pill */}
-      <div className="absolute top-3 right-3 z-10 pointer-events-none">
-        <span className="px-2 py-0.5 rounded-full bg-black/70 backdrop-blur-md border border-white/20 text-white text-[10px] font-bold flex items-center gap-1 shadow-sm">
-          <MapPin className="w-2.5 h-2.5 text-amber-400" />
-          <span>{badge.region}</span>
-        </span>
-      </div>
-
-      {/* Toggle between Bowl Setting and Grain Texture (both non-text food photos) */}
-      {allowToggle && (
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            setIsLoaded(false);
-            setViewMode(prev => prev === 'culinary' ? 'texture' : 'culinary');
-          }}
-          className="absolute bottom-2.5 right-3 z-20 px-2.5 py-1 rounded-lg bg-stone-900/90 hover:bg-stone-800 text-stone-300 hover:text-amber-300 border border-stone-700/80 text-[10px] font-medium backdrop-blur-md flex items-center gap-1.5 transition-all cursor-pointer shadow-md"
+      {/* Origin Badge (Top Right) */}
+      <div className="absolute top-2.5 right-2.5 z-20 pointer-events-none">
+        <span
+          className={`px-2 py-0.5 rounded-md text-[10px] sm:text-[11px] font-bold tracking-tight shadow-xs backdrop-blur-md flex items-center gap-1 ${
+            origin.isFlagship
+              ? 'bg-amber-500 text-stone-950 border border-amber-400 font-extrabold'
+              : 'bg-white/90 text-stone-800 border border-stone-200/80'
+          }`}
         >
-          {viewMode === 'culinary' ? (
-            <>
-              <Eye className="w-3 h-3 text-amber-400" />
-              <span>{isMarathi ? 'मसाला पोत' : 'Spice Grain'}</span>
-            </>
+          {origin.isFlagship ? (
+            <Sparkles className="w-2.5 h-2.5 text-amber-950 fill-amber-950" />
           ) : (
-            <>
-              <Camera className="w-3 h-3 text-amber-400" />
-              <span>{isMarathi ? 'पारंपरिक वाटी' : 'Bowl Setting'}</span>
-            </>
+            <MapPin className="w-2.5 h-2.5 text-amber-600" />
           )}
-        </button>
-      )}
-
-      {/* Bottom Cultural Notes */}
-      <div className="absolute bottom-2.5 left-3 z-10 flex items-center pointer-events-none text-white">
-        <span className="px-2 py-0.5 rounded-md bg-black/70 backdrop-blur-md text-amber-300 text-[10px] font-extrabold flex items-center gap-1 border border-amber-400/30">
-          <span>{badge.emoji}</span>
-          <span className="truncate max-w-[130px] sm:max-w-[160px]">{badge.tag}</span>
+          <span className="truncate max-w-[110px] sm:max-w-[130px]">{origin.region}</span>
         </span>
       </div>
     </div>
   );
 };
-
