@@ -2,6 +2,30 @@ export type UserRole = 'customer' | 'manager' | 'delivery' | 'admin';
 
 export type Language = 'mr' | 'en';
 
+export interface SavedAddress {
+  id: string;
+  label: 'Home' | 'Work' | 'Other' | string;
+  fullName: string;
+  phone: string;
+  addressLine1: string;
+  addressLine2?: string;
+  landmark?: string;
+  talukaDistrict: string;
+  pincode: string;
+  state: string;
+  isDefault?: boolean;
+}
+
+export interface SavedPaymentMethod {
+  id: string;
+  type: 'upi' | 'cod' | 'card';
+  upiId?: string;
+  cardLast4?: string;
+  cardBrand?: string;
+  isDefault?: boolean;
+  label: string;
+}
+
 export interface UserProfile {
   uid: string;
   email: string;
@@ -11,7 +35,10 @@ export interface UserProfile {
   avatarUrl?: string;
   preferredLanguage?: Language;
   defaultAddress?: CustomerAddress;
+  addresses?: SavedAddress[];
+  paymentMethods?: SavedPaymentMethod[];
   createdAt: string;
+  updatedAt?: string;
 }
 
 export interface LiveDeliveryLocation {

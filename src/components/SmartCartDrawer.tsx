@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Trash2, ShoppingBag, ArrowRight, Sparkles, Tag, ShieldCheck, Plus, Minus } from 'lucide-react';
+import { X, Trash2, ShoppingBag, ArrowRight, Sparkles, Tag, ShieldCheck, Plus, Minus, Gift } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { ChutneyArtwork } from './ChutneyArtwork';
 
@@ -18,7 +18,7 @@ export const SmartCartDrawer: React.FC = () => {
       setAppliedDiscount(discountVal);
       setCouponError(null);
     } else {
-      setCouponError(isMr ? 'अवैध कूपन कोड!' : 'Invalid coupon code!');
+      setCouponError('Invalid coupon code!');
       setAppliedDiscount(0);
     }
   };
@@ -53,7 +53,7 @@ export const SmartCartDrawer: React.FC = () => {
               <div className="flex items-center gap-2">
                 <ShoppingBag className="w-5 h-5 text-amber-600" />
                 <h3 className="font-extrabold text-lg text-stone-900 font-brand">
-                  {isMr ? 'तुमचे खरेदी कार्ट' : 'Your Spice Cart'}
+                  Your Spice Cart
                 </h3>
                 <span className="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 font-bold">
                   {cart.length}
@@ -75,10 +75,10 @@ export const SmartCartDrawer: React.FC = () => {
                     <ShoppingBag className="w-8 h-8" />
                   </div>
                   <h4 className="font-bold text-base text-[#2D2424] font-brand">
-                    {isMr ? 'तुमचे कार्ट रिकामे आहे' : 'Your cart is empty'}
+                    Your cart is empty
                   </h4>
                   <p className="text-xs text-[#7A6E6E] max-w-xs mx-auto">
-                    {isMr ? 'आमच्या लोकप्रिय गावरान चटण्या किंवा स्वतःचा कस्टमाईज्ड जार तयार करा!' : 'Explore our delicious chutneys or design your custom blend jar!'}
+                    Explore our authentic traditional chutneys, pickles and masalas!
                   </p>
                 </div>
               ) : (
@@ -99,7 +99,7 @@ export const SmartCartDrawer: React.FC = () => {
                           <div className="w-full h-full overflow-hidden">
                             <img
                               src={item.product.imageUrl || '/products/kanda-lasun.jpg'}
-                              alt={isMr ? item.product.nameMr : item.product.nameEn}
+                              alt={item.product.nameEn}
                               referrerPolicy="no-referrer"
                               onError={(e) => {
                                 (e.target as HTMLImageElement).src = '/products/kanda-lasun.jpg';
@@ -119,7 +119,7 @@ export const SmartCartDrawer: React.FC = () => {
                             {item.isCustomRecipe && item.customRecipe
                               ? item.customRecipe.customName
                               : item.product
-                              ? (isMr ? item.product.nameMr : item.product.nameEn)
+                              ? item.product.nameEn
                               : 'Chutney Jar'}
                           </h4>
                           <button
@@ -142,7 +142,7 @@ export const SmartCartDrawer: React.FC = () => {
                           </div>
                         ) : (
                           <div className="text-[11px] text-[#7A6E6E]">
-                            {isMr ? 'पॅक साईज:' : 'Size:'} {item.selectedSize || '250g'}
+                            Size: {item.selectedSize || '250g'}
                           </div>
                         )}
 
@@ -180,11 +180,11 @@ export const SmartCartDrawer: React.FC = () => {
                   {cartSubtotal >= 499 ? (
                     <div className="text-green-700 font-bold flex items-center gap-1.5">
                       <ShieldCheck className="w-4 h-4" />
-                      <span>{isMr ? 'अभिनंदन! तुमची डिलिव्हरी मोफत आहे!' : 'Congratulations! You qualify for Free Delivery!'}</span>
+                      <span>Congratulations! You qualify for Free Delivery!</span>
                     </div>
                   ) : (
                     <div className="text-[#6B5E5E]">
-                      {isMr ? `मोफत डिलिव्हरीसाठी अजून ₹${499 - cartSubtotal} ची खरेदी करा.` : `Add ₹${499 - cartSubtotal} more for Free Delivery.`}
+                      Add ₹{499 - cartSubtotal} more for Free Delivery.
                     </div>
                   )}
                 </div>
@@ -210,36 +210,44 @@ export const SmartCartDrawer: React.FC = () => {
                     onClick={handleApplyCoupon}
                     className="px-3.5 py-2 rounded-lg bg-[#2D2424] hover:bg-black text-white text-xs font-bold transition-colors cursor-pointer"
                   >
-                    {isMr ? 'लागू करा' : 'Apply'}
+                    Apply
                   </button>
                 </div>
                 {couponError && <p className="text-[11px] text-red-500">{couponError}</p>}
                 {appliedDiscount > 0 && <p className="text-[11px] text-green-600 font-bold">✓ ₹{appliedDiscount} Discount Applied!</p>}
 
+                {/* BOGO Offer Banner in Cart */}
+                <div className="p-2.5 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-300/80 flex items-center gap-2">
+                  <Gift className="w-4 h-4 text-amber-700 shrink-0 animate-pulse" />
+                  <p className="text-[11px] font-bold text-amber-950 leading-tight">
+                    🎁 Festive BOGO active: 1 Free Shengdana Peanut Chutney Jar included with your package!
+                  </p>
+                </div>
+
                 {/* Price Breakdown */}
                 <div className="space-y-1.5 text-xs text-[#6B5E5E] pt-2 border-t border-[#F5EDE4]">
                   <div className="flex justify-between">
-                    <span>{isMr ? 'उपएकूण (Subtotal):' : 'Subtotal:'}</span>
+                    <span>Subtotal:</span>
                     <span className="font-semibold text-[#2D2424]">₹{cartSubtotal}</span>
                   </div>
                   {appliedDiscount > 0 && (
                     <div className="flex justify-between text-green-700">
-                      <span>{isMr ? 'कूपन सूट (Discount):' : 'Discount:'}</span>
+                      <span>Discount:</span>
                       <span className="font-bold">-₹{appliedDiscount}</span>
                     </div>
                   )}
                   <div className="flex justify-between">
-                    <span>{isMr ? 'डिलिव्हरी शुल्क (Delivery):' : 'Delivery Charges:'}</span>
+                    <span>Delivery Charges:</span>
                     <span className="font-semibold text-[#2D2424]">
                       {deliveryFee === 0 ? (
-                        <span className="text-green-700 font-bold">{isMr ? 'मोफत' : 'FREE'}</span>
+                        <span className="text-green-700 font-bold">FREE</span>
                       ) : (
                         `₹${deliveryFee}`
                       )}
                     </span>
                   </div>
                   <div className="flex justify-between text-sm font-extrabold text-stone-900 pt-2 border-t border-[#F5EDE4]">
-                    <span>{isMr ? 'एकूण देय रक्कम:' : 'Total Payable:'}</span>
+                    <span>Total Payable:</span>
                     <span className="text-amber-900">₹{finalTotal}</span>
                   </div>
                 </div>
@@ -252,7 +260,7 @@ export const SmartCartDrawer: React.FC = () => {
                   }}
                   className="w-full py-3.5 px-4 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-extrabold text-sm sm:text-base rounded-xl transition-all shadow-md shadow-orange-500/20 flex items-center justify-center gap-2 cursor-pointer"
                 >
-                  <span>{isMr ? 'ऑर्डर पूर्ण करा (Checkout)' : 'Proceed to Checkout'}</span>
+                  <span>Proceed to Checkout</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </div>

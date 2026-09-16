@@ -332,12 +332,12 @@ export const InvoiceModal: React.FC<InvoiceModalProps> = ({
 
   // 3. Copy Summary to Clipboard
   const handleCopySummary = () => {
-    const textSummary = `📜 एमएस मसाले - अधिकृत कर पावती (Tax Invoice)
+    const textSummary = `📜 MS Masale - Official Tax Invoice
 📄 Invoice No: ${invoiceNumber}
 🔢 Order ID: #${order.id}
 👤 Customer: ${order.customer.fullName} (${order.customer.phone})
 📦 Items:
-${order.items.map((it, i) => `  ${i + 1}. ${it.titleMr} (${it.size}) x ${it.quantity} = ₹${it.totalPrice || it.unitPrice * it.quantity}`).join('\n')}
+${order.items.map((it, i) => `  ${i + 1}. ${it.titleEn || it.titleMr} (${it.size}) x ${it.quantity} = ₹${it.totalPrice || it.unitPrice * it.quantity}`).join('\n')}
 💰 Total Paid: ₹${grandTotal} (${order.paymentMethod || 'Online'})
 🏢 GSTIN: 27AABCU9603R1ZM | FSSAI: 11523038000492`;
     navigator.clipboard.writeText(textSummary);
@@ -376,7 +376,7 @@ ${order.items.map((it, i) => `  ${i + 1}. ${it.titleMr} (${it.size}) x ${it.quan
                 <div>
                   <span className="text-[10px] font-bold tracking-wider text-amber-300 uppercase flex items-center gap-1">
                     <Sparkles className="w-3 h-3 text-amber-400" />
-                    {isMr ? 'कायदेशीर कर बीजक (Official Tax Invoice)' : 'Official Tax Invoice (GST)'}
+                    Official Tax Invoice (GST)
                   </span>
                   <h3 className="text-sm sm:text-base font-extrabold text-white">
                     {invoiceNumber}
@@ -396,7 +396,7 @@ ${order.items.map((it, i) => `  ${i + 1}. ${it.titleMr} (${it.size}) x ${it.quan
                   className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-[#B82A16] to-[#8C1C0B] hover:from-[#981E0D] hover:to-[#701407] text-white text-xs font-bold shadow-md hover:shadow-lg transition-all flex items-center gap-1.5 cursor-pointer"
                 >
                   <Printer className="w-3.5 h-3.5" />
-                  <span>{isPrinting ? (isMr ? 'प्रिंटिंग...' : 'Printing...') : (isMr ? 'प्रिंट करा (Print)' : 'Print Invoice')}</span>
+                  <span>{isPrinting ? 'Printing...' : 'Print Invoice'}</span>
                 </motion.button>
 
                 {/* Download Document Button */}
@@ -409,7 +409,7 @@ ${order.items.map((it, i) => `  ${i + 1}. ${it.titleMr} (${it.size}) x ${it.quan
                   className="px-3.5 py-2 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-400/40 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
                 >
                   <Download className="w-3.5 h-3.5" />
-                  <span>{isMr ? 'डाउनलोड (.html / PDF)' : 'Download'}</span>
+                  <span>Download</span>
                 </motion.button>
 
                 {/* Copy Text Summary */}
@@ -422,7 +422,7 @@ ${order.items.map((it, i) => `  ${i + 1}. ${it.titleMr} (${it.size}) x ${it.quan
                   title="Copy Summary"
                 >
                   {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                  <span className="hidden sm:inline">{copied ? (isMr ? 'कॉपी झाले!' : 'Copied!') : (isMr ? 'कॉपी' : 'Copy')}</span>
+                  <span className="hidden sm:inline">{copied ? 'Copied!' : 'Copy'}</span>
                 </motion.button>
 
                 {/* Close Button */}
@@ -487,7 +487,7 @@ ${order.items.map((it, i) => `  ${i + 1}. ${it.titleMr} (${it.size}) x ${it.quan
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-2xl bg-stone-50 border border-stone-200 text-xs">
                 <div>
                   <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block mb-1">
-                    बिल कोणाचे (Billed & Shipped To):
+                    Billed & Shipped To:
                   </span>
                   <div className="font-bold text-sm text-stone-900">{order.customer.fullName}</div>
                   <div className="text-stone-700 mt-0.5">{order.customer.addressLine1}</div>
@@ -502,7 +502,7 @@ ${order.items.map((it, i) => `  ${i + 1}. ${it.titleMr} (${it.size}) x ${it.quan
 
                 <div>
                   <span className="text-[10px] font-bold text-stone-400 uppercase tracking-wider block mb-1">
-                    डिलिव्हरी & पेमेंट तपशील (Dispatch & Payment):
+                    Dispatch & Payment Details:
                   </span>
                   <div className="space-y-1">
                     <div className="flex justify-between">
@@ -515,11 +515,11 @@ ${order.items.map((it, i) => `  ${i + 1}. ${it.titleMr} (${it.size}) x ${it.quan
                     </div>
                     <div className="flex justify-between">
                       <span className="text-stone-500">Dispatch Hub:</span>
-                      <span className="font-bold text-stone-800">Sahyadri Stone-Crush Center #01</span>
+                      <span className="font-bold text-stone-800">MS Masale Processing Hub #01</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-stone-500">Courier Partner:</span>
-                      <span className="font-bold text-stone-800">{order.assignedDeliveryPerson?.name || 'Assal Express Fleet'}</span>
+                      <span className="font-bold text-stone-800">{order.assignedDeliveryPerson?.name || 'Express Courier Fleet'}</span>
                     </div>
                   </div>
                 </div>
@@ -531,12 +531,12 @@ ${order.items.map((it, i) => `  ${i + 1}. ${it.titleMr} (${it.size}) x ${it.quan
                   <thead>
                     <tr className="bg-stone-800 text-white font-bold">
                       <th className="p-2.5 rounded-l-lg">#</th>
-                      <th className="p-2.5">वस्तू / चटणीचे नाव (Description)</th>
+                      <th className="p-2.5">Item / Product Name</th>
                       <th className="p-2.5">HSN Code</th>
-                      <th className="p-2.5">पॅक आकार</th>
-                      <th className="p-2.5 text-center">नग (Qty)</th>
-                      <th className="p-2.5 text-right">दर (Rate)</th>
-                      <th className="p-2.5 text-right rounded-r-lg">रक्कम (Total)</th>
+                      <th className="p-2.5">Pack Size</th>
+                      <th className="p-2.5 text-center">Qty</th>
+                      <th className="p-2.5 text-right">Rate</th>
+                      <th className="p-2.5 text-right rounded-r-lg">Total</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-stone-200">
@@ -544,11 +544,10 @@ ${order.items.map((it, i) => `  ${i + 1}. ${it.titleMr} (${it.size}) x ${it.quan
                       <tr key={idx} className="hover:bg-stone-50/50">
                         <td className="p-2.5 font-mono text-stone-500">{idx + 1}</td>
                         <td className="p-2.5">
-                          <div className="font-bold text-stone-900">{item.titleMr}</div>
-                          <div className="text-[10px] text-stone-500">{item.titleEn}</div>
+                          <div className="font-bold text-stone-900">{item.titleEn || item.titleMr}</div>
                           {item.isCustomRecipe && (
                             <span className="inline-block mt-0.5 px-1.5 py-0.2 rounded bg-amber-100 text-amber-900 text-[9px] font-bold">
-                              १००% सानुकूल दगडी खलबत्त्यात कुटलेली
+                              100% Traditional Stone Mortar Ground
                             </span>
                           )}
                         </td>
@@ -571,11 +570,11 @@ ${order.items.map((it, i) => `  ${i + 1}. ${it.titleMr} (${it.size}) x ${it.quan
                   <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-300 text-amber-950 font-medium">
                     <div className="font-bold mb-1 flex items-center gap-1.5">
                       <ShieldCheck className="w-4 h-4 text-[#B82A16]" />
-                      <span>FSSAI & अन्न सुरक्षा हमी:</span>
+                      <span>FSSAI & Food Safety Assurance:</span>
                     </div>
                     <p className="text-[11px] leading-relaxed">
-                      हे उत्पादन १००% नैसर्गिक, शून्य केमिकल प्रिझर्व्हेटिव्ह व शून्य पाम ऑइल युक्त आहे.
-                      सदर बीजक वस्तू व सेवा कर (GST) कायद्यानुसार अधिकृत आहे.
+                      This product is 100% natural, zero chemical preservatives, zero palm oil.
+                      This invoice is valid under the Goods and Services Tax (GST) Act.
                     </p>
                   </div>
                   <div className="text-[11px] text-stone-500">
@@ -585,23 +584,23 @@ ${order.items.map((it, i) => `  ${i + 1}. ${it.titleMr} (${it.size}) x ${it.quan
 
                 <div className="space-y-2 text-xs">
                   <div className="flex justify-between text-stone-600">
-                    <span>Subtotal (एकूण किंमत):</span>
+                    <span>Subtotal:</span>
                     <span className="font-mono font-bold">₹{subtotal}</span>
                   </div>
                   {discount > 0 && (
                     <div className="flex justify-between text-emerald-700">
-                      <span>Discount (सूट):</span>
+                      <span>Discount:</span>
                       <span className="font-mono font-bold">- ₹{discount}</span>
                     </div>
                   )}
                   <div className="flex justify-between text-stone-600">
-                    <span>Shipping & Delivery (डिलिव्हरी शुल्क):</span>
+                    <span>Shipping & Delivery:</span>
                     <span className="font-mono font-bold">
-                      {shippingFee === 0 ? 'मोफत (FREE)' : `₹${shippingFee}`}
+                      {shippingFee === 0 ? 'FREE' : `₹${shippingFee}`}
                     </span>
                   </div>
                   <div className="flex justify-between text-stone-500 text-[11px] pt-1 border-t border-stone-200">
-                    <span>Taxable Amount (करपात्र मूल्य):</span>
+                    <span>Taxable Amount:</span>
                     <span className="font-mono">₹{taxableAmount}</span>
                   </div>
                   <div className="flex justify-between text-stone-500 text-[11px]">
@@ -613,7 +612,7 @@ ${order.items.map((it, i) => `  ${i + 1}. ${it.titleMr} (${it.size}) x ${it.quan
                     <span className="font-mono">₹{sgst}</span>
                   </div>
                   <div className="flex justify-between items-center text-sm font-extrabold text-[#241C1A] pt-2 border-t-2 border-stone-800">
-                    <span>Grand Total (एकूण देय रक्कम):</span>
+                    <span>Grand Total:</span>
                     <span className="font-mono text-base text-[#B82A16]">₹{grandTotal}</span>
                   </div>
                 </div>
@@ -637,7 +636,7 @@ ${order.items.map((it, i) => `  ${i + 1}. ${it.titleMr} (${it.size}) x ${it.quan
                   </div>
                   <div className="w-32 h-0.5 bg-stone-300 mx-auto sm:ml-auto" />
                   <div className="text-[10px] font-bold text-stone-600 mt-1 uppercase">
-                    Authorized Signatory (अधिकृत स्वाक्षरी)
+                    Authorized Signatory
                   </div>
                 </div>
               </div>

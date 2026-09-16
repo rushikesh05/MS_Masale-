@@ -355,7 +355,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setIsBasketFilling(false);
     }, 1400);
 
-    showToast(language === 'mr' ? 'चटणी बास्केटमध्ये भरली! 🌶️' : 'Added to your basket!');
+    showToast('Added to your basket! 🌶️');
     if (openDrawer) {
       setIsCartOpen(true);
     }
@@ -363,7 +363,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const removeFromCart = (cartItemId: string) => {
     setCart(prev => prev.filter(item => item.cartItemId !== cartItemId));
-    showToast(language === 'mr' ? 'आयटम काढून टाकला' : 'Item removed from cart');
+    showToast('Item removed from cart');
   };
 
   const updateQuantity = (cartItemId: string, quantity: number) => {

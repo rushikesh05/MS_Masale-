@@ -97,19 +97,19 @@ export const ProductVisual: React.FC<ProductVisualProps> = ({
 
   const getOriginInfo = () => {
     if (!product) {
-      return { region: isMarathi ? 'पारंपरिक' : 'Traditional', isFlagship: false };
+      return { region: 'Traditional', isFlagship: false };
     }
     if (product.id === 'prod-kanda-lasun') {
-      return { region: isMarathi ? 'विशेष मसाले' : 'Signature Blend', isFlagship: true };
+      return { region: 'Signature Blend', isFlagship: true };
     }
     return {
-      region: isMarathi ? (product.regionOriginMr || 'पारंपरिक') : (product.regionOriginEn || 'Traditional'),
+      region: product.regionOriginEn || 'Traditional',
       isFlagship: Boolean(product.isBestSeller)
     };
   };
 
   const origin = getOriginInfo();
-  const displayName = isMarathi ? (product?.nameMr || name || 'MS Masale') : (product?.nameEn || name || 'MS Masale');
+  const displayName = product?.nameEn || name || 'MS Masale';
 
   // Aspect ratio classes for responsive standard sizing
   const aspectClass = 

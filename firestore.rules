@@ -32,12 +32,9 @@ service cloud.firestore {
     match /users/{userId} {
       allow read: if isSignedIn();
       allow create: if isOwner(userId)
-                    && request.resource.data.keys().hasAll(['uid', 'email', 'role', 'createdAt'])
-                    && request.resource.data.uid == userId
-                    && request.resource.data.role in ['customer', 'manager', 'delivery', 'admin'];
+                    && request.resource.data.uid == userId;
       allow update: if isOwner(userId)
-                    && request.resource.data.uid == userId
-                    && request.resource.data.role in ['customer', 'manager', 'delivery', 'admin'];
+                    && request.resource.data.uid == userId;
       allow delete: if false;
     }
 

@@ -79,25 +79,25 @@ export const CategorySortFilterControl: React.FC<CategorySortFilterControlProps>
     (priceFilter !== 'all' ? 1 : 0) +
     (popularityFilter !== 'all' ? 1 : 0);
 
-  const sortOptions: { id: SortOption; labelEn: string; labelMr: string; icon: React.ReactNode }[] = [
-    { id: 'popular', labelEn: 'Popularity & Bestseller', labelMr: 'सर्वात लोकप्रिय', icon: <Award className="w-3.5 h-3.5 text-amber-600" /> },
-    { id: 'price-asc', labelEn: 'Price: Low to High', labelMr: 'किंमत: कमी ते जास्त', icon: <IndianRupee className="w-3.5 h-3.5 text-emerald-600" /> },
-    { id: 'price-desc', labelEn: 'Price: High to Low', labelMr: 'किंमत: जास्त ते कमी', icon: <IndianRupee className="w-3.5 h-3.5 text-rose-600" /> },
-    { id: 'rating', labelEn: 'Customer Rating', labelMr: 'उत्कृष्ट रेटिंग', icon: <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" /> },
+  const sortOptions: { id: SortOption; labelEn: string; icon: React.ReactNode }[] = [
+    { id: 'popular', labelEn: 'Popularity & Bestseller', icon: <Award className="w-3.5 h-3.5 text-amber-600" /> },
+    { id: 'price-asc', labelEn: 'Price: Low to High', icon: <IndianRupee className="w-3.5 h-3.5 text-emerald-600" /> },
+    { id: 'price-desc', labelEn: 'Price: High to Low', icon: <IndianRupee className="w-3.5 h-3.5 text-rose-600" /> },
+    { id: 'rating', labelEn: 'Customer Rating', icon: <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" /> },
   ];
 
-  const priceOptions: { id: PriceFilterOption; label: string; sub: string }[] = [
-    { id: 'all', label: 'All Prices', sub: 'सर्व' },
-    { id: 'under-100', label: 'Under ₹100', sub: '₹१०० पेक्षा कमी' },
-    { id: '100-200', label: '₹100 - ₹200', sub: 'मध्यम' },
-    { id: '200-300', label: '₹200 - ₹300', sub: 'प्रिमियम' },
-    { id: '300-plus', label: '₹300+', sub: 'मोठे पॅक / १ किलो' },
+  const priceOptions: { id: PriceFilterOption; label: string }[] = [
+    { id: 'all', label: 'All Prices' },
+    { id: 'under-100', label: 'Under ₹100' },
+    { id: '100-200', label: '₹100 - ₹200' },
+    { id: '200-300', label: '₹200 - ₹300' },
+    { id: '300-plus', label: '₹300+' },
   ];
 
-  const popularityOptions: { id: PopularityFilterOption; label: string; desc: string }[] = [
-    { id: 'all', label: 'All Items', desc: 'सर्व उत्पादने' },
-    { id: 'bestsellers', label: '⭐ Bestsellers Only', desc: 'ग्राहक पसंती' },
-    { id: 'top-rated', label: '★ 4.9+ Top Rated', desc: 'उच्च दर्जा' },
+  const popularityOptions: { id: PopularityFilterOption; label: string }[] = [
+    { id: 'all', label: 'All Items' },
+    { id: 'bestsellers', label: '⭐ Bestsellers Only' },
+    { id: 'top-rated', label: '★ 4.9+ Top Rated' },
   ];
 
   return (
@@ -118,8 +118,8 @@ export const CategorySortFilterControl: React.FC<CategorySortFilterControlProps>
           <div>
             <div className="flex items-center gap-2">
               <span className="text-xs font-bold uppercase tracking-wider text-amber-800">
-                {isChutneyCategory ? 'Chutneys Collection (चटण्या)' : 
-                 isAcharCategory ? 'Achar / Lonach Collection (लोणचं / आचार)' : 
+                {isChutneyCategory ? 'Chutneys Collection' : 
+                 isAcharCategory ? 'Pickles Collection' : 
                  'Catalog Filters & Sorting'}
               </span>
               <span className="px-2 py-0.5 rounded-full text-[11px] font-bold bg-white text-stone-800 border border-amber-200 shadow-2xs">
@@ -180,10 +180,7 @@ export const CategorySortFilterControl: React.FC<CategorySortFilterControlProps>
             <label className="text-xs font-bold text-stone-800 flex items-center justify-between">
               <span className="flex items-center gap-1.5">
                 <ArrowUpDown className="w-3.5 h-3.5 text-amber-600" />
-                Sort Products By (क्रमवारी):
-              </span>
-              <span className="text-[11px] font-normal text-stone-500">
-                {sortOptions.find(o => o.id === sortBy)?.labelMr}
+                Sort Products By:
               </span>
             </label>
             <div className="relative">
@@ -194,7 +191,7 @@ export const CategorySortFilterControl: React.FC<CategorySortFilterControlProps>
               >
                 {sortOptions.map(opt => (
                   <option key={opt.id} value={opt.id}>
-                    {opt.labelEn} ({opt.labelMr})
+                    {opt.labelEn}
                   </option>
                 ))}
               </select>
@@ -208,7 +205,7 @@ export const CategorySortFilterControl: React.FC<CategorySortFilterControlProps>
           <div className="lg:col-span-6 space-y-1.5">
             <label className="text-xs font-bold text-stone-800 flex items-center gap-1.5">
               <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-              Popularity & Reviews (लोकप्रियता):
+              Popularity & Reviews:
             </label>
             <div className="flex flex-wrap gap-1.5">
               {popularityOptions.map(opt => {
@@ -235,7 +232,7 @@ export const CategorySortFilterControl: React.FC<CategorySortFilterControlProps>
         <div className="pt-2 border-t border-amber-200/50 space-y-1.5">
           <label className="text-xs font-bold text-stone-800 flex items-center gap-1.5">
             <IndianRupee className="w-3.5 h-3.5 text-emerald-600" />
-            Filter by Price Range (किंमत श्रेणी):
+            Filter by Price Range:
           </label>
           <div className="flex flex-wrap gap-1.5">
             {priceOptions.map(opt => {

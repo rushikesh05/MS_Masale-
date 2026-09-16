@@ -4,56 +4,81 @@ import {
   X, 
   MapPin, 
   CreditCard, 
-  CheckCircle, 
-  QrCode, 
-  Smartphone, 
   Truck, 
+  CheckCircle, 
   ShieldCheck, 
-  ArrowRight, 
-  MessageSquare,
-  Sparkles,
-  Phone,
-  User,
-  Mail,
-  FileText
+  ArrowRight,
+  QrCode,
+  FileText,
+  Sparkles
 } from 'lucide-react';
-import confetti from 'canvas-confetti';
 import { useApp } from '../context/AppContext';
 import { CustomerAddress, OrderItem } from '../types';
-import { createOrderWithTransactionInFirestore, saveOrderToFirestore } from '../lib/firestoreSync';
+import confetti from 'canvas-confetti';
+import { createOrderWithTransactionInFirestore } from '../lib/firestoreSync';
+import { useAuth } from '../context/AuthContext';
 
 export const CheckoutModal: React.FC = () => {
   const { 
-    language, 
-    cart, 
-    cartSubtotal, 
     isCheckoutOpen, 
     setIsCheckoutOpen, 
+    cart, 
+    cartSubtotal, 
     clearCart, 
-    refreshOrders,
     openWhatsAppAlert,
+    refreshOrders,
     openInvoiceModal,
     showToast
   } = useApp();
 
-  const isMr = language === 'mr';
+  const {
+    currentUser,
+    userProfile,
+    setIsAuthModalOpen,
+    setAuthMode
+  } = useAuth();
 
   const [step, setStep] = useState<'address' | 'payment' | 'success'>('address');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
-  // Address form
+  // Address form initialized dynamically
+  const defaultSaved = userProfile?.addresses?.find(a => a.isDefault) || userProfile?.addresses?.[0];
+
   const [address, setAddress] = useState<CustomerAddress>({
-    fullName: 'सागर रामचंद्र गायकवाड (Sagar Gaikwad)',
-    phone: '8591254237',
-    email: 'sagar.gaikwad@example.com',
-    addressLine1: 'फ्लॅट ४०२, स्वामिनी हाइट्स, बाणेर रोड',
-    addressLine2: 'डी मार्ट जवळ',
-    landmark: 'गणपती मंदिराशेजारी',
-    talukaDistrict: 'पुणे (Pune)',
-    pincode: '411045',
-    state: 'Maharashtra',
-    deliveryNotes: 'कृपया गेटवर घंटी वाजवा'
+    fullName: defaultSaved?.fullName || userProfile?.displayName || currentUser?.displayName || '',
+    phone: defaultSaved?.phone || userProfile?.phone || '8591254237',
+    email: currentUser?.email || 'customer@msmasale.com',
+    addressLine1: defaultSaved?.addressLine1 || 'Flat 402, Swamini Heights, Baner Road',
+    addressLine2: defaultSaved?.landmark || 'Near D-Mart',
+    landmark: defaultSaved?.landmark || 'Near Ganpati Temple',
+    talukaDistrict: defaultSaved?.talukaDistrict || 'Pune',
+    pincode: defaultSaved?.pincode || '411045',
+    state: defaultSaved?.state || 'Maharashtra',
+    deliveryNotes: 'Please ring bell at gate'
   });
+
+  // When default address or userProfile updates, update address state if empty or changed
+  React.useEffect(() => {
+    if (defaultSaved) {
+      setAddress(prev => ({
+        ...prev,
+        fullName: defaultSaved.fullName || prev.fullName,
+        phone: defaultSaved.phone || prev.phone,
+        addressLine1: defaultSaved.addressLine1 || prev.addressLine1,
+        landmark: defaultSaved.landmark || prev.landmark,
+        talukaDistrict: defaultSaved.talukaDistrict || prev.talukaDistrict,
+        pincode: defaultSaved.pincode || prev.pincode,
+        email: currentUser?.email || prev.email
+      }));
+    } else if (currentUser) {
+      setAddress(prev => ({
+        ...prev,
+        fullName: prev.fullName || userProfile?.displayName || currentUser.displayName || '',
+        email: currentUser.email || prev.email,
+        phone: prev.phone || userProfile?.phone || ''
+      }));
+    }
+  }, [userProfile, currentUser]);
 
   // Payment Method
   const [paymentMethod, setPaymentMethod] = useState<'upi' | 'razorpay_cards' | 'cod'>('upi');
@@ -66,7 +91,7 @@ export const CheckoutModal: React.FC = () => {
 
   const handlePlaceOrder = async () => {
     if (!address.fullName || !address.phone || !address.addressLine1 || !address.pincode) {
-      showToast(isMr ? 'कृपया सर्व आवश्यक पत्ता भरा!' : 'Please fill all required address fields!');
+      showToast('Please fill all required address fields!');
       return;
     }
 
@@ -75,7 +100,7 @@ export const CheckoutModal: React.FC = () => {
       const orderItems: OrderItem[] = cart.map(item => ({
         id: item.cartItemId,
         isCustomRecipe: item.isCustomRecipe,
-        titleMr: item.isCustomRecipe && item.customRecipe ? item.customRecipe.customName : item.product?.nameMr || 'Chutney',
+        titleMr: item.isCustomRecipe && item.customRecipe ? item.customRecipe.customName : item.product?.nameEn || 'Chutney',
         titleEn: item.isCustomRecipe && item.customRecipe ? item.customRecipe.customName : item.product?.nameEn || 'Chutney',
         size: item.isCustomRecipe && item.customRecipe ? `${item.customRecipe.packSizeGrams}g` : item.selectedSize || '250g',
         quantity: item.quantity,
@@ -90,7 +115,7 @@ export const CheckoutModal: React.FC = () => {
         subtotal: cartSubtotal,
         shippingFee: deliveryFee,
         discount: discount,
-        couponCode: 'GAVRAN50',
+        couponCode: 'FESTIVE50',
         totalAmount: totalAmount,
         paymentMethod: paymentMethod
       };
@@ -110,7 +135,6 @@ export const CheckoutModal: React.FC = () => {
         refreshOrders();
 
         // Atomic Cloud Firestore Transaction synchronization:
-        // Commits price, quantity, and product metadata atomically to Firestore /orders and /inventory
         await createOrderWithTransactionInFirestore(result.data);
 
         // Trigger celebratory confetti
@@ -133,7 +157,7 @@ export const CheckoutModal: React.FC = () => {
       }
     } catch (err) {
       console.error('Order placement failed:', err);
-      showToast(isMr ? 'ऑर्डर नोंदवताना त्रुटी आली.' : 'Failed to place order.');
+      showToast('Failed to place order. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -143,21 +167,21 @@ export const CheckoutModal: React.FC = () => {
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs overflow-y-auto">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-stone-900/60 backdrop-blur-xs overflow-y-auto">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.95 }}
-          className="bg-white rounded-3xl max-w-2xl w-full overflow-hidden shadow-2xl border border-[#EFE4D8] my-8 relative"
+          className="bg-white rounded-3xl max-w-2xl w-full overflow-hidden shadow-2xl border border-amber-200/80 my-8 relative"
         >
           {/* Header */}
           <div className="p-5 border-b border-amber-200/70 flex items-center justify-between bg-gradient-to-r from-amber-50/80 to-orange-50/80">
             <div className="flex items-center gap-2">
               <span className="text-xl">🌶️</span>
-              <h3 className="font-extrabold text-lg text-stone-900 font-brand">
-                {step === 'address' && (isMr ? 'डिलिव्हरी पत्ता (Shipping Details)' : 'Delivery Address')}
-                {step === 'payment' && (isMr ? 'पेमेंट पद्धत (Select Payment)' : 'Payment Method')}
-                {step === 'success' && (isMr ? 'ऑर्डर निश्चित झाली! (Order Placed)' : 'Order Confirmed!')}
+              <h3 className="font-extrabold text-lg text-stone-900 font-serif">
+                {step === 'address' && 'Delivery Address & Shipping'}
+                {step === 'payment' && 'Select Payment Method'}
+                {step === 'success' && 'Order Confirmed!'}
               </h3>
             </div>
 
@@ -174,73 +198,137 @@ export const CheckoutModal: React.FC = () => {
           {/* STEP 1: Address Details */}
           {step === 'address' && (
             <div className="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+              {/* If user is not logged in, prompt to log in */}
+              {!currentUser && (
+                <div className="p-3 rounded-2xl bg-amber-50/80 border border-amber-200 text-xs text-amber-950 flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-amber-700 shrink-0" />
+                    <span>Have an account with MS Masale?</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAuthMode('login');
+                      setIsAuthModalOpen(true);
+                    }}
+                    className="font-bold text-amber-800 underline hover:text-amber-950 cursor-pointer text-xs"
+                  >
+                    Sign In for 1-Click Saved Addresses
+                  </button>
+                </div>
+              )}
+
+              {/* If user has saved addresses, display quick chips */}
+              {userProfile?.addresses && userProfile.addresses.length > 0 && (
+                <div className="space-y-1.5 pb-2 border-b border-stone-100">
+                  <label className="block text-[11px] font-bold text-stone-600 uppercase tracking-wider">
+                    Select from Saved Addresses:
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {userProfile.addresses.map((saved) => (
+                      <button
+                        key={saved.id}
+                        type="button"
+                        onClick={() => {
+                          setAddress(prev => ({
+                            ...prev,
+                            fullName: saved.fullName,
+                            phone: saved.phone,
+                            addressLine1: saved.addressLine1,
+                            landmark: saved.landmark || '',
+                            talukaDistrict: saved.talukaDistrict,
+                            pincode: saved.pincode
+                          }));
+                          showToast(`Selected ${saved.label} address`);
+                        }}
+                        className="px-3 py-1.5 rounded-xl border text-xs font-semibold flex items-center gap-1.5 bg-stone-50 hover:bg-amber-50 hover:border-amber-400 text-stone-800 transition-colors cursor-pointer"
+                      >
+                        <MapPin className="w-3.5 h-3.5 text-amber-600" />
+                        <span className="font-bold">{saved.label}:</span>
+                        <span className="max-w-[150px] truncate">{saved.addressLine1}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div>
-                  <label className="block text-xs font-bold text-[#2D2424] mb-1">
-                    {isMr ? 'संपूर्ण नाव (Full Name)*:' : 'Full Name*:'}
+                  <label className="block text-xs font-bold text-stone-700 mb-1">
+                    Full Name *:
                   </label>
                   <input
                     type="text"
+                    required
+                    placeholder="e.g. Anand Joshi"
                     value={address.fullName}
                     onChange={(e) => setAddress({ ...address, fullName: e.target.value })}
-                    className="w-full px-3 py-2 text-sm bg-white border border-[#EADFD5] rounded-xl focus:ring-2 focus:ring-[#C84B31] focus:outline-none"
+                    className="w-full px-3 py-2 text-sm bg-white border border-stone-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-[#2D2424] mb-1">
-                    {isMr ? 'मोबाईल नंबर (WhatsApp Number)*:' : 'Phone (WhatsApp)*:'}
+                  <label className="block text-xs font-bold text-stone-700 mb-1">
+                    Phone / WhatsApp Number *:
                   </label>
                   <input
-                    type="text"
+                    type="tel"
+                    required
+                    placeholder="10-digit mobile number"
                     value={address.phone}
                     onChange={(e) => setAddress({ ...address, phone: e.target.value })}
-                    className="w-full px-3 py-2 text-sm bg-white border border-[#EADFD5] rounded-xl focus:ring-2 focus:ring-[#C84B31] focus:outline-none"
+                    className="w-full px-3 py-2 text-sm bg-white border border-stone-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none"
                   />
                 </div>
 
                 <div className="sm:col-span-2">
-                  <label className="block text-xs font-bold text-[#2D2424] mb-1">
-                    {isMr ? 'घर क्र., इमारत / गल्ली (Address Line 1)*:' : 'House/Flat No, Building, Street*:'}
+                  <label className="block text-xs font-bold text-stone-700 mb-1">
+                    House/Flat No, Building, Street Address *:
                   </label>
                   <input
                     type="text"
+                    required
+                    placeholder="e.g. Flat 402, Swamini Heights, Baner Road"
                     value={address.addressLine1}
                     onChange={(e) => setAddress({ ...address, addressLine1: e.target.value })}
-                    className="w-full px-3 py-2 text-sm bg-white border border-[#EADFD5] rounded-xl focus:ring-2 focus:ring-[#C84B31] focus:outline-none"
+                    className="w-full px-3 py-2 text-sm bg-white border border-stone-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-[#2D2424] mb-1">
-                    {isMr ? 'जिल्हा / तालुका (District / City)*:' : 'District / City*:'}
+                  <label className="block text-xs font-bold text-stone-700 mb-1">
+                    City / District *:
                   </label>
                   <select
                     value={address.talukaDistrict}
                     onChange={(e) => setAddress({ ...address, talukaDistrict: e.target.value })}
-                    className="w-full px-3 py-2 text-sm bg-white border border-[#EADFD5] rounded-xl focus:ring-2 focus:ring-[#C84B31] focus:outline-none"
+                    className="w-full px-3 py-2 text-sm bg-white border border-stone-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none"
                   >
-                    <option value="पुणे (Pune)">पुणे (Pune)</option>
-                    <option value="मुंबई / ठाणे (Mumbai / Thane)">मुंबई / ठाणे (Mumbai / Thane)</option>
-                    <option value="सातारा (Satara)">सातारा (Satara)</option>
-                    <option value="सांगली (Sangli)">सांगली (Sangli)</option>
-                    <option value="नाशिक (Nashik)">नाशिक (Nashik)</option>
-                    <option value="अहमदनगर (Ahmednagar)">अहमदनगर (Ahmednagar)</option>
-                    <option value="छत्रपती संभाजीनगर (Sambhaji Nagar)">छत्रपती संभाजीनगर</option>
-                    <option value="नागपूर (Nagpur)">नागपूर (Nagpur)</option>
-                    <option value="लातूर (Latur)">लातूर (Latur)</option>
+                    <option value="Pune">Pune</option>
+                    <option value="Mumbai / Thane">Mumbai / Thane</option>
+                    <option value="Satara">Satara</option>
+                    <option value="Sangli">Sangli</option>
+                    <option value="Nashik">Nashik</option>
+                    <option value="Ahmednagar">Ahmednagar</option>
+                    <option value="Chhatrapati Sambhaji Nagar">Chhatrapati Sambhaji Nagar</option>
+                    <option value="Nagpur">Nagpur</option>
+                    <option value="Kolhapur">Kolhapur</option>
+                    <option value="Other Cities (All India)">Other Cities (All India)</option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-[#2D2424] mb-1">
-                    {isMr ? 'पिनकोड (Pincode)*:' : 'Pincode*:'}
+                  <label className="block text-xs font-bold text-stone-700 mb-1">
+                    Pincode *:
                   </label>
                   <input
                     type="text"
+                    required
+                    maxLength={6}
+                    placeholder="411045"
                     value={address.pincode}
                     onChange={(e) => setAddress({ ...address, pincode: e.target.value })}
-                    className="w-full px-3 py-2 text-sm bg-white border border-[#EADFD5] rounded-xl focus:ring-2 focus:ring-[#C84B31] focus:outline-none"
+                    className="w-full px-3 py-2 text-sm bg-white border border-stone-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none"
                   />
                 </div>
               </div>
@@ -248,21 +336,21 @@ export const CheckoutModal: React.FC = () => {
               {/* Order Summary Preview */}
               <div className="p-3.5 rounded-xl bg-gradient-to-r from-amber-50/70 to-orange-50/70 border border-amber-200/80 text-xs flex justify-between items-center">
                 <div>
-                  <span className="text-stone-600">{isMr ? 'एकूण आयटम्स:' : 'Items:'} {cart.length}</span>
+                  <span className="text-stone-600">Cart Items: {cart.length}</span>
                   <span className="font-extrabold text-amber-900 text-sm block">₹{totalAmount}</span>
                 </div>
                 <button
                   onClick={() => setStep('payment')}
                   className="px-5 py-2.5 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold text-xs sm:text-sm rounded-xl transition-all shadow-md shadow-orange-500/20 flex items-center gap-1.5 cursor-pointer"
                 >
-                  <span>{isMr ? 'पेमेंटकडे जा' : 'Continue to Payment'}</span>
+                  <span>Continue to Payment</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
             </div>
           )}
 
-          {/* STEP 2: Payment Simulation (UPI, Cards, COD) */}
+          {/* STEP 2: Payment (UPI, Cards, COD) */}
           {step === 'payment' && (
             <div className="p-6 space-y-5 max-h-[75vh] overflow-y-auto">
               <div className="space-y-3">
@@ -282,10 +370,10 @@ export const CheckoutModal: React.FC = () => {
                       </div>
                       <div>
                         <div className="font-extrabold text-sm text-stone-900">
-                          {isMr ? 'झटपट UPI (GPay, PhonePe, Paytm, QR)' : 'Instant UPI Transfer'}
+                          Instant UPI Transfer (GPay, PhonePe, Paytm, QR)
                         </div>
                         <div className="text-xs text-stone-500">
-                          {isMr ? 'शून्य ट्रॅन्झॅक्शन फी, त्वरित खात्री' : 'Zero transaction fees, instant confirmation'}
+                          Zero transaction fees, instant confirmation
                         </div>
                       </div>
                     </div>
@@ -325,7 +413,7 @@ export const CheckoutModal: React.FC = () => {
                       {selectedUpiApp === 'qr' && (
                         <div className="p-3 bg-white rounded-xl border border-amber-200 text-center max-w-[200px] mx-auto space-y-1">
                           <QrCode className="w-24 h-24 mx-auto text-stone-800" />
-                          <span className="text-[10px] font-mono font-bold text-stone-700 block">UPI: assalgavran@icici</span>
+                          <span className="text-[10px] font-mono font-bold text-stone-700 block">UPI: msmasale@icici</span>
                           <span className="text-[9px] text-stone-500">Scan with any UPI App</span>
                         </div>
                       )}
@@ -348,7 +436,7 @@ export const CheckoutModal: React.FC = () => {
                     </div>
                     <div>
                       <div className="font-extrabold text-sm text-stone-900">
-                        {isMr ? 'क्रेडिट / डेबिट कार्ड व नेट बँकिंग' : 'Credit / Debit Cards & Netbanking'}
+                        Credit / Debit Cards & Netbanking
                       </div>
                       <div className="text-xs text-stone-500">
                         Visa, MasterCard, RuPay, Netbanking
@@ -372,10 +460,10 @@ export const CheckoutModal: React.FC = () => {
                     </div>
                     <div>
                       <div className="font-extrabold text-sm text-stone-900">
-                        {isMr ? 'कॅश ऑन डिलिव्हरी (COD)' : 'Cash on Delivery (COD)'}
+                        Cash on Delivery (COD)
                       </div>
                       <div className="text-xs text-stone-500">
-                        {isMr ? 'जार हातात मिळाल्यावर पैसे द्या' : 'Pay in cash/UPI upon jar delivery'}
+                        Pay in cash/UPI upon jar delivery at your door
                       </div>
                     </div>
                   </div>
@@ -388,7 +476,7 @@ export const CheckoutModal: React.FC = () => {
                   onClick={() => setStep('address')}
                   className="px-4 py-2 rounded-xl text-xs font-bold text-stone-600 bg-stone-100 hover:bg-stone-200 transition-colors cursor-pointer"
                 >
-                  {isMr ? 'मागे जा' : 'Back'}
+                  Back
                 </button>
 
                 <button
@@ -399,8 +487,8 @@ export const CheckoutModal: React.FC = () => {
                   <ShieldCheck className="w-4 h-4" />
                   <span>
                     {isSubmitting
-                      ? (isMr ? 'प्रक्रिया सुरू आहे...' : 'Processing...')
-                      : (isMr ? `ऑर्डर निश्चित करा (₹${totalAmount})` : `Place Order (₹${totalAmount})`)}
+                      ? 'Processing...'
+                      : `Place Order (₹${totalAmount})`}
                   </span>
                 </button>
               </div>
@@ -416,32 +504,30 @@ export const CheckoutModal: React.FC = () => {
 
               <div>
                 <span className="text-xs px-3 py-1 rounded-full bg-amber-100 text-amber-900 font-bold uppercase tracking-wider">
-                  {isMr ? 'ऑर्डर आयडी:' : 'Order ID:'} #{createdOrder.id}
+                  Order ID: #{createdOrder.id}
                 </span>
-                <h3 className="text-2xl font-extrabold text-stone-900 font-brand mt-3">
-                  {isMr ? 'धन्यवाद! तुमची ऑर्डर नोंदवली गेली आहे' : 'Thank You! Your Order has been placed'}
+                <h3 className="text-2xl font-extrabold text-stone-900 font-serif mt-3">
+                  Thank You! Your Order has been placed
                 </h3>
                 <p className="text-xs sm:text-sm text-stone-600 mt-1 max-w-md mx-auto">
-                  {isMr
-                    ? 'तुमच्या आवडीनुसार खलबत्त्यात ताजी कुटून आम्ही जार तयार करत आहोत. व्हॉट्सॲपवर तुम्हाला तपशील पाठवले आहेत.'
-                    : 'We are blending your artisanal spices fresh in our workshop. WhatsApp confirmation receipt generated!'}
+                  We are blending your artisanal spices fresh in our workshop. WhatsApp confirmation receipt generated!
                 </p>
               </div>
 
               {/* Delivery & OTP Card */}
               <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-50/90 via-orange-50/70 to-rose-50/80 border border-amber-200 text-left text-xs space-y-2 max-w-md mx-auto shadow-2xs">
                 <div className="flex justify-between items-center">
-                  <span className="font-semibold text-stone-600">{isMr ? 'डिलिव्हरी पार्टनर:' : 'Delivery Partner:'}</span>
+                  <span className="font-semibold text-stone-600">Delivery Partner:</span>
                   <span className="font-bold text-stone-900">{createdOrder.assignedDeliveryPerson?.name}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="font-semibold text-stone-600">{isMr ? 'डिलिव्हरी सिक्युरिटी OTP:' : 'Delivery Verification OTP:'}</span>
+                  <span className="font-semibold text-stone-600">Delivery Verification OTP:</span>
                   <span className="text-sm font-mono font-extrabold text-amber-900 bg-white px-2 py-0.5 rounded border border-amber-200 shadow-2xs">
                     {createdOrder.deliveryOtp}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="font-semibold text-stone-600">{isMr ? 'अपेक्षित वितरण:' : 'Est. Delivery:'}</span>
+                  <span className="font-semibold text-stone-600">Est. Delivery:</span>
                   <span className="font-bold text-emerald-700">{createdOrder.estimatedDeliveryDate}</span>
                 </div>
               </div>
@@ -457,14 +543,14 @@ export const CheckoutModal: React.FC = () => {
                   className="px-5 py-3 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white text-xs font-extrabold shadow-md shadow-orange-500/20 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <FileText className="w-4 h-4" />
-                  <span>{isMr ? '📄 कर बीजक (Tax Invoice) डाउनलोड करा' : '📄 Download Tax Invoice'}</span>
+                  <span>Download Tax Invoice</span>
                 </button>
 
                 <button
                   onClick={() => setIsCheckoutOpen(false)}
                   className="px-5 py-3 rounded-2xl bg-stone-100 hover:bg-stone-200 text-stone-800 text-xs font-bold transition-all cursor-pointer"
                 >
-                  {isMr ? 'खरेदी चालू ठेवा' : 'Continue Shopping'}
+                  Continue Shopping
                 </button>
               </div>
             </div>

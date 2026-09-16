@@ -15,7 +15,10 @@ import {
   ShieldCheck,
   Truck,
   CheckCircle2,
-  Sparkles
+  Sparkles,
+  ArrowRight,
+  LayoutGrid,
+  StretchHorizontal
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useAuth } from '../context/AuthContext';
@@ -23,6 +26,7 @@ import { ProductCard } from './ProductCard';
 import { LiveDeliveryTrackerModal } from './LiveDeliveryTrackerModal';
 import { Order, Product } from '../types';
 import { ProductVisual } from './ProductVisual';
+import { BogoBanner } from './BogoBanner';
 import { 
   CategorySortFilterControl, 
   SortOption, 
@@ -42,9 +46,12 @@ export const CustomerPortal: React.FC = () => {
     setIsCartOpen, 
     setSelectedProductDetail, 
     products, 
-    categories: dynamicCategories 
+    categories: dynamicCategories,
+    language,
+    showToast
   } = useApp();
   const { currentUser, setIsAuthModalOpen, setAuthMode } = useAuth();
+  const isMr = language === 'mr';
 
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -57,17 +64,17 @@ export const CustomerPortal: React.FC = () => {
   const [priceFilter, setPriceFilter] = useState<PriceFilterOption>('all');
   const [popularityFilter, setPopularityFilter] = useState<PopularityFilterOption>('all');
 
-  // Classic, simple category list with primary categories for Chutneys and Achar / Lonach
+  // Classic, simple category list with primary categories for Chutneys and Pickles
   const categories = [
-    { id: 'all', name: 'All Products (सर्व उत्पादने)' },
-    { id: 'chutneys', name: 'Chutneys (चटण्या)' },
-    { id: 'achar-lonach', name: 'Achar / Lonach (लोणचं / आचार)' },
-    { id: 'masala', name: 'Masales (मसाले)' },
-    { id: 'thecha', name: 'Thecha (ठेचा)' },
-    { id: 'metkut', name: 'Metkut (मेतकूट)' },
+    { id: 'all', name: 'All Products' },
+    { id: 'chutneys', name: 'Chutneys' },
+    { id: 'achar-lonach', name: 'Pickles' },
+    { id: 'masala', name: 'Masalas' },
+    { id: 'thecha', name: 'Thecha' },
+    { id: 'metkut', name: 'Metkut' },
     ...dynamicCategories
       .filter(dc => !['all', 'masala', 'pickles', 'achar-lonach', 'thecha', 'dry-chutneys', 'chutneys', 'metkut', 'bestsellers', 'healthy', 'chutney', 'pickle', 'specialty'].includes(dc.id))
-      .map(dc => ({ id: dc.id, name: `${dc.nameEn} (${dc.nameMr})` }))
+      .map(dc => ({ id: dc.id, name: dc.nameEn }))
   ];
 
   const getProductMinPrice = (p: Product) => {
@@ -158,231 +165,42 @@ export const CustomerPortal: React.FC = () => {
 
   const kandaProduct = products.find(p => p.id === 'prod-kanda-lasun') || products[0];
 
+  const scrollToCatalog = (cat?: string) => {
+    setActiveSection('catalog');
+    if (cat) setSelectedCategory(cat);
+    setTimeout(() => {
+      const el = document.getElementById('catalog-grid-section') || document.getElementById('browse-masale-catalog');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 60);
+  };
+
+  const [mobileDensity, setMobileDensity] = useState<'comfortable' | 'compact'>('comfortable');
+
   return (
-    <div className="space-y-8 pb-16">
-      {/* 1. Light Gradient Hero Banner */}
-      <section className="mx-4 sm:mx-6 lg:mx-8 rounded-2xl p-6 sm:p-10 bg-gradient-to-br from-amber-100/90 via-orange-50/95 to-rose-100/80 text-stone-900 shadow-sm border border-amber-200/80">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-          
-          {/* Left Column: Strictly MS Masale, Contact & Fast Actions */}
-          <div className="lg:col-span-7 space-y-4">
-            {/* Title: Strictly MS Masale without brand tagline */}
-            <h1 className="text-3xl sm:text-5xl font-black font-serif text-stone-900 tracking-tight">
-              MS Masale
-            </h1>
+    <div className="space-y-6 sm:space-y-8 pb-16">
+      {/* Promotional Buy 1 Get 1 Free Banner */}
+      <BogoBanner
+        language={language}
+        onClaimOffer={() => {
+          showToast('🎁 BOGO Offer: Buy 1 Get 1 Free on Shengdana Peanut Chutney!');
+          const shengdana = products.find(p => p.id === 'prod-shengdana-chutney');
+          if (shengdana) {
+            setSelectedProductDetail(shengdana);
+          } else {
+            scrollToCatalog('chutneys');
+          }
+        }}
+        onExploreAll={() => {
+          scrollToCatalog('all');
+        }}
+      />
 
-            <p className="text-sm sm:text-base text-stone-700 max-w-xl leading-relaxed">
-              Spices, masalas, chutneys, and condiments made with pure ingredients and traditional recipes. Delivered fresh to your home.
-            </p>
-
-            {/* Direct Contact & Action Buttons */}
-            <div className="pt-2 flex flex-wrap items-center gap-3">
-              <button
-                onClick={() => {
-                  setActiveSection('catalog');
-                  setSelectedCategory('all');
-                }}
-                className="px-6 py-3 font-bold text-xs sm:text-sm rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white transition-all shadow-xs cursor-pointer"
-              >
-                Order Online
-              </button>
-
-              <button
-                onClick={() => {
-                  setActiveSection('catalog');
-                  setSelectedCategory('chutneys');
-                }}
-                className="px-4 py-3 font-bold text-xs sm:text-sm rounded-xl bg-white hover:bg-amber-50/80 text-stone-900 border border-amber-300/80 transition-all shadow-2xs cursor-pointer flex items-center gap-1.5"
-              >
-                <Sparkles className="w-4 h-4 text-amber-600" />
-                <span>Chutneys (चटण्या)</span>
-              </button>
-
-              <button
-                onClick={() => {
-                  setActiveSection('catalog');
-                  setSelectedCategory('achar-lonach');
-                }}
-                className="px-4 py-3 font-bold text-xs sm:text-sm rounded-xl bg-white hover:bg-amber-50/80 text-stone-900 border border-amber-300/80 transition-all shadow-2xs cursor-pointer flex items-center gap-1.5"
-              >
-                <Flame className="w-4 h-4 text-amber-600" />
-                <span>Achar / Lonach (लोणचं)</span>
-              </button>
-
-              <button
-                onClick={() => {
-                  setActiveSection('catalog');
-                  setSelectedCategory('masala');
-                }}
-                className="px-4 py-3 font-bold text-xs sm:text-sm rounded-xl bg-white hover:bg-amber-50/80 text-stone-900 border border-amber-300/80 transition-all shadow-2xs cursor-pointer flex items-center gap-1.5"
-              >
-                <Flame className="w-4 h-4 text-amber-600" />
-                <span>Masales (मसाले)</span>
-              </button>
-
-              {/* Direct Phone Call Button */}
-              <a
-                href="tel:8591254237"
-                className="px-5 py-3 font-bold text-xs sm:text-sm rounded-xl bg-white hover:bg-amber-50/80 text-amber-900 border border-amber-200/80 transition-all shadow-2xs flex items-center gap-2"
-              >
-                <Phone className="w-4 h-4 text-amber-600" />
-                <span>Call: 8591254237</span>
-              </a>
-
-              {/* Direct WhatsApp Button */}
-              <a
-                href="https://wa.me/918591254237?text=Hello%20MS%20Masale,%20I%20want%20to%20order"
-                target="_blank"
-                rel="noreferrer"
-                className="px-4 py-3 font-bold text-xs sm:text-sm rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white transition-all shadow-xs flex items-center gap-2"
-              >
-                <MessageSquare className="w-4 h-4 text-emerald-100" />
-                <span>WhatsApp: 8591254237</span>
-              </a>
-            </div>
-
-            {/* Simple Contact Banner Badge */}
-            <div className="pt-1 text-xs text-stone-700 flex items-center gap-2">
-              <span className="font-semibold">Helpline & Orders:</span>
-              <a href="tel:8591254237" className="font-mono font-bold text-amber-900 underline">
-                8591254237
-              </a>
-              <span className="text-stone-500">• Fast Home Delivery</span>
-            </div>
-          </div>
-
-          {/* Right Column: Clean Product Showcase Image */}
-          <div className="lg:col-span-5 flex items-center justify-center mt-6 lg:mt-0">
-            <div 
-              onClick={() => {
-                if (kandaProduct) setSelectedProductDetail(kandaProduct);
-              }}
-              className="w-full max-w-xs sm:max-w-sm aspect-4/3 rounded-2xl overflow-hidden border border-amber-200/90 shadow-md hover:shadow-xl hover:shadow-amber-500/20 hover:border-amber-400 transition-all duration-500 cursor-pointer bg-white group group/hero relative"
-            >
-              {kandaProduct && (
-                <ProductVisual
-                  product={kandaProduct}
-                  imageUrl={kandaProduct.imageUrl}
-                  name={kandaProduct.nameEn}
-                  aspectRatio="wide"
-                  className="w-full h-full"
-                />
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* 3 Simple Pillars */}
-        <div className="mt-8 pt-6 border-t border-amber-200/80 grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs text-stone-700">
-          <div className="flex items-center gap-3">
-            <ShieldCheck className="w-5 h-5 text-amber-600 shrink-0" />
-            <div>
-              <div className="font-bold text-stone-900">100% Pure & Traditional</div>
-              <div className="text-[11px] text-stone-600">No chemical preservatives</div>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <Truck className="w-5 h-5 text-amber-600 shrink-0" />
-            <div>
-              <div className="font-bold text-stone-900">Express Home Delivery</div>
-              <div className="text-[11px] text-stone-600">Packed fresh upon order</div>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <Phone className="w-5 h-5 text-amber-600 shrink-0" />
-            <div>
-              <div className="font-bold text-stone-900">Direct Phone Ordering</div>
-              <div className="text-[11px] text-stone-600">Call or WhatsApp: 8591254237</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 2. Navigation Tabs (Light Gradient) */}
-      <div className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none p-1.5 rounded-xl bg-gradient-to-r from-white via-amber-50/60 to-orange-50/50 border border-amber-200/70 shadow-2xs w-fit">
-          <button
-            onClick={() => {
-              setActiveSection('catalog');
-              setSelectedCategory('all');
-            }}
-            className={`px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all cursor-pointer ${
-              activeSection === 'catalog' && selectedCategory === 'all'
-                ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-xs'
-                : 'text-stone-700 hover:text-stone-950 hover:bg-amber-100/60'
-            }`}
-          >
-            All Products
-          </button>
-
-          <button
-            onClick={() => {
-              setActiveSection('catalog');
-              setSelectedCategory('chutneys');
-            }}
-            className={`px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-              activeSection === 'catalog' && (selectedCategory === 'chutneys' || selectedCategory === 'chutney' || selectedCategory === 'dry-chutneys')
-                ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-xs'
-                : 'text-stone-700 hover:text-stone-950 hover:bg-amber-100/60'
-            }`}
-          >
-            <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-            <span>Chutneys (चटण्या)</span>
-          </button>
-
-          <button
-            onClick={() => {
-              setActiveSection('catalog');
-              setSelectedCategory('achar-lonach');
-            }}
-            className={`px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-              activeSection === 'catalog' && (selectedCategory === 'achar-lonach' || selectedCategory === 'pickle' || selectedCategory === 'pickles')
-                ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-xs'
-                : 'text-stone-700 hover:text-stone-950 hover:bg-amber-100/60'
-            }`}
-          >
-            <Flame className="w-3.5 h-3.5 text-amber-600" />
-            <span>Achar / Lonach (लोणचं)</span>
-          </button>
-
-          <button
-            onClick={() => {
-              setActiveSection('catalog');
-              setSelectedCategory('masala');
-            }}
-            className={`px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-              activeSection === 'catalog' && selectedCategory === 'masala'
-                ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-xs'
-                : 'text-stone-700 hover:text-stone-950 hover:bg-amber-100/60'
-            }`}
-          >
-            <Flame className="w-3.5 h-3.5 text-amber-600" />
-            <span>Masales (मसाले)</span>
-          </button>
-
-          <button
-            onClick={() => setActiveSection('orders')}
-            className={`px-4 py-2 rounded-lg text-xs sm:text-sm font-bold transition-all cursor-pointer relative ${
-              activeSection === 'orders'
-                ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-xs'
-                : 'text-stone-700 hover:text-stone-950 hover:bg-amber-100/60'
-            }`}
-          >
-            <span>My Orders</span>
-            {orders.length > 0 && (
-              <span className="ml-1.5 px-1.5 py-0.2 rounded-full text-[10px] font-black bg-amber-400 text-stone-950">
-                {orders.length}
-              </span>
-            )}
-          </button>
-        </div>
-      </div>
-
-      {/* 3. Main Content: Catalog or Orders */}
+      {/* Main Content: Catalog or Orders */}
       {activeSection === 'catalog' && (
-        <section id="catalog-grid-section" className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-6">
+        <section id="catalog-grid-section" data-anchor="browse-masale-catalog" className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-6">
+          <div id="browse-masale-catalog" className="-mt-8 pt-8" />
           
           {/* Light Gradient Search Bar */}
           <div className="bg-gradient-to-r from-white via-[#FFFDF9] to-amber-50/40 p-3 sm:p-4 rounded-xl border border-amber-200/70 shadow-xs flex items-center gap-3">
@@ -409,11 +227,11 @@ export const CustomerPortal: React.FC = () => {
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pt-1">
             <div>
               <h2 className="text-2xl font-bold text-stone-900 font-serif">
-                {(selectedCategory === 'chutneys' || selectedCategory === 'chutney' || selectedCategory === 'dry-chutneys') ? 'Chutneys (चटण्या)' : 
-                 (selectedCategory === 'achar-lonach' || selectedCategory === 'pickle' || selectedCategory === 'pickles') ? 'Achar / Lonach (लोणचं / आचार)' : 
-                 selectedCategory === 'masala' ? 'Masales (मसाले)' : 
-                 selectedCategory === 'thecha' ? 'Thecha (ठेचा)' : 
-                 selectedCategory === 'metkut' ? 'Metkut (मेतकूट)' : 
+                {(selectedCategory === 'chutneys' || selectedCategory === 'chutney' || selectedCategory === 'dry-chutneys') ? 'Chutneys' : 
+                 (selectedCategory === 'achar-lonach' || selectedCategory === 'pickle' || selectedCategory === 'pickles') ? 'Pickles' : 
+                 selectedCategory === 'masala' ? 'Masalas' : 
+                 selectedCategory === 'thecha' ? 'Thecha' : 
+                 selectedCategory === 'metkut' ? 'Metkut' : 
                  'All Products'}
               </h2>
               <p className="text-xs text-stone-500 mt-0.5">
@@ -422,13 +240,16 @@ export const CustomerPortal: React.FC = () => {
             </div>
 
             {/* Category Filter Pills */}
-            <div className="flex flex-wrap gap-1.5">
+            <div className="flex flex-wrap items-center gap-1.5">
               {categories.map(cat => (
                 <button
                   key={cat.id}
-                  onClick={() => setSelectedCategory(cat.id)}
+                  onClick={() => {
+                    setActiveSection('catalog');
+                    setSelectedCategory(cat.id);
+                  }}
                   className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                    selectedCategory === cat.id
+                    activeSection === 'catalog' && selectedCategory === cat.id
                       ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-xs'
                       : 'bg-white text-stone-700 border border-amber-200/80 hover:bg-amber-50/70 hover:border-amber-300'
                   }`}
@@ -436,6 +257,23 @@ export const CustomerPortal: React.FC = () => {
                   {cat.name}
                 </button>
               ))}
+
+              <button
+                onClick={() => setActiveSection(activeSection === 'orders' ? 'catalog' : 'orders')}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
+                  activeSection === 'orders'
+                    ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-xs'
+                    : 'bg-white text-stone-700 border border-amber-200/80 hover:bg-amber-50/70 hover:border-amber-300'
+                }`}
+              >
+                <ShoppingBag className="w-3.5 h-3.5 text-amber-600" />
+                <span>My Orders</span>
+                {orders.length > 0 && (
+                  <span className="px-1.5 py-0.2 rounded-full text-[10px] font-black bg-amber-400 text-stone-950">
+                    {orders.length}
+                  </span>
+                )}
+              </button>
             </div>
           </div>
 
@@ -459,7 +297,7 @@ export const CustomerPortal: React.FC = () => {
               <div className="flex items-center gap-3">
                 <Flame className="w-5 h-5 text-amber-600 shrink-0" />
                 <div className="text-xs">
-                  <strong className="text-stone-900 font-serif text-sm block">मसाले (Pure Masales)</strong>
+                  <strong className="text-stone-900 font-serif text-sm block">Pure Masalas</strong>
                   Order signature cooking spices separately in 100g, 250g, 500g, or 1kg packs.
                 </div>
               </div>
@@ -472,9 +310,51 @@ export const CustomerPortal: React.FC = () => {
             </div>
           )}
 
-          {/* Product Cards Grid */}
+          {/* Product Grid View Density & Count Header */}
+          <div className="flex items-center justify-between gap-3 pt-1">
+            <div className="text-xs sm:text-sm font-medium text-stone-600">
+              Showing <span className="font-bold text-stone-900">{sortedAndFilteredProducts.length}</span> handcrafted products
+            </div>
+
+            {/* Mobile / Tablet Density Switcher */}
+            <div className="flex items-center gap-1 bg-white p-1 rounded-xl border border-stone-200 shadow-2xs text-xs">
+              <button
+                type="button"
+                onClick={() => setMobileDensity('comfortable')}
+                title="Spacious View (Full Width)"
+                className={`px-2.5 py-1 rounded-lg font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                  mobileDensity === 'comfortable'
+                    ? 'bg-amber-600 text-white shadow-xs'
+                    : 'text-stone-600 hover:text-stone-900 hover:bg-stone-100'
+                }`}
+              >
+                <StretchHorizontal className="w-3.5 h-3.5" />
+                <span>Spacious</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setMobileDensity('compact')}
+                title="Compact Grid View"
+                className={`px-2.5 py-1 rounded-lg font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                  mobileDensity === 'compact'
+                    ? 'bg-amber-600 text-white shadow-xs'
+                    : 'text-stone-600 hover:text-stone-900 hover:bg-stone-100'
+                }`}
+              >
+                <LayoutGrid className="w-3.5 h-3.5" />
+                <span>Compact</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Spacious & Breathable Product Cards Grid */}
           {sortedAndFilteredProducts.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
+            <div className={`grid ${
+              mobileDensity === 'compact' 
+                ? 'grid-cols-2 gap-3.5 sm:gap-6' 
+                : 'grid-cols-1 gap-6 sm:gap-6'
+            } sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 lg:gap-8`}>
               {sortedAndFilteredProducts.map(product => (
                 <ProductCard
                   key={product.id}
@@ -546,13 +426,22 @@ export const CustomerPortal: React.FC = () => {
               </p>
             </div>
 
-            <button
-              onClick={handleRefresh}
-              className="px-3.5 py-1.5 rounded-lg border border-stone-200 bg-white hover:bg-stone-50 text-stone-700 text-xs font-semibold flex items-center gap-1.5 shadow-2xs cursor-pointer"
-            >
-              <RefreshCw className={`w-3.5 h-3.5 text-stone-600 ${isRefreshing ? 'animate-spin' : ''}`} />
-              <span>Refresh Status</span>
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setActiveSection('catalog')}
+                className="px-3 py-1.5 rounded-lg border border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-900 text-xs font-bold flex items-center gap-1.5 shadow-2xs cursor-pointer transition-colors"
+              >
+                <span>← Back to Products</span>
+              </button>
+
+              <button
+                onClick={handleRefresh}
+                className="px-3.5 py-1.5 rounded-lg border border-stone-200 bg-white hover:bg-stone-50 text-stone-700 text-xs font-semibold flex items-center gap-1.5 shadow-2xs cursor-pointer"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 text-stone-600 ${isRefreshing ? 'animate-spin' : ''}`} />
+                <span>Refresh Status</span>
+              </button>
+            </div>
           </div>
 
           {orders.length === 0 ? (

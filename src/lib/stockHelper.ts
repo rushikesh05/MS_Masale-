@@ -61,9 +61,9 @@ export function getProductStockInfo(product: Product, selectedSize?: string): St
       isLowStock: false,
       isOutOfStock: true,
       badgeTextEn: 'Out of Stock',
-      badgeTextMr: 'साठा संपला',
+      badgeTextMr: 'Out of Stock',
       detailTextEn: 'Batch sold out • Restocking soon',
-      detailTextMr: 'बॅच संपली • लवकरच उपलब्ध होईल',
+      detailTextMr: 'Batch sold out • Restocking soon',
       urgencyLevel: 'none'
     };
   }
@@ -94,9 +94,9 @@ export function getProductStockInfo(product: Product, selectedSize?: string): St
       isLowStock: false,
       isOutOfStock: true,
       badgeTextEn: 'Out of Stock',
-      badgeTextMr: 'साठा संपला',
+      badgeTextMr: 'Out of Stock',
       detailTextEn: 'Sold out • New batch in progress',
-      detailTextMr: 'साठा संपला • नवीन बॅच तयार होत आहे',
+      detailTextMr: 'Sold out • New batch in progress',
       urgencyLevel: 'none'
     };
   }
@@ -109,9 +109,9 @@ export function getProductStockInfo(product: Product, selectedSize?: string): St
       isLowStock: true,
       isOutOfStock: false,
       badgeTextEn: isVeryLow ? `Only ${stockCount} left!` : `Low Stock: ${stockCount} left`,
-      badgeTextMr: isVeryLow ? `फक्त ${stockCount} शिल्लक!` : `कमी साठा: ${stockCount} शिल्लक`,
+      badgeTextMr: isVeryLow ? `Only ${stockCount} left!` : `Low Stock: ${stockCount} left`,
       detailTextEn: isVeryLow ? `Hurry, only ${stockCount} packs left in current batch` : `Only ${stockCount} packs left in stock`,
-      detailTextMr: isVeryLow ? `त्वरा करा, चालू बॅचमध्ये फक्त ${stockCount} पॅक शिल्लक आहेत` : `चालू साठ्यात फक्त ${stockCount} पॅक शिल्लक`,
+      detailTextMr: isVeryLow ? `Hurry, only ${stockCount} packs left in current batch` : `Only ${stockCount} packs left in stock`,
       urgencyLevel: isVeryLow ? 'high' : 'medium'
     };
   }
@@ -122,9 +122,9 @@ export function getProductStockInfo(product: Product, selectedSize?: string): St
     isLowStock: false,
     isOutOfStock: false,
     badgeTextEn: 'In Stock',
-    badgeTextMr: 'शिल्लक उपलब्ध',
+    badgeTextMr: 'In Stock',
     detailTextEn: `In Stock (${stockCount} packs available • Fresh batch)`,
-    detailTextMr: `शिल्लक उपलब्ध (${stockCount} पॅक उपलब्ध • ताजी घाणी)`,
+    detailTextMr: `In Stock (${stockCount} packs available • Fresh batch)`,
     urgencyLevel: 'normal'
   };
 }

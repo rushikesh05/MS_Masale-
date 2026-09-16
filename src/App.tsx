@@ -6,12 +6,12 @@ import { Footer } from './components/Footer';
 import { CustomerPortal } from './components/CustomerPortal';
 import { ManagerPortal } from './components/ManagerPortal';
 import { DeliveryPartnerPortal } from './components/DeliveryPartnerPortal';
-import { AdminPortal } from './components/AdminPortal';
 import { SmartCartDrawer } from './components/SmartCartDrawer';
 import { ProductDetailModal } from './components/ProductDetailModal';
 import { CheckoutModal } from './components/CheckoutModal';
 import { MockWhatsAppModal } from './components/MockWhatsAppModal';
 import { AuthModal } from './components/AuthModal';
+import { AccountModal } from './components/AccountModal';
 import { InvoiceModal } from './components/InvoiceModal';
 import { motion, AnimatePresence } from 'motion/react';
 import { Sparkles, Flame } from 'lucide-react';
@@ -145,18 +145,6 @@ const AppContent: React.FC = () => {
                     <DeliveryPartnerPortal />
                   </motion.div>
                 )}
-
-                {role === 'admin' && (
-                  <motion.div
-                    key="admin"
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -8 }}
-                    transition={{ duration: 0.25 }}
-                  >
-                    <AdminPortal />
-                  </motion.div>
-                )}
               </AnimatePresence>
             </main>
 
@@ -166,6 +154,7 @@ const AppContent: React.FC = () => {
             <CheckoutModal />
             <MockWhatsAppModal />
             <AuthModal />
+            <AccountModal />
             <InvoiceModal
               order={selectedInvoiceOrder}
               isOpen={isInvoiceModalOpen}

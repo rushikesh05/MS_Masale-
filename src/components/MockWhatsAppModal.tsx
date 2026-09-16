@@ -108,10 +108,10 @@ export const MockWhatsAppModal: React.FC = () => {
             <div className="flex justify-start">
               <div className="bg-[#202C33] max-w-[85%] rounded-2xl rounded-tl-none p-3 shadow-md border border-[#2A3942]/50 text-xs text-[#E9EDEF]">
                 <p className="font-semibold text-[#00A884] text-[11px] mb-1">
-                  🌶️ एम एस मसाले (MS Masale)
+                  🌶️ MS Masale Customer Care
                 </p>
                 <p className="leading-relaxed">
-                  नमस्कार! एम एस मसाले परिवारात आपले स्वागत आहे. तुमची ऑर्डर अपडेट खालीलप्रमाणे आहे:
+                  Hello! Welcome to the MS Masale family. Your live order update is given below:
                 </p>
                 <span className="text-[9px] text-[#8696A0] float-right mt-1">10:00 AM</span>
               </div>

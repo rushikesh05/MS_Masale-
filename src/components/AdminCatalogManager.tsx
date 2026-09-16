@@ -29,7 +29,6 @@ import {
 import { useApp } from '../context/AppContext';
 import { Product, ProductCategory, ProductSize } from '../types';
 import { ProductVisual } from './ProductVisual';
-import { AIImagenPackagingStudio } from './AIImagenPackagingStudio';
 
 export interface ImagePresetItem {
   id: string;
@@ -198,7 +197,6 @@ export const AdminCatalogManager: React.FC = () => {
 
   // Modal State for Products
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
-  const [isAiPackagingModalOpen, setIsAiPackagingModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [productToDelete, setProductToDelete] = useState<Product | null>(null);
 
@@ -1230,14 +1228,6 @@ export const AdminCatalogManager: React.FC = () => {
                         </div>
                       </div>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => setIsAiPackagingModalOpen(true)}
-                      className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-[#C84B31] text-white text-xs font-bold flex items-center gap-1 shadow-xs hover:shadow-md transition cursor-pointer shrink-0"
-                    >
-                      <Sparkles className="w-3.5 h-3.5" />
-                      <span>Generate with AI</span>
-                    </button>
                   </div>
                 </div>
 
@@ -1425,52 +1415,6 @@ export const AdminCatalogManager: React.FC = () => {
                   </button>
                 </div>
               </form>
-            </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
-
-      {/* AI IMAGEN PACKAGING MODAL */}
-      <AnimatePresence>
-        {isAiPackagingModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/75 backdrop-blur-sm overflow-y-auto">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.96 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.96 }}
-              className="bg-white rounded-3xl border border-stone-200 w-full max-w-5xl shadow-2xl overflow-hidden max-h-[92vh] flex flex-col"
-            >
-              <div className="flex items-center justify-between p-4 px-6 border-b border-stone-100 bg-stone-50/80">
-                <div className="flex items-center gap-2">
-                  <span className="p-1.5 rounded-lg bg-amber-500 text-white">
-                    <Sparkles className="w-4 h-4" />
-                  </span>
-                  <div>
-                    <h3 className="font-bold text-sm text-stone-900">AI Imagen Packaging Generator</h3>
-                    <p className="text-[11px] text-stone-500">Generating branded label packaging for "{formData.nameMr || 'Product'}"</p>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setIsAiPackagingModalOpen(false)}
-                  className="p-1.5 rounded-lg text-stone-400 hover:text-stone-700 hover:bg-stone-200 transition cursor-pointer"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              <div className="p-4 sm:p-6 overflow-y-auto flex-1">
-                <AIImagenPackagingStudio
-                  compact={true}
-                  initialProductName={formData.nameMr || ''}
-                  initialProductId={editingProduct?.id || ''}
-                  onApplyToProduct={(url) => {
-                    setFormData(prev => ({ ...prev, imageUrl: url }));
-                    setIsAiPackagingModalOpen(false);
-                    showToast('AI packaging photo applied!');
-                  }}
-                />
-              </div>
             </motion.div>
           </div>
         )}
