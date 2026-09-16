@@ -156,15 +156,29 @@ export const ManagerPortal: React.FC = () => {
     setIsLoading(true);
     try {
       const ordRes = await fetch('/api/orders');
-      const ordData = await ordRes.json();
-      if (ordData.success) {
-        setOrders(ordData.data);
+      const contentType = ordRes.headers.get('content-type') || '';
+      if (ordRes.ok && contentType.includes('application/json')) {
+        const ordData = await ordRes.json();
+        if (ordData.success && Array.isArray(ordData.data)) {
+          setOrders(ordData.data);
+          return;
+        }
       }
     } catch (e) {
-      console.error('Manager data fetch error:', e);
+      console.warn('Manager orders fetch fallback to local cache:', e);
     } finally {
       setIsLoading(false);
     }
+
+    try {
+      const cached = localStorage.getItem('assal_gavran_orders');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setOrders(parsed);
+        }
+      }
+    } catch (e) {}
   };
 
   useEffect(() => {
@@ -173,26 +187,40 @@ export const ManagerPortal: React.FC = () => {
 
   const handleUpdateOrderStatus = async (orderId: string, newStatus: string) => {
     try {
-      const res = await fetch(`/api/orders/${orderId}/status`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: newStatus })
-      });
-      const data = await res.json();
-      if (data.success) {
-        // Cloud Firestore Synchronization
-        updateOrderStatusInFirestore(orderId, newStatus as any);
-        
-        // If transitioning to blending, simulate kitchen mortar deduction in Firestore
-        const targetOrder = orders.find(o => o.id === orderId);
-        if (targetOrder && newStatus === 'blending_in_workshop') {
-          deductInventoryForOrderInFirestore(rawStocks, targetOrder);
+      try {
+        const res = await fetch(`/api/orders/${orderId}/status`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: newStatus })
+        });
+        const contentType = res.headers.get('content-type') || '';
+        if (res.ok && contentType.includes('application/json')) {
+          await res.json();
         }
-
-        showToast(isMr ? `ऑर्डर #${orderId} स्थिती अपडेट झाली!` : `Order #${orderId} status updated!`);
-        loadOrders();
-        refreshOrders();
+      } catch (apiErr) {
+        console.warn('Backend API status route note (applying locally/Firestore):', apiErr);
       }
+
+      // Update state locally and in localStorage
+      setOrders(prev => {
+        const updated = prev.map(o => o.id === orderId ? { ...o, orderStatus: newStatus as any } : o);
+        try {
+          localStorage.setItem('assal_gavran_orders', JSON.stringify(updated));
+        } catch (e) {}
+        return updated;
+      });
+
+      // Cloud Firestore Synchronization
+      updateOrderStatusInFirestore(orderId, newStatus as any);
+      
+      // If transitioning to blending, simulate kitchen mortar deduction in Firestore
+      const targetOrder = orders.find(o => o.id === orderId);
+      if (targetOrder && newStatus === 'blending_in_workshop') {
+        deductInventoryForOrderInFirestore(rawStocks, targetOrder);
+      }
+
+      showToast(isMr ? `ऑर्डर #${orderId} स्थिती अपडेट झाली!` : `Order #${orderId} status updated!`);
+      refreshOrders();
     } catch (e) {
       console.error('Status update failed:', e);
     }

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { UserRole, Language, CartItem, Product, ProductCategory, CustomChutneyConfig, WhatsAppNotification, Order } from '../types';
-import { PRODUCTS, INITIAL_CATEGORIES } from '../data/initialData';
+import { PRODUCTS, INITIAL_CATEGORIES, INITIAL_ORDERS } from '../data/initialData';
 import { 
   subscribeToProducts, 
   subscribeToCategories, 
@@ -10,6 +10,7 @@ import {
   deleteCategoryFromFirestore,
   seedCatalogToFirestore 
 } from '../lib/firestoreService';
+import { subscribeToOrders } from '../lib/firestoreSync';
 
 export type AppTheme = 'express' | 'crimson' | 'sahyadri' | 'konkan';
 
@@ -80,6 +81,7 @@ interface AppContextType {
   orders: Order[];
   recentOrders: Order[];
   refreshOrders: () => Promise<void>;
+  addLocalOrder: (order: Order) => void;
   
   // App initialization state
   isInitializing: boolean;
@@ -311,17 +313,88 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setIsWhatsAppModalOpen(true);
   };
 
+  const addLocalOrder = (order: Order) => {
+    setRecentOrders(prev => {
+      const exists = prev.some(o => o.id === order.id);
+      const updated = exists ? prev.map(o => o.id === order.id ? order : o) : [order, ...prev];
+      try {
+        localStorage.setItem('assal_gavran_orders', JSON.stringify(updated));
+      } catch (e) {
+        console.warn('Failed to cache orders locally:', e);
+      }
+      return updated;
+    });
+  };
+
   const refreshOrders = async () => {
     try {
       const res = await fetch('/api/orders');
-      const data = await res.json();
-      if (data.success) {
-        setRecentOrders(data.data);
+      const contentType = res.headers.get('content-type') || '';
+      if (res.ok && contentType.includes('application/json')) {
+        const data = await res.json();
+        if (data.success && Array.isArray(data.data)) {
+          setRecentOrders(data.data);
+          try {
+            localStorage.setItem('assal_gavran_orders', JSON.stringify(data.data));
+          } catch (e) {}
+          return;
+        }
       }
     } catch (e) {
-      console.error('Failed to load orders:', e);
+      console.warn('API /api/orders endpoint unreachable (e.g. static/Vercel host):', e);
     }
+
+    // Fallback: Read from localStorage or initial seed orders
+    try {
+      const cached = localStorage.getItem('assal_gavran_orders');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setRecentOrders(parsed);
+          return;
+        }
+      }
+    } catch (e) {}
+    setRecentOrders(INITIAL_ORDERS);
   };
+
+  // Immediate mount cache restore & real-time Firestore order synchronization
+  useEffect(() => {
+    try {
+      const cached = localStorage.getItem('assal_gavran_orders');
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setRecentOrders(parsed);
+        } else {
+          setRecentOrders(INITIAL_ORDERS);
+        }
+      } else {
+        setRecentOrders(INITIAL_ORDERS);
+      }
+    } catch (e) {
+      setRecentOrders(INITIAL_ORDERS);
+    }
+
+    // Subscribe to Firestore orders collection for live cloud synchronization
+    let unsubscribe: (() => void) | undefined;
+    try {
+      unsubscribe = subscribeToOrders((firestoreOrders) => {
+        if (firestoreOrders && firestoreOrders.length > 0) {
+          setRecentOrders(firestoreOrders);
+          try {
+            localStorage.setItem('assal_gavran_orders', JSON.stringify(firestoreOrders));
+          } catch (e) {}
+        }
+      });
+    } catch (err) {
+      console.warn('[AppContext] Firestore subscribeToOrders note:', err);
+    }
+
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
+  }, []);
 
   useEffect(() => {
     const initApp = async () => {
@@ -434,6 +507,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         orders: recentOrders,
         recentOrders,
         refreshOrders,
+        addLocalOrder,
         isInitializing,
         toastMessage,
         showToast,

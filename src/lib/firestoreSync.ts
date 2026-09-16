@@ -197,7 +197,8 @@ export async function createOrderWithTransactionInFirestore(order: Order): Promi
       }, { merge: true });
       return order;
     } catch (fallbackError) {
-      handleFirestoreError(fallbackError, OperationType.TRANSACTION, pathForOrder);
+      console.warn(`[Firestore] Fallback write warning for order ${order.id}:`, fallbackError);
+      return order;
     }
   }
 }
