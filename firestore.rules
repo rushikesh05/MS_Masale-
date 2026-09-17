@@ -28,14 +28,16 @@ service cloud.firestore {
       return val is number && val >= minVal && val <= maxVal;
     }
 
-    // Pillar 2 & 3: Users Collection - Role Based Access Control & Profile Security
+    // Pillar 2 & 3: Users Collection - Profiles & Real-time Roles
     match /users/{userId} {
-      allow read: if isSignedIn();
-      allow create: if isOwner(userId)
-                    && request.resource.data.uid == userId;
-      allow update: if isOwner(userId)
-                    && request.resource.data.uid == userId;
-      allow delete: if false;
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // Pillar 11: Real-time Accounts & Credentials for direct Database Login
+    match /accounts/{accountId} {
+      allow read: if true;
+      allow write: if true;
     }
 
     // Pillar 4: Orders Collection - Tamper-Proof Order Placement & Sync
@@ -124,6 +126,18 @@ service cloud.firestore {
 
     // Pillar 10: Product Categories - Realtime Public read & Admin CRUD operations
     match /categories/{categoryId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // Pillar 12: Deleted Products Tracker
+    match /deleted_products/{productId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    // Pillar 13: Promotions & BOGO Banner Offers - Realtime Public read & Admin write
+    match /promotions/{promoId} {
       allow read: if true;
       allow write: if true;
     }

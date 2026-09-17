@@ -168,9 +168,55 @@
         "sortOrder": { "type": "number", "description": "Ordering priority" }
       },
       "required": ["id", "nameMr", "nameEn"]
+    },
+    "AccountCredential": {
+      "title": "AccountCredential",
+      "description": "User login credentials, role, and profile stored directly in real-time database",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Unique user identifier" },
+        "email": { "type": "string", "description": "User email address" },
+        "password": { "type": "string", "description": "User login password" },
+        "role": { "type": "string", "enum": ["customer", "manager", "delivery", "admin"], "description": "Access role" },
+        "displayName": { "type": "string", "description": "Display name" },
+        "phone": { "type": "string", "description": "Phone number" },
+        "createdAt": { "type": "string", "description": "ISO timestamp" }
+      },
+      "required": ["uid", "email", "password", "role"]
+    },
+    "Promotion": {
+      "title": "Promotion",
+      "description": "Storefront promotion banners such as BOGO offers and festive campaigns",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Promotion ID (e.g. bogo-festive)" },
+        "isActive": { "type": "boolean", "description": "Whether offer is active on storefront" },
+        "productId": { "type": "string", "description": "Featured product ID" },
+        "titleEn": { "type": "string", "description": "Offer headline in English" },
+        "titleMr": { "type": "string", "description": "Offer headline in Marathi" },
+        "descriptionEn": { "type": "string", "description": "Offer description in English" },
+        "descriptionMr": { "type": "string", "description": "Offer description in Marathi" },
+        "badgeEn": { "type": "string", "description": "Top badge in English" },
+        "badgeMr": { "type": "string", "description": "Top badge in Marathi" },
+        "tagEn": { "type": "string", "description": "Product tag in English" },
+        "tagMr": { "type": "string", "description": "Product tag in Marathi" },
+        "couponCode": { "type": "string", "description": "Coupon code" },
+        "imageUrl": { "type": "string", "description": "Image URL or transparent asset" },
+        "countdownHours": { "type": "number", "description": "Timer countdown hours" },
+        "updatedAt": { "type": "string", "description": "ISO timestamp" }
+      },
+      "required": ["id", "isActive", "productId", "titleEn", "descriptionEn", "imageUrl"]
     }
   },
   "firestore": {
+    "/promotions/{promoId}": {
+      "schema": "Promotion",
+      "description": "Real-time promotion banner configuration and BOGO featured product"
+    },
+    "/accounts/{accountId}": {
+      "schema": "AccountCredential",
+      "description": "Real-time user accounts and credentials allowing proper email/password login directly via database"
+    },
     "/products/{productId}": {
       "schema": "Product",
       "description": "Products catalog synced live to Firestore with admin CRUD capability"

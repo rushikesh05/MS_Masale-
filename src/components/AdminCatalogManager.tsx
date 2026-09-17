@@ -24,11 +24,20 @@ import {
   ExternalLink,
   ShoppingBag,
   SlidersHorizontal,
-  CheckCircle2
+  CheckCircle2,
+  Gift,
+  Wand2,
+  Eye,
+  RotateCcw,
+  Camera,
+  Store
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
-import { Product, ProductCategory, ProductSize } from '../types';
+import { Product, ProductCategory, ProductSize, BogoOfferConfig } from '../types';
 import { ProductVisual } from './ProductVisual';
+import { compressImage, uploadImageToServer, removeBackgroundClient } from '../utils/imageOptimizer';
+import { DEFAULT_BOGO_CONFIG } from '../lib/firestoreService';
+import { BogoBanner } from './BogoBanner';
 
 export interface ImagePresetItem {
   id: string;
@@ -174,13 +183,32 @@ export const AdminCatalogManager: React.FC = () => {
     deleteCategory, 
     seedCatalog, 
     isSyncingCatalog, 
-    showToast 
+    showToast,
+    bogoConfig,
+    updateBogoConfig,
+    resetBogoConfig,
+    setRole
   } = useApp();
 
-  const [activeSubTab, setActiveSubTab] = useState<'products' | 'categories' | 'images'>('products');
+  const [activeSubTab, setActiveSubTab] = useState<'products' | 'categories' | 'images' | 'bogo'>('products');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState('all');
   const [stockStatusFilter, setStockStatusFilter] = useState<'all' | 'in_stock' | 'out_of_stock'>('all');
+
+  // BOGO Offer Configuration Form State
+  const [bogoForm, setBogoForm] = useState<BogoOfferConfig>(() => bogoConfig || DEFAULT_BOGO_CONFIG);
+  const [isSavingBogo, setIsSavingBogo] = useState<boolean>(false);
+  const [isProcessingBogoImage, setIsProcessingBogoImage] = useState<boolean>(false);
+  const [bogoImagePickerMode, setBogoImagePickerMode] = useState<'upload' | 'presets' | 'url'>('upload');
+  const [bogoPreviewLang, setBogoPreviewLang] = useState<'en' | 'mr'>('en');
+  const bogoFileInputRef = useRef<HTMLInputElement | null>(null);
+
+  // Keep bogoForm in sync with remote bogoConfig
+  useEffect(() => {
+    if (bogoConfig) {
+      setBogoForm(bogoConfig);
+    }
+  }, [bogoConfig]);
 
   // Media & Uploaded Images
   const [uploadedImages, setUploadedImages] = useState<UploadedImageItem[]>(() => {
@@ -194,6 +222,11 @@ export const AdminCatalogManager: React.FC = () => {
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const galleryFileInputRef = useRef<HTMLInputElement | null>(null);
+
+  // Uploading state & real-time progress
+  const [isUploadingImage, setIsUploadingImage] = useState<boolean>(false);
+  const [uploadProgressText, setUploadProgressText] = useState<string>('');
+  const [isDraggingOver, setIsDraggingOver] = useState<boolean>(false);
 
   // Modal State for Products
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
@@ -312,41 +345,58 @@ export const AdminCatalogManager: React.FC = () => {
     setIsProductModalOpen(true);
   };
 
-  // Handle Image File Upload (FileReader Base64)
-  const handleFileUpload = (file: File, isForGallery: boolean = false) => {
+  // Handle High-Efficiency Image Upload with Client Compression & Server API
+  const handleFileUpload = async (file: File, isForGallery: boolean = false) => {
     if (!file.type.startsWith('image/')) {
       showToast('Please select a valid image file (JPG, PNG, WebP)');
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const result = e.target?.result as string;
-      if (result) {
-        const newItem: UploadedImageItem = {
-          id: `img-${Date.now()}`,
-          name: file.name,
-          url: result,
-          uploadedAt: new Date().toLocaleDateString(),
-          size: `${Math.round(file.size / 1024)} KB`
-        };
+    setIsUploadingImage(true);
+    setUploadProgressText('Compressing & optimizing photo...');
 
-        const updated = [newItem, ...uploadedImages];
-        setUploadedImages(updated);
-        try {
-          localStorage.setItem('ms_admin_uploaded_images_v2', JSON.stringify(updated.slice(0, 20)));
-        } catch {
-          // LocalStorage quota fallback
-        }
+    try {
+      // 1. Client-side compression to WebP/JPEG max 1000px, 85% quality
+      const compressed = await compressImage(file, 1000, 1000, 0.85);
 
-        if (!isForGallery) {
-          setFormData(prev => ({ ...prev, imageUrl: result }));
-        }
+      setUploadProgressText('Uploading high-speed product image...');
 
-        showToast(`Image "${file.name}" uploaded successfully!`);
+      // 2. Upload to server API (falls back to compressed data URL if offline)
+      const uploadResult = await uploadImageToServer(compressed.dataUrl, file.name);
+      const finalUrl = uploadResult.url;
+      const reportedSize = `${uploadResult.sizeKb || compressed.sizeKb} KB`;
+
+      const newItem: UploadedImageItem = {
+        id: `img-${Date.now()}`,
+        name: file.name,
+        url: finalUrl,
+        uploadedAt: new Date().toLocaleDateString(),
+        size: reportedSize
+      };
+
+      const updated = [newItem, ...uploadedImages];
+      setUploadedImages(updated);
+      try {
+        localStorage.setItem('ms_admin_uploaded_images_v2', JSON.stringify(updated.slice(0, 30)));
+      } catch {
+        // LocalStorage quota fallback
       }
-    };
-    reader.readAsDataURL(file);
+
+      if (!isForGallery) {
+        setFormData(prev => ({ ...prev, imageUrl: finalUrl }));
+      }
+
+      showToast(`Image uploaded & optimized successfully (${reportedSize})!`);
+    } catch (err: any) {
+      console.error('Image upload failed:', err);
+      showToast('Failed to process image. Please try another file.');
+    } finally {
+      setIsUploadingImage(false);
+      setUploadProgressText('');
+      // Always reset inputs so selecting the same or another file immediately fires onChange!
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      if (galleryFileInputRef.current) galleryFileInputRef.current.value = '';
+    }
   };
 
   // Product Size Modifier
@@ -525,6 +575,109 @@ export const AdminCatalogManager: React.FC = () => {
     );
   });
 
+  // BOGO Handler Functions
+  const handleBogoImageUpload = async (file: File) => {
+    try {
+      setIsProcessingBogoImage(true);
+      showToast('Optimizing, removing background & updating 3D packaging image...');
+
+      // 1. Compress image
+      const compressed = await compressImage(file, 1000, 1000, 0.9);
+
+      // 2. Automatically remove white/solid background to make 3D transparent
+      let transparentDataUrl = compressed.dataUrl;
+      try {
+        transparentDataUrl = await removeBackgroundClient(compressed.dataUrl);
+      } catch (err) {
+        console.warn('Background removal fallback:', err);
+      }
+
+      let finalUrl = transparentDataUrl;
+
+      // 3. Upload to server if available
+      try {
+        const uploadRes = await uploadImageToServer(
+          transparentDataUrl, 
+          file.name.replace(/\.[^/.]+$/, "") + "-bogo-transparent.png"
+        );
+        if (uploadRes.url) {
+          finalUrl = uploadRes.url;
+        }
+      } catch (err) {
+        console.warn('Image server upload fallback:', err);
+      }
+
+      setBogoForm(prev => ({ ...prev, imageUrl: finalUrl }));
+      showToast('🎉 3D Transparent packaging image prepared! Click Save to apply.');
+    } catch (err) {
+      console.error('BOGO image upload error:', err);
+      showToast('❌ Failed to process image. Please try another file.');
+    } finally {
+      setIsProcessingBogoImage(false);
+      if (bogoFileInputRef.current) {
+        bogoFileInputRef.current.value = '';
+      }
+    }
+  };
+
+  const handleMakeCurrentImageTransparent = async () => {
+    if (!bogoForm.imageUrl) return;
+    try {
+      setIsProcessingBogoImage(true);
+      showToast('Removing background and generating 3D cut-out...');
+      const transparentUrl = await removeBackgroundClient(bogoForm.imageUrl);
+      setBogoForm(prev => ({ ...prev, imageUrl: transparentUrl }));
+      showToast('✨ Background removed! Image is now 3D transparent.');
+    } catch (err) {
+      console.error('Failed to remove background:', err);
+      showToast('Could not auto-remove background from this image source.');
+    } finally {
+      setIsProcessingBogoImage(false);
+    }
+  };
+
+  const handleAutoFillFromProduct = (productId: string) => {
+    const selected = products.find(p => p.id === productId);
+    if (!selected) return;
+
+    setBogoForm(prev => ({
+      ...prev,
+      productId: selected.id,
+      titleEn: `BUY 1 GET 1 FREE (BOGO)!`,
+      titleMr: `१ वर १ मोफत ऑफर (BOGO)!`,
+      descriptionEn: `Special Festive Offer on ${selected.nameEn} (${selected.nameMr}): Buy 1 pack & get 1 pack 100% FREE!`,
+      descriptionMr: `खास ऑफर ${selected.nameMr} (${selected.nameEn}) वर: १ पॅक विकत घ्या आणि १ पॅक १००% मोफत मिळवा!`,
+      badgeEn: selected.badgeEn || 'Special Festive Offer',
+      badgeMr: selected.badgeMr || 'खास सणासुदीची ऑफर',
+      tagEn: `${selected.nameEn} (BOGO)`,
+      tagMr: `${selected.nameMr} (BOGO)`,
+      imageUrl: selected.imageUrl || prev.imageUrl,
+    }));
+
+    showToast(`✨ Auto-filled BOGO details from "${selected.nameEn}"!`);
+  };
+
+  const handleSaveBogoOffer = async () => {
+    try {
+      setIsSavingBogo(true);
+      await updateBogoConfig(bogoForm);
+      showToast('🎉 BOGO Offer & Banner saved to Cloud Firestore!');
+    } catch (err) {
+      console.error('Error saving BOGO offer:', err);
+      showToast('❌ Failed to save BOGO offer to database.');
+    } finally {
+      setIsSavingBogo(false);
+    }
+  };
+
+  const handleResetBogoOffer = async () => {
+    if (window.confirm('Reset BOGO offer to default authentic Peanut & Garlic Chutney configuration?')) {
+      await resetBogoConfig();
+      setBogoForm(DEFAULT_BOGO_CONFIG);
+      showToast('Reset to default Peanut & Garlic Chutney offer.');
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Top Banner & Real-time Database Status */}
@@ -555,6 +708,15 @@ export const AdminCatalogManager: React.FC = () => {
           {/* Action buttons */}
           <div className="flex items-center gap-2.5 flex-wrap">
             <button
+              onClick={() => setRole('customer')}
+              className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold rounded-xl border border-amber-300 dark:border-stone-700 bg-amber-50 dark:bg-stone-800 text-amber-900 dark:text-amber-300 hover:bg-amber-100 transition-colors cursor-pointer shadow-2xs"
+              title="Return to customer store view"
+            >
+              <Store className="w-3.5 h-3.5 text-amber-700" />
+              <span>View Storefront</span>
+            </button>
+
+            <button
               onClick={seedCatalog}
               disabled={isSyncingCatalog}
               className="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-xl border border-stone-300 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 text-stone-700 dark:text-stone-200 hover:bg-stone-100 dark:hover:bg-stone-700/80 transition-colors disabled:opacity-50 cursor-pointer"
@@ -572,6 +734,27 @@ export const AdminCatalogManager: React.FC = () => {
                 <Plus className="w-4 h-4" />
                 Add Product
               </button>
+            )}
+
+            {activeSubTab === 'bogo' && (
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleResetBogoOffer}
+                  className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-xl border border-stone-200 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-600 dark:text-stone-400 transition-colors cursor-pointer"
+                  title="Reset to default Peanut & Garlic Chutney configuration"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  <span>Reset Default</span>
+                </button>
+                <button
+                  onClick={handleSaveBogoOffer}
+                  disabled={isSavingBogo}
+                  className="inline-flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-xl bg-gradient-to-r from-amber-600 to-rose-600 hover:from-amber-500 hover:to-rose-500 text-white shadow-xs transition-colors cursor-pointer disabled:opacity-50"
+                >
+                  {isSavingBogo ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                  <span>Save BOGO Offer</span>
+                </button>
+              </div>
             )}
 
             {activeSubTab === 'categories' && (
@@ -608,7 +791,7 @@ export const AdminCatalogManager: React.FC = () => {
           </div>
         </div>
 
-        {/* Tab switcher: Products vs Categories vs Images */}
+        {/* Tab switcher: Products vs BOGO vs Images vs Categories */}
         <div className="flex items-center gap-2 mt-5 border-b border-stone-200 dark:border-stone-800 pb-3 overflow-x-auto">
           <button
             onClick={() => setActiveSubTab('products')}
@@ -621,6 +804,24 @@ export const AdminCatalogManager: React.FC = () => {
             <ShoppingBag className="w-3.5 h-3.5" />
             <span>Products & Masales ({products.length})</span>
           </button>
+
+          <button
+            onClick={() => setActiveSubTab('bogo')}
+            className={`px-4 py-2 text-xs font-bold rounded-xl transition-all flex items-center gap-2 cursor-pointer ${
+              activeSubTab === 'bogo'
+                ? 'bg-gradient-to-r from-amber-600 to-rose-600 text-white shadow-xs'
+                : 'text-amber-800 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 hover:bg-amber-100 dark:hover:bg-amber-900/40 border border-amber-200/80 dark:border-amber-800/60'
+            }`}
+          >
+            <Gift className="w-3.5 h-3.5 text-amber-300 animate-bounce" />
+            <span>BOGO Banner & Offer</span>
+            <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-black ${
+              bogoForm.isActive !== false ? 'bg-amber-400 text-stone-950' : 'bg-stone-400 text-white'
+            }`}>
+              {bogoForm.isActive !== false ? 'ACTIVE' : 'PAUSED'}
+            </span>
+          </button>
+
           <button
             onClick={() => setActiveSubTab('images')}
             className={`px-4 py-2 text-xs font-bold rounded-xl transition-all flex items-center gap-2 cursor-pointer ${
@@ -632,6 +833,7 @@ export const AdminCatalogManager: React.FC = () => {
             <ImageIcon className="w-3.5 h-3.5" />
             <span>Images & Media Gallery ({AVAILABLE_IMAGE_PRESETS.length + uploadedImages.length})</span>
           </button>
+
           <button
             onClick={() => setActiveSubTab('categories')}
             className={`px-4 py-2 text-xs font-bold rounded-xl transition-all flex items-center gap-2 cursor-pointer ${
@@ -731,11 +933,11 @@ export const AdminCatalogManager: React.FC = () => {
                 <div>
                   {/* Top visual & category tag */}
                   <div className="flex gap-3 mb-3">
-                    <div className="w-20 h-20 rounded-2xl overflow-hidden bg-stone-100 dark:bg-stone-800 shrink-0 border border-stone-200 dark:border-stone-700 relative">
+                    <div className="w-20 h-20 rounded-2xl overflow-hidden bg-white shrink-0 border border-stone-200 relative flex items-center justify-center">
                       <ProductVisual
                         product={product}
-                        aspectRatio="square"
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        aspectRatio="card"
+                        className="w-full h-full object-contain"
                       />
                     </div>
                     <div className="flex-1 min-w-0">
@@ -1010,7 +1212,576 @@ export const AdminCatalogManager: React.FC = () => {
         </div>
       )}
 
-      {/* PRODUCT CREATE / EDIT MODAL */}
+      {/* SUB-TAB 4: BOGO BANNER & OFFER MANAGEMENT */}
+      {activeSubTab === 'bogo' && (
+        <div className="space-y-6">
+          {/* Header Card & Status Switch */}
+          <div className="p-5 sm:p-6 rounded-3xl bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-rose-500/10 dark:from-amber-950/30 dark:via-orange-950/30 dark:to-rose-950/30 border-2 border-amber-300/80 dark:border-amber-700/60 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex items-start gap-3.5">
+              <div className="p-3 rounded-2xl bg-amber-500 text-stone-950 shadow-md">
+                <Gift className="w-6 h-6 animate-pulse" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h3 className="font-serif font-bold text-lg text-stone-900 dark:text-stone-100">
+                    BOGO (Buy 1 Get 1 Free) Banner & Featured Product
+                  </h3>
+                  <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-black uppercase tracking-wider ${
+                    bogoForm.isActive !== false 
+                      ? 'bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 border border-emerald-300' 
+                      : 'bg-stone-200 dark:bg-stone-800 text-stone-600 dark:text-stone-400'
+                  }`}>
+                    {bogoForm.isActive !== false ? '● Live on Store' : '○ Paused'}
+                  </span>
+                </div>
+                <p className="text-xs text-stone-600 dark:text-stone-300 mt-1 max-w-2xl leading-relaxed">
+                  Customize the featured promotional product, 3D packaging image, and bilingual Marathi & English descriptions anytime. Any updates are saved directly to Cloud Firestore and sync across all customer devices.
+                </p>
+              </div>
+            </div>
+
+            {/* Status & Save Controls */}
+            <div className="flex items-center gap-3 shrink-0 self-end md:self-center">
+              <label className="flex items-center gap-2 cursor-pointer select-none bg-white dark:bg-stone-900 px-3.5 py-2 rounded-xl border border-stone-200 dark:border-stone-700 shadow-xs">
+                <input
+                  type="checkbox"
+                  checked={bogoForm.isActive !== false}
+                  onChange={(e) => setBogoForm(prev => ({ ...prev, isActive: e.target.checked }))}
+                  className="w-4 h-4 text-amber-600 rounded-sm focus:ring-amber-500 cursor-pointer"
+                />
+                <span className="text-xs font-bold text-stone-800 dark:text-stone-200">
+                  {bogoForm.isActive !== false ? 'Offer Active' : 'Offer Paused'}
+                </span>
+              </label>
+
+              <button
+                type="button"
+                onClick={handleSaveBogoOffer}
+                disabled={isSavingBogo}
+                className="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-600 to-rose-600 hover:from-amber-500 hover:to-rose-500 text-white text-xs font-bold shadow-md flex items-center gap-2 cursor-pointer disabled:opacity-50 transition-all hover:scale-102 active:scale-98"
+              >
+                {isSavingBogo ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                <span>Save All Changes</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Section 1: Associated Product & Quick Auto-Fill */}
+          <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-3xl p-5 sm:p-6 shadow-xs space-y-4">
+            <div className="flex items-center justify-between flex-wrap gap-2 border-b border-stone-100 dark:border-stone-800 pb-3">
+              <div>
+                <h4 className="text-sm font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
+                  <ShoppingBag className="w-4 h-4 text-amber-600" />
+                  <span>1. Linked Promotional Product</span>
+                </h4>
+                <p className="text-xs text-stone-500 dark:text-stone-400">
+                  Choose which product from your catalog receives the Buy 1 Get 1 Free offer.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => handleAutoFillFromProduct(bogoForm.productId || 'prod-shengdana-chutney')}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-100 hover:bg-amber-200 dark:bg-amber-950/60 dark:hover:bg-amber-900/60 text-amber-900 dark:text-amber-300 text-xs font-bold transition-colors cursor-pointer"
+                title="Automatically populate title, Marathi/English description, and packaging photo from selected product"
+              >
+                <Wand2 className="w-3.5 h-3.5" />
+                <span>Auto-fill details from selected product</span>
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+              <div>
+                <label className="block text-xs font-bold text-stone-700 dark:text-stone-300 mb-1.5">
+                  Select Product from Catalog
+                </label>
+                <select
+                  value={bogoForm.productId || 'prod-shengdana-chutney'}
+                  onChange={(e) => {
+                    const newId = e.target.value;
+                    setBogoForm(prev => ({ ...prev, productId: newId }));
+                  }}
+                  className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 text-stone-900 dark:text-stone-100 focus:outline-hidden focus:ring-2 focus:ring-amber-500 font-medium cursor-pointer"
+                >
+                  {products.map(p => (
+                    <option key={p.id} value={p.id}>
+                      {p.nameEn} ({p.nameMr}) — ₹{p.sizes?.[0]?.price || 165}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Linked Product Quick Card */}
+              {(() => {
+                const linked = products.find(p => p.id === (bogoForm.productId || 'prod-shengdana-chutney')) || products[0];
+                if (!linked) return null;
+                return (
+                  <div className="flex items-center gap-3 p-3 rounded-2xl bg-stone-50 dark:bg-stone-800/60 border border-stone-200/80 dark:border-stone-700">
+                    <div className="w-12 h-12 rounded-xl bg-white dark:bg-stone-700 overflow-hidden shrink-0 border border-stone-200 dark:border-stone-600 flex items-center justify-center">
+                      <img src={linked.imageUrl} alt={linked.nameEn} className="w-full h-full object-contain p-1" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="text-xs font-bold text-stone-900 dark:text-stone-100 truncate">
+                        {linked.nameEn}
+                      </div>
+                      <div className="text-[11px] font-semibold text-amber-700 dark:text-amber-400 truncate">
+                        {linked.nameMr}
+                      </div>
+                      <div className="text-[10px] text-stone-500 mt-0.5">
+                        Starting from ₹{linked.sizes?.[0]?.price || 165} • ID: <code className="bg-stone-200/70 dark:bg-stone-700 px-1 rounded-xs">{linked.id}</code>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+          </div>
+
+          {/* Section 2: Product Image & 3D Packaging Studio */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            {/* Left: 3D Image Showcase Preview */}
+            <div className="lg:col-span-5 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-3xl p-5 sm:p-6 shadow-xs flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between mb-3 border-b border-stone-100 dark:border-stone-800 pb-2">
+                  <h4 className="text-sm font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
+                    <Camera className="w-4 h-4 text-amber-600" />
+                    <span>3D Packaging Showcase</span>
+                  </h4>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300">
+                    Transparent 3D Preview
+                  </span>
+                </div>
+
+                {/* 3D Floating Stage with Radial Glow and Perspective */}
+                <div className="relative aspect-square w-full rounded-2xl bg-gradient-to-b from-stone-900 via-stone-800 to-stone-950 p-6 flex flex-col items-center justify-center overflow-hidden select-none [perspective:1000px] border border-stone-700/60 shadow-inner">
+                  {/* Subtle Grid / Backdrop */}
+                  <div className="absolute inset-0 bg-[radial-gradient(#f59e0b_1px,transparent_1px)] [background-size:16px_16px] opacity-15 pointer-events-none" />
+                  
+                  {/* Luminous Warm Light Spot */}
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 bg-radial from-amber-400/30 via-orange-500/15 to-transparent rounded-full blur-2xl pointer-events-none" />
+
+                  {/* 3D Animated Floating Product Pouch/Jar */}
+                  <motion.div
+                    animate={{
+                      y: [0, -10, 0],
+                      rotateY: [-5, 6, -5],
+                      rotateZ: [-1, 2, -1]
+                    }}
+                    transition={{
+                      duration: 4.5,
+                      repeat: Infinity,
+                      ease: 'easeInOut'
+                    }}
+                    className="relative z-10 w-44 h-44 sm:w-48 sm:h-48 flex items-center justify-center filter drop-shadow-[0_18px_25px_rgba(0,0,0,0.6)]"
+                  >
+                    <img
+                      src={bogoForm.imageUrl || '/products/peanut-garlic-pouch-transparent.png'}
+                      alt="BOGO Product Packaging"
+                      className="max-h-full max-w-full object-contain pointer-events-none"
+                    />
+                  </motion.div>
+
+                  {/* Ground Contact Shadow */}
+                  <motion.div
+                    animate={{
+                      scale: [1, 0.78, 1],
+                      opacity: [0.6, 0.3, 0.6]
+                    }}
+                    transition={{
+                      duration: 4.5,
+                      repeat: Infinity,
+                      ease: 'easeInOut'
+                    }}
+                    className="w-28 h-3.5 rounded-[100%] bg-black/60 blur-md mx-auto -mt-2 pointer-events-none"
+                  />
+
+                  {/* Floating Tag */}
+                  <div className="mt-3 z-10">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 text-stone-950 uppercase tracking-wide shadow-lg border border-white/60">
+                      <Sparkles className="w-3.5 h-3.5 text-stone-950" />
+                      <span>{bogoForm.tagEn || 'Peanut & Garlic (BOGO)'}</span>
+                    </span>
+                  </div>
+                </div>
+
+                <div className="text-[11px] text-stone-500 dark:text-stone-400 font-mono mt-2 truncate text-center">
+                  Path: {bogoForm.imageUrl}
+                </div>
+              </div>
+
+              {/* Background Removal Action */}
+              <div className="pt-3 border-t border-stone-100 dark:border-stone-800 mt-3 space-y-2">
+                <button
+                  type="button"
+                  onClick={handleMakeCurrentImageTransparent}
+                  disabled={isProcessingBogoImage}
+                  className="w-full py-2 px-3 rounded-xl bg-stone-100 hover:bg-stone-200 dark:bg-stone-800 dark:hover:bg-stone-700 text-stone-800 dark:text-stone-200 text-xs font-bold flex items-center justify-center gap-2 cursor-pointer transition-colors disabled:opacity-50"
+                  title="Automatically remove white background to create a clean 3D transparent packaging cutout"
+                >
+                  {isProcessingBogoImage ? (
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin text-amber-500" />
+                  ) : (
+                    <Wand2 className="w-3.5 h-3.5 text-amber-600" />
+                  )}
+                  <span>Make Background Transparent (3D Cutout)</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Right: Image Selector (Upload, Presets, URL) */}
+            <div className="lg:col-span-7 bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-3xl p-5 sm:p-6 shadow-xs space-y-4">
+              <div className="flex items-center justify-between border-b border-stone-100 dark:border-stone-800 pb-3">
+                <div>
+                  <h4 className="text-sm font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
+                    <ImageIcon className="w-4 h-4 text-amber-600" />
+                    <span>2. Select or Upload Packaging Image</span>
+                  </h4>
+                  <p className="text-xs text-stone-500 dark:text-stone-400">
+                    Upload an image or select an existing packaging photo.
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-1 bg-stone-100 dark:bg-stone-800 p-1 rounded-xl">
+                  <button
+                    type="button"
+                    onClick={() => setBogoImagePickerMode('upload')}
+                    className={`px-3 py-1 text-xs font-bold rounded-lg cursor-pointer transition-colors ${
+                      bogoImagePickerMode === 'upload' ? 'bg-white dark:bg-stone-700 text-stone-900 dark:text-stone-100 shadow-xs' : 'text-stone-500'
+                    }`}
+                  >
+                    Upload File
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setBogoImagePickerMode('presets')}
+                    className={`px-3 py-1 text-xs font-bold rounded-lg cursor-pointer transition-colors ${
+                      bogoImagePickerMode === 'presets' ? 'bg-white dark:bg-stone-700 text-stone-900 dark:text-stone-100 shadow-xs' : 'text-stone-500'
+                    }`}
+                  >
+                    Presets ({AVAILABLE_IMAGE_PRESETS.length})
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setBogoImagePickerMode('url')}
+                    className={`px-3 py-1 text-xs font-bold rounded-lg cursor-pointer transition-colors ${
+                      bogoImagePickerMode === 'url' ? 'bg-white dark:bg-stone-700 text-stone-900 dark:text-stone-100 shadow-xs' : 'text-stone-500'
+                    }`}
+                  >
+                    Custom URL
+                  </button>
+                </div>
+              </div>
+
+              {/* Mode A: Upload File */}
+              {bogoImagePickerMode === 'upload' && (
+                <div className="space-y-3">
+                  <input
+                    ref={bogoFileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      if (e.target.files && e.target.files[0]) {
+                        handleBogoImageUpload(e.target.files[0]);
+                      }
+                    }}
+                    className="hidden"
+                    id="bogo-admin-file-picker"
+                  />
+
+                  <div
+                    onClick={() => bogoFileInputRef.current?.click()}
+                    className="border-2 border-dashed border-amber-300 hover:border-amber-500 bg-amber-50/40 dark:bg-amber-950/10 rounded-2xl p-6 text-center cursor-pointer transition-all hover:bg-amber-50/70"
+                  >
+                    <div className="w-12 h-12 rounded-2xl bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 flex items-center justify-center mx-auto mb-2.5">
+                      <UploadCloud className="w-6 h-6" />
+                    </div>
+                    <div className="text-xs font-bold text-stone-900 dark:text-stone-100">
+                      {isProcessingBogoImage ? 'Processing & removing background...' : 'Click to Upload Packaging Photo'}
+                    </div>
+                    <p className="text-[11px] text-stone-500 dark:text-stone-400 mt-1">
+                      Accepts JPG, PNG, or WebP. Automatic background removal and 3D cutout will be applied.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Mode B: Presets */}
+              {bogoImagePickerMode === 'presets' && (
+                <div className="space-y-2">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 max-h-60 overflow-y-auto p-1">
+                    {/* Authentic Transparent Pouch option */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setBogoForm(prev => ({ ...prev, imageUrl: '/products/peanut-garlic-pouch-transparent.png' }));
+                        showToast('Selected authentic 3D Peanut & Garlic transparent pouch!');
+                      }}
+                      className={`p-2 rounded-xl border text-left flex flex-col justify-between transition-all cursor-pointer ${
+                        bogoForm.imageUrl === '/products/peanut-garlic-pouch-transparent.png'
+                          ? 'border-amber-500 bg-amber-50/60 dark:bg-amber-950/40 ring-2 ring-amber-500'
+                          : 'border-stone-200 dark:border-stone-700 hover:border-amber-400 bg-white dark:bg-stone-800'
+                      }`}
+                    >
+                      <div className="aspect-square bg-stone-900 rounded-lg overflow-hidden flex items-center justify-center p-1.5 mb-1.5">
+                        <img src="/products/peanut-garlic-pouch-transparent.png" alt="Transparent Pouch" className="max-h-full max-w-full object-contain" />
+                      </div>
+                      <div className="text-[11px] font-bold text-amber-700 dark:text-amber-400 truncate">
+                        Peanut & Garlic (3D)
+                      </div>
+                      <div className="text-[9px] text-stone-500">Transparent Pouch</div>
+                    </button>
+
+                    {AVAILABLE_IMAGE_PRESETS.map((preset) => (
+                      <button
+                        key={preset.id}
+                        type="button"
+                        onClick={() => {
+                          setBogoForm(prev => ({ ...prev, imageUrl: preset.value }));
+                          showToast(`Selected "${preset.labelEn}"!`);
+                        }}
+                        className={`p-2 rounded-xl border text-left flex flex-col justify-between transition-all cursor-pointer ${
+                          bogoForm.imageUrl === preset.value
+                            ? 'border-amber-500 bg-amber-50/60 dark:bg-amber-950/40 ring-2 ring-amber-500'
+                            : 'border-stone-200 dark:border-stone-700 hover:border-amber-400 bg-white dark:bg-stone-800'
+                        }`}
+                      >
+                        <div className="aspect-square bg-stone-100 dark:bg-stone-700 rounded-lg overflow-hidden flex items-center justify-center p-1 mb-1.5">
+                          <img src={preset.value} alt={preset.labelEn} className="w-full h-full object-cover" />
+                        </div>
+                        <div className="text-[11px] font-bold text-stone-800 dark:text-stone-200 truncate">
+                          {preset.labelEn}
+                        </div>
+                        <div className="text-[9px] text-stone-500 truncate">{preset.labelMr}</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Mode C: Custom URL */}
+              {bogoImagePickerMode === 'url' && (
+                <div className="space-y-2">
+                  <label className="block text-xs font-bold text-stone-700 dark:text-stone-300">
+                    Direct Image URL
+                  </label>
+                  <input
+                    type="url"
+                    value={bogoForm.imageUrl}
+                    onChange={(e) => setBogoForm(prev => ({ ...prev, imageUrl: e.target.value }))}
+                    placeholder="https://example.com/chutney-jar.png"
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 text-stone-900 dark:text-stone-100 focus:outline-hidden focus:ring-2 focus:ring-amber-500 font-mono"
+                  />
+                  <p className="text-[11px] text-stone-500">
+                    Paste a direct PNG link. For best 3D floating effect, use an image with a transparent background.
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Section 3: Promotional Copy & Descriptions (English & Marathi - Just Like Other Products) */}
+          <div className="bg-white dark:bg-stone-900 border border-stone-200 dark:border-stone-800 rounded-3xl p-5 sm:p-6 shadow-xs space-y-5">
+            <div className="border-b border-stone-100 dark:border-stone-800 pb-3">
+              <h4 className="text-sm font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
+                <Edit3 className="w-4 h-4 text-amber-600" />
+                <span>3. Product Title, Descriptions & Badges (मराठी आणि English)</span>
+              </h4>
+              <p className="text-xs text-stone-500 dark:text-stone-400">
+                Just like catalog products, update the Marathi and English copy displayed on the customer banner.
+              </p>
+            </div>
+
+            {/* Titles */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-bold text-stone-700 dark:text-stone-300 mb-1">
+                  Offer Headline (English) *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={bogoForm.titleEn}
+                  onChange={(e) => setBogoForm(prev => ({ ...prev, titleEn: e.target.value }))}
+                  placeholder="BUY 1 GET 1 FREE (BOGO)!"
+                  className="w-full px-3.5 py-2 text-xs rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 text-stone-900 dark:text-stone-100 focus:outline-hidden focus:ring-2 focus:ring-amber-500 font-bold"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-stone-700 dark:text-stone-300 mb-1">
+                  Offer Headline (मराठी) *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={bogoForm.titleMr}
+                  onChange={(e) => setBogoForm(prev => ({ ...prev, titleMr: e.target.value }))}
+                  placeholder="१ वर १ मोफत ऑफर (BOGO)!"
+                  className="w-full px-3.5 py-2 text-xs rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 text-stone-900 dark:text-stone-100 focus:outline-hidden focus:ring-2 focus:ring-amber-500 font-bold"
+                />
+              </div>
+            </div>
+
+            {/* Descriptions */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-bold text-stone-700 dark:text-stone-300 mb-1">
+                  Offer & Product Description (English) *
+                </label>
+                <textarea
+                  rows={3}
+                  required
+                  value={bogoForm.descriptionEn}
+                  onChange={(e) => setBogoForm(prev => ({ ...prev, descriptionEn: e.target.value }))}
+                  placeholder="Special Offer on Peanut and Garlic Chutney: Buy 1 jar & get 1 jar 100% FREE!"
+                  className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 text-stone-900 dark:text-stone-100 focus:outline-hidden focus:ring-2 focus:ring-amber-500 leading-relaxed"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-stone-700 dark:text-stone-300 mb-1">
+                  Offer & Product Description (मराठी) *
+                </label>
+                <textarea
+                  rows={3}
+                  required
+                  value={bogoForm.descriptionMr}
+                  onChange={(e) => setBogoForm(prev => ({ ...prev, descriptionMr: e.target.value }))}
+                  placeholder="खास ऑफर शेंगदाणा आणि लसूण चटणी वर: १ पॅक विकत घ्या आणि १ पॅक १००% मोफत मिळवा!"
+                  className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 text-stone-900 dark:text-stone-100 focus:outline-hidden focus:ring-2 focus:ring-amber-500 leading-relaxed"
+                />
+              </div>
+            </div>
+
+            {/* Badges & Tags */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-2">
+              <div>
+                <label className="block text-xs font-bold text-stone-700 dark:text-stone-300 mb-1">
+                  Top Badge (English / मराठी)
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  <input
+                    type="text"
+                    value={bogoForm.badgeEn}
+                    onChange={(e) => setBogoForm(prev => ({ ...prev, badgeEn: e.target.value }))}
+                    placeholder="Special Festive Offer"
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 text-stone-900 dark:text-stone-100 focus:ring-2 focus:ring-amber-500"
+                  />
+                  <input
+                    type="text"
+                    value={bogoForm.badgeMr}
+                    onChange={(e) => setBogoForm(prev => ({ ...prev, badgeMr: e.target.value }))}
+                    placeholder="खास सणासुदीची ऑफर"
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 text-stone-900 dark:text-stone-100 focus:ring-2 focus:ring-amber-500"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-stone-700 dark:text-stone-300 mb-1">
+                  3D Pill Tag (English / मराठी)
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  <input
+                    type="text"
+                    value={bogoForm.tagEn}
+                    onChange={(e) => setBogoForm(prev => ({ ...prev, tagEn: e.target.value }))}
+                    placeholder="Peanut & Garlic (BOGO)"
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 text-stone-900 dark:text-stone-100 focus:ring-2 focus:ring-amber-500"
+                  />
+                  <input
+                    type="text"
+                    value={bogoForm.tagMr}
+                    onChange={(e) => setBogoForm(prev => ({ ...prev, tagMr: e.target.value }))}
+                    placeholder="शेंगदाणा आणि लसूण चटणी (BOGO)"
+                    className="w-full px-3 py-2 text-xs rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 text-stone-900 dark:text-stone-100 focus:ring-2 focus:ring-amber-500"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-stone-700 dark:text-stone-300 mb-1">
+                  Coupon Code
+                </label>
+                <input
+                  type="text"
+                  value={bogoForm.couponCode}
+                  onChange={(e) => setBogoForm(prev => ({ ...prev, couponCode: e.target.value.toUpperCase() }))}
+                  placeholder="BOGO-FREE"
+                  className="w-full px-3 py-2 text-xs rounded-xl border border-stone-200 dark:border-stone-700 bg-stone-50 dark:bg-stone-800 text-stone-900 dark:text-stone-100 focus:ring-2 focus:ring-amber-500 font-mono font-bold tracking-wider"
+                />
+              </div>
+            </div>
+
+            {/* Save Buttons Row */}
+            <div className="flex items-center justify-end gap-3 pt-4 border-t border-stone-100 dark:border-stone-800">
+              <button
+                type="button"
+                onClick={handleResetBogoOffer}
+                className="px-4 py-2 rounded-xl border border-stone-200 dark:border-stone-700 hover:bg-stone-100 dark:hover:bg-stone-800 text-stone-700 dark:text-stone-300 text-xs font-semibold cursor-pointer transition-colors"
+              >
+                Reset to Default Peanut & Garlic
+              </button>
+              <button
+                type="button"
+                onClick={handleSaveBogoOffer}
+                disabled={isSavingBogo}
+                className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-600 to-rose-600 hover:from-amber-500 hover:to-rose-500 text-white text-xs font-bold shadow-md flex items-center gap-2 cursor-pointer disabled:opacity-50 transition-all hover:scale-102"
+              >
+                {isSavingBogo ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                <span>Save BOGO Configuration to Database</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Section 4: Live Customer Store Preview */}
+          <div className="bg-stone-50 dark:bg-stone-900/50 border border-stone-200 dark:border-stone-800 rounded-3xl p-5 sm:p-6 shadow-xs space-y-4">
+            <div className="flex items-center justify-between flex-wrap gap-3 border-b border-stone-200 dark:border-stone-800 pb-3">
+              <div>
+                <h4 className="text-sm font-bold text-stone-900 dark:text-stone-100 flex items-center gap-2">
+                  <Eye className="w-4 h-4 text-amber-600" />
+                  <span>4. Live Customer Store Banner Preview</span>
+                </h4>
+                <p className="text-xs text-stone-500 dark:text-stone-400">
+                  This is exactly how the BOGO banner appears on customer devices in real-time.
+                </p>
+              </div>
+
+              {/* Language Switcher for Preview */}
+              <div className="flex items-center gap-1 bg-white dark:bg-stone-800 p-1 rounded-xl border border-stone-200 dark:border-stone-700">
+                <button
+                  type="button"
+                  onClick={() => setBogoPreviewLang('en')}
+                  className={`px-3 py-1 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
+                    bogoPreviewLang === 'en' ? 'bg-amber-500 text-white' : 'text-stone-600 dark:text-stone-400'
+                  }`}
+                >
+                  English Preview
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setBogoPreviewLang('mr')}
+                  className={`px-3 py-1 text-xs font-bold rounded-lg transition-colors cursor-pointer ${
+                    bogoPreviewLang === 'mr' ? 'bg-amber-500 text-white' : 'text-stone-600 dark:text-stone-400'
+                  }`}
+                >
+                  मराठी Preview
+                </button>
+              </div>
+            </div>
+
+            {/* Embedded Live BogoBanner */}
+            <div className="pt-2">
+              <BogoBanner
+                language={bogoPreviewLang}
+                customImageUrl={bogoForm.imageUrl}
+                onClaimOffer={() => showToast('Preview mode: "Claim Offer" clicked')}
+                onExploreAll={() => showToast('Preview mode: "Explore All" clicked')}
+              />
+            </div>
+          </div>
+        </div>
+      )}
       <AnimatePresence>
         {isProductModalOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs overflow-y-auto">
@@ -1173,16 +1944,51 @@ export const AdminCatalogManager: React.FC = () => {
                   {imagePickerTab === 'upload' && (
                     <div className="space-y-2">
                       <div
-                        onClick={() => fileInputRef.current?.click()}
-                        className="border-2 border-dashed border-amber-300 hover:border-amber-500 bg-white dark:bg-stone-900 rounded-xl p-4 text-center cursor-pointer transition-colors"
+                        onClick={() => !isUploadingImage && fileInputRef.current?.click()}
+                        onDragOver={(e) => {
+                          e.preventDefault();
+                          setIsDraggingOver(true);
+                        }}
+                        onDragLeave={() => setIsDraggingOver(false)}
+                        onDrop={(e) => {
+                          e.preventDefault();
+                          setIsDraggingOver(false);
+                          if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                            handleFileUpload(e.dataTransfer.files[0], false);
+                          }
+                        }}
+                        className={`border-2 border-dashed rounded-xl p-5 text-center cursor-pointer transition-all ${
+                          isDraggingOver 
+                            ? 'border-amber-500 bg-amber-50/60 dark:bg-amber-950/20 ring-2 ring-amber-400' 
+                            : isUploadingImage
+                            ? 'border-amber-400 bg-amber-50/30 dark:bg-amber-950/10 opacity-80 cursor-wait'
+                            : 'border-amber-300 hover:border-amber-500 bg-white dark:bg-stone-900'
+                        }`}
                       >
-                        <UploadCloud className="w-6 h-6 mx-auto text-amber-600 mb-1" />
-                        <span className="text-xs font-bold text-stone-800 dark:text-stone-200 block">
-                          Click to select photo from device
-                        </span>
-                        <span className="text-[10px] text-stone-400">
-                          File will be encoded and saved to Firestore product record
-                        </span>
+                        {isUploadingImage ? (
+                          <div className="flex flex-col items-center justify-center py-2">
+                            <div className="w-8 h-8 rounded-full border-2 border-amber-600 border-t-transparent animate-spin mb-2" />
+                            <span className="text-xs font-bold text-amber-900 dark:text-amber-200">
+                              {uploadProgressText || 'Processing image...'}
+                            </span>
+                            <span className="text-[10px] text-stone-400 mt-1">
+                              Compressing to high-efficiency WebP format
+                            </span>
+                          </div>
+                        ) : (
+                          <>
+                            <UploadCloud className="w-7 h-7 mx-auto text-amber-600 mb-1.5" />
+                            <span className="text-xs font-bold text-stone-800 dark:text-stone-200 block">
+                              Click or Drag & Drop photo here
+                            </span>
+                            <span className="text-[11px] text-stone-500 dark:text-stone-400 block mt-0.5">
+                              Supports JPG, PNG, WebP • Auto-optimized for instant customer loading
+                            </span>
+                            <span className="inline-block mt-2 px-2.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/50 text-[10px] font-semibold text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800">
+                              Fast Real-time Firestore Sync
+                            </span>
+                          </>
+                        )}
                       </div>
                       <input
                         type="file"
@@ -1191,6 +1997,7 @@ export const AdminCatalogManager: React.FC = () => {
                           if (e.target.files && e.target.files[0]) {
                             handleFileUpload(e.target.files[0], false);
                           }
+                          e.target.value = '';
                         }}
                         accept="image/*"
                         className="hidden"

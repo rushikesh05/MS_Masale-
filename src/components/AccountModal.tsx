@@ -20,6 +20,7 @@ import {
   ArrowRight, 
   FileText,
   Truck,
+  Shield,
   ShieldCheck,
   Building,
   Home
@@ -29,6 +30,8 @@ export const AccountModal: React.FC = () => {
   const {
     currentUser,
     userProfile,
+    role,
+    setRole,
     isAccountModalOpen,
     setIsAccountModalOpen,
     logout,
@@ -246,9 +249,24 @@ export const AccountModal: React.FC = () => {
                 <h2 className="text-lg sm:text-xl font-bold font-serif text-white truncate">
                   {userProfile?.displayName || currentUser.displayName || 'Customer Account'}
                 </h2>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-400/20 text-amber-300 border border-amber-400/30 shrink-0">
-                  Customer
-                </span>
+                {userProfile?.role === 'admin' ? (
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-gradient-to-r from-amber-400 to-amber-300 text-stone-950 shadow-2xs border border-amber-300 flex items-center gap-1 shrink-0 uppercase tracking-wider">
+                    <ShieldCheck className="w-3 h-3 text-stone-950" />
+                    <span>Admin</span>
+                  </span>
+                ) : userProfile?.role === 'manager' ? (
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-400/20 text-amber-300 border border-amber-400/30 shrink-0">
+                    Manager
+                  </span>
+                ) : userProfile?.role === 'delivery' ? (
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-400/20 text-amber-300 border border-amber-400/30 shrink-0">
+                    Rider
+                  </span>
+                ) : (
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-400/20 text-amber-300 border border-amber-400/30 shrink-0">
+                    Customer
+                  </span>
+                )}
               </div>
               <p className="text-xs text-stone-300 font-mono truncate mt-0.5">
                 {currentUser.email}
@@ -262,6 +280,40 @@ export const AccountModal: React.FC = () => {
             </div>
           </div>
         </div>
+
+        {/* Dedicated Admin Dashboard Banner (Exclusively accessible when authenticated as Admin) */}
+        {userProfile?.role === 'admin' && (
+          <div className="bg-gradient-to-r from-stone-900 via-[#2A1D16] to-[#1C120D] text-white px-5 py-3.5 sm:px-6 border-b border-amber-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shrink-0">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-xl bg-amber-500 text-stone-950 flex items-center justify-center font-bold shadow-xs shrink-0">
+                <Shield className="w-4 h-4" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h4 className="text-xs font-bold text-amber-200">
+                    Admin Management Dashboard
+                  </h4>
+                  <span className="text-[9px] font-black px-1.5 py-0.5 rounded-xs bg-amber-400/20 text-amber-300 border border-amber-400/40 uppercase">
+                    Admin Only
+                  </span>
+                </div>
+                <p className="text-[11px] text-stone-300">
+                  Manage products, pricing, inventory, BOGO offer banner & Firestore database.
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => {
+                setRole('admin');
+                setIsAccountModalOpen(false);
+              }}
+              className="self-start sm:self-center px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-stone-950 font-bold text-xs shadow-xs cursor-pointer flex items-center gap-1.5 transition-all hover:scale-102 shrink-0"
+            >
+              <span>Go to Admin Dashboard</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        )}
 
         {/* Tab Navigation */}
         <div className="flex border-b border-amber-200/70 bg-white px-3 sm:px-6 shrink-0 overflow-x-auto no-scrollbar">

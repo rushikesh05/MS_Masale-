@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { AppProvider, useApp } from './context/AppContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { Header } from './components/Header';
@@ -6,6 +6,7 @@ import { Footer } from './components/Footer';
 import { CustomerPortal } from './components/CustomerPortal';
 import { ManagerPortal } from './components/ManagerPortal';
 import { DeliveryPartnerPortal } from './components/DeliveryPartnerPortal';
+import { AdminCatalogManager } from './components/AdminCatalogManager';
 import { SmartCartDrawer } from './components/SmartCartDrawer';
 import { ProductDetailModal } from './components/ProductDetailModal';
 import { CheckoutModal } from './components/CheckoutModal';
@@ -14,7 +15,7 @@ import { AuthModal } from './components/AuthModal';
 import { AccountModal } from './components/AccountModal';
 import { InvoiceModal } from './components/InvoiceModal';
 import { motion, AnimatePresence } from 'motion/react';
-import { Sparkles, Flame } from 'lucide-react';
+import { Sparkles, Flame, ShieldAlert } from 'lucide-react';
 
 const AppSkeleton: React.FC = () => {
   return (
@@ -69,7 +70,14 @@ const AppContent: React.FC = () => {
     setIsFeedbackModalOpen,
     language 
   } = useApp();
-  const { role } = useAuth();
+  const { role, setRole, userProfile } = useAuth();
+
+  // Enforce admin-only access: if admin role is selected but user is not a verified admin, revert to customer view
+  useEffect(() => {
+    if (role === 'admin' && (!userProfile || userProfile.role !== 'admin')) {
+      setRole('customer');
+    }
+  }, [role, userProfile, setRole]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#FFFDF9] via-[#FAF5EE] to-[#FFF1E8] text-stone-900 flex flex-col font-sans selection:bg-amber-500 selection:text-white relative">
@@ -144,6 +152,37 @@ const AppContent: React.FC = () => {
                   >
                     <DeliveryPartnerPortal />
                   </motion.div>
+                )}
+
+                {role === 'admin' && (
+                  userProfile?.role === 'admin' ? (
+                    <motion.div
+                      key="admin"
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={{ duration: 0.25 }}
+                      className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-8"
+                    >
+                      <AdminCatalogManager />
+                    </motion.div>
+                  ) : (
+                    <div className="max-w-md mx-auto my-16 p-8 rounded-3xl bg-white border border-amber-200 text-center space-y-4 shadow-sm">
+                      <div className="w-12 h-12 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center mx-auto">
+                        <ShieldAlert className="w-6 h-6" />
+                      </div>
+                      <h3 className="font-serif font-bold text-lg text-stone-900">Admin Access Restricted</h3>
+                      <p className="text-xs text-stone-600 leading-relaxed">
+                        The Admin Dashboard is strictly restricted to verified store administrators. Please sign in with an authorized admin account.
+                      </p>
+                      <button
+                        onClick={() => setRole('customer')}
+                        className="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold transition-colors cursor-pointer"
+                      >
+                        Return to Customer Storefront
+                      </button>
+                    </div>
+                  )
                 )}
               </AnimatePresence>
             </main>

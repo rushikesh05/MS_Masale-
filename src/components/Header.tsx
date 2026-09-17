@@ -9,7 +9,8 @@ import {
   User,
   MapPin,
   CreditCard,
-  ChevronDown
+  ChevronDown,
+  Store
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { useAuth } from '../context/AuthContext';
@@ -26,6 +27,8 @@ export const Header: React.FC = () => {
   const {
     currentUser,
     userProfile,
+    role,
+    setRole,
     setIsAuthModalOpen,
     setIsAccountModalOpen,
     setAuthMode,
@@ -98,39 +101,49 @@ export const Header: React.FC = () => {
             <span className="hidden md:inline font-bold">WhatsApp</span>
           </button>
 
-          {/* Top Right Customer Name & Account Section */}
+          {/* Profile / Account Section (Standard Profile Icon - No User Name Mentioned) */}
           {currentUser ? (
-            <div className="relative">
+            <div className="flex items-center gap-1.5 sm:gap-2">
               <button
                 id="header-account-button"
                 onClick={() => setIsAccountModalOpen(true)}
-                className="flex items-center gap-1.5 sm:gap-2 px-2.5 py-1.5 sm:px-3.5 sm:py-2 rounded-full text-xs font-bold transition-all cursor-pointer bg-gradient-to-r from-amber-50 to-orange-50/80 hover:from-amber-100 hover:to-orange-100 text-stone-900 border border-amber-300 shadow-2xs group"
-                title="Open Account Section (Manage Addresses, Payments, Orders)"
+                className="flex items-center gap-1.5 sm:gap-2 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-full text-xs font-bold transition-all cursor-pointer bg-amber-50/90 hover:bg-amber-100/90 text-stone-900 border border-amber-300 shadow-2xs group"
+                title="Account & Profile (Orders, Addresses, Profile Settings)"
+                aria-label="Account and Profile Section"
               >
-                {currentUser.photoURL ? (
-                  <img
-                    src={currentUser.photoURL}
-                    alt="avatar"
-                    referrerPolicy="no-referrer"
-                    className="w-5 h-5 rounded-full object-cover border border-amber-400"
-                  />
-                ) : (
-                  <div className="w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black bg-gradient-to-br from-amber-500 to-orange-600 text-white shadow-xs">
-                    {displayName[0]?.toUpperCase() || 'U'}
-                  </div>
-                )}
+                {/* Standard Profile Icon */}
+                <div className="relative w-6 h-6 rounded-full bg-amber-200/80 group-hover:bg-amber-300/80 flex items-center justify-center text-amber-900 transition-colors">
+                  <User className="w-3.5 h-3.5" />
+                  {/* Subtle active login indicator */}
+                  <span className="absolute bottom-0 right-0 w-1.5 h-1.5 bg-emerald-500 rounded-full border border-white" />
+                </div>
                 
-                {/* Customer Name written on top right near cart */}
-                <div className="text-left flex items-center gap-1">
-                  <span className="font-black text-stone-900 max-w-[85px] sm:max-w-[120px] truncate">
-                    {displayName}
-                  </span>
-                  <span className="hidden sm:inline-block text-[10px] font-semibold text-amber-700 bg-amber-200/60 px-1.5 py-0.2 rounded-full">
+                {/* Clean "Account" Label - No personal name mentioned */}
+                <div className="flex items-center gap-1">
+                  <span className="font-bold text-stone-800 text-xs sm:text-[13px]">
                     Account
                   </span>
+                  {role !== 'customer' && (
+                    <span className="hidden sm:inline-block text-[10px] font-extrabold px-1.5 py-0.5 rounded-full bg-amber-200 text-amber-900 border border-amber-300">
+                      {role === 'admin' ? 'Admin' : role === 'manager' ? 'Manager' : 'Rider'}
+                    </span>
+                  )}
                 </div>
                 <ChevronDown className="w-3 h-3 text-stone-500 group-hover:text-stone-900 transition-colors" />
               </button>
+
+              {/* If an admin is currently in the Admin Dashboard, provide a quick toggle back to the customer storefront */}
+              {role === 'admin' && (
+                <button
+                  type="button"
+                  onClick={() => setRole('customer')}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold border transition-colors cursor-pointer bg-stone-900 hover:bg-stone-800 text-amber-300 border-stone-800 shadow-2xs"
+                  title="Return to Customer Storefront"
+                >
+                  <Store className="w-3.5 h-3.5 text-amber-400" />
+                  <span className="hidden sm:inline">Storefront</span>
+                </button>
+              )}
             </div>
           ) : (
             <button
@@ -139,10 +152,14 @@ export const Header: React.FC = () => {
                 setAuthMode('login');
                 setIsAuthModalOpen(true);
               }}
-              className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-full text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer bg-white hover:bg-amber-50 text-stone-800 border border-amber-200 shadow-2xs"
+              className="px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-full text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer bg-white hover:bg-amber-50 text-stone-800 border border-amber-200 shadow-2xs"
+              title="Account & Profile (Sign In)"
+              aria-label="Sign In to Account"
             >
-              <User className="w-3.5 h-3.5 text-amber-600" />
-              <span>Sign In</span>
+              <div className="w-5 h-5 rounded-full bg-stone-100 flex items-center justify-center text-stone-600">
+                <User className="w-3.5 h-3.5 text-stone-700" />
+              </div>
+              <span>Account</span>
             </button>
           )}
 

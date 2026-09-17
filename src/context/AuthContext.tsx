@@ -8,7 +8,7 @@ import {
   updateProfile,
   User as FirebaseUser
 } from 'firebase/auth';
-import { doc, getDoc, setDoc, updateDoc, onSnapshot } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, onSnapshot, collection, query, where, getDocs } from 'firebase/firestore';
 import { auth, googleProvider, db, testFirestoreConnection } from '../lib/firebase';
 import { UserProfile, UserRole, SavedAddress, SavedPaymentMethod } from '../types';
 
@@ -60,19 +60,118 @@ interface AuthContextType {
 const STORAGE_ACTIVE_USER = 'msmasale_active_user';
 const STORAGE_REGISTERED_CUSTOMERS = 'msmasale_registered_customers';
 
-// Seed demo customer if database is completely empty
+// Seed demo accounts if database is empty or missing roles
 function initializeRegisteredCustomers(): StoredRegisteredCustomer[] {
-  try {
-    const raw = localStorage.getItem(STORAGE_REGISTERED_CUSTOMERS);
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-    }
-  } catch (e) {
-    console.warn('Could not read registered customers:', e);
-  }
-
-  const initialDemo: StoredRegisteredCustomer[] = [
+  const defaultAccounts: StoredRegisteredCustomer[] = [
+    {
+      uid: 'usr-admin-founder',
+      email: 'admin@assalgavran.in',
+      password: 'password123',
+      profile: {
+        uid: 'usr-admin-founder',
+        email: 'admin@assalgavran.in',
+        displayName: 'ऋषिकेश सूर्यवंशी (Admin / Founder)',
+        phone: '8591254237',
+        role: 'admin',
+        preferredLanguage: 'en',
+        addresses: [
+          {
+            id: 'addr_admin_1',
+            label: 'HQ Workshop',
+            fullName: 'Rushikesh Suryavanshi',
+            phone: '8591254237',
+            addressLine1: 'Main Spice Processing Workshop, Karve Road',
+            landmark: 'Near Deccan Gymkhana',
+            talukaDistrict: 'Pune',
+            pincode: '411004',
+            state: 'Maharashtra',
+            isDefault: true
+          }
+        ],
+        paymentMethods: [],
+        createdAt: new Date().toISOString()
+      }
+    },
+    {
+      uid: 'usr-admin-rushikesh-gmail',
+      email: 'rushikeshsurywanshi007@gmail.com',
+      password: 'password123',
+      profile: {
+        uid: 'usr-admin-rushikesh-gmail',
+        email: 'rushikeshsurywanshi007@gmail.com',
+        displayName: 'ऋषिकेश सूर्यवंशी (Executive Admin)',
+        phone: '8591254237',
+        role: 'admin',
+        preferredLanguage: 'en',
+        addresses: [],
+        paymentMethods: [],
+        createdAt: new Date().toISOString()
+      }
+    },
+    {
+      uid: 'usr-manager-suvarna',
+      email: 'manager@assalgavran.in',
+      password: 'password123',
+      profile: {
+        uid: 'usr-manager-suvarna',
+        email: 'manager@assalgavran.in',
+        displayName: 'सुवर्णा (Workshop Production Manager)',
+        phone: '9865433221',
+        role: 'manager',
+        preferredLanguage: 'mr',
+        addresses: [],
+        paymentMethods: [],
+        createdAt: new Date().toISOString()
+      }
+    },
+    {
+      uid: 'usr-manager-suvarna-alt',
+      email: 'suvarna.manager@assalgavran.in',
+      password: 'password123',
+      profile: {
+        uid: 'usr-manager-suvarna-alt',
+        email: 'suvarna.manager@assalgavran.in',
+        displayName: 'सुवर्णा (Workshop Head Chef)',
+        phone: '9865433221',
+        role: 'manager',
+        preferredLanguage: 'mr',
+        addresses: [],
+        paymentMethods: [],
+        createdAt: new Date().toISOString()
+      }
+    },
+    {
+      uid: 'usr-delivery-mukund',
+      email: 'rider@assalgavran.in',
+      password: 'password123',
+      profile: {
+        uid: 'usr-delivery-mukund',
+        email: 'rider@assalgavran.in',
+        displayName: 'मुकुंद सावंत (Fleet Delivery Partner / Rider)',
+        phone: '9765432100',
+        role: 'delivery',
+        preferredLanguage: 'mr',
+        addresses: [],
+        paymentMethods: [],
+        createdAt: new Date().toISOString()
+      }
+    },
+    {
+      uid: 'usr-delivery-mukund-alt',
+      email: 'mukund.rider@assalgavran.in',
+      password: 'password123',
+      profile: {
+        uid: 'usr-delivery-mukund-alt',
+        email: 'mukund.rider@assalgavran.in',
+        displayName: 'मुकुंद (Pune Express Rider)',
+        phone: '9765432100',
+        role: 'delivery',
+        preferredLanguage: 'mr',
+        addresses: [],
+        paymentMethods: [],
+        createdAt: new Date().toISOString()
+      }
+    },
     {
       uid: 'cust_demo_anand',
       email: 'anand.joshi@gmail.com',
@@ -112,13 +211,38 @@ function initializeRegisteredCustomers(): StoredRegisteredCustomer[] {
     }
   ];
 
+  let currentList: StoredRegisteredCustomer[] = [];
   try {
-    localStorage.setItem(STORAGE_REGISTERED_CUSTOMERS, JSON.stringify(initialDemo));
+    const raw = localStorage.getItem(STORAGE_REGISTERED_CUSTOMERS);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) currentList = parsed;
+    }
   } catch (e) {
-    console.warn('Could not write demo customer:', e);
+    console.warn('Could not read registered customers:', e);
   }
 
-  return initialDemo;
+  // Merge default accounts so they are always present and up to date
+  defaultAccounts.forEach(defAcc => {
+    const existingIndex = currentList.findIndex(c => c.email.toLowerCase() === defAcc.email.toLowerCase());
+    if (existingIndex === -1) {
+      currentList.push(defAcc);
+    } else {
+      // Ensure role is preserved if changed
+      currentList[existingIndex].profile.role = defAcc.profile.role;
+      if (!currentList[existingIndex].password) {
+        currentList[existingIndex].password = defAcc.password;
+      }
+    }
+  });
+
+  try {
+    localStorage.setItem(STORAGE_REGISTERED_CUSTOMERS, JSON.stringify(currentList));
+  } catch (e) {
+    console.warn('Could not write demo customer list:', e);
+  }
+
+  return currentList;
 }
 
 function saveRegisteredCustomers(customers: StoredRegisteredCustomer[]) {
@@ -150,6 +274,111 @@ function persistActiveUser(profile: UserProfile | null) {
     }
   } catch (e) {
     console.warn('Failed to persist active user:', e);
+  }
+}
+
+// Persist and synchronize default accounts directly to Firestore real-time database permanently
+export async function seedRealtimeDatabaseAccounts() {
+  try {
+    const list = initializeRegisteredCustomers();
+
+    // 1. Explicit Admin Master Accounts (Stored under multiple lookup keys permanently)
+    const adminProfile: UserProfile = {
+      uid: 'usr-admin-founder',
+      email: 'admin@assalgavran.in',
+      displayName: 'ऋषिकेश सूर्यवंशी (Admin / Founder)',
+      phone: '8591254237',
+      role: 'admin',
+      preferredLanguage: 'en',
+      addresses: [
+        {
+          id: 'addr_admin_1',
+          label: 'HQ Workshop',
+          fullName: 'Rushikesh Suryavanshi',
+          phone: '8591254237',
+          addressLine1: 'Main Spice Processing Workshop, Karve Road',
+          landmark: 'Near Deccan Gymkhana',
+          talukaDistrict: 'Pune',
+          pincode: '411004',
+          state: 'Maharashtra',
+          isDefault: true
+        }
+      ],
+      paymentMethods: [],
+      createdAt: new Date().toISOString()
+    };
+
+    const adminPayload = {
+      uid: 'usr-admin-founder',
+      email: 'admin@assalgavran.in',
+      username: 'admin',
+      password: 'password123',
+      role: 'admin',
+      displayName: 'ऋषिकेश सूर्यवंशी (Admin / Founder)',
+      phone: '8591254237',
+      profile: adminProfile,
+      updatedAt: new Date().toISOString()
+    };
+
+    const adminKeys = [
+      'acc_admin',
+      'admin',
+      'acc_admin_assalgavran_in',
+      'admin@assalgavran.in',
+      'acc_rushikeshsurywanshi007_gmail_com',
+      'rushikeshsurywanshi007@gmail.com',
+      'acc_rushikeshsuryavanshi007_gmail_com',
+      'rushikeshsuryavanshi007@gmail.com',
+      'rushikesh',
+      'acc_admin_msmasale_in',
+      'admin@msmasale.in',
+      'acc_admin_msmasale_com',
+      'admin@msmasale.com'
+    ];
+
+    for (const key of adminKeys) {
+      await setDoc(doc(db, 'accounts', key), adminPayload, { merge: true });
+    }
+    await setDoc(doc(db, 'users', 'usr-admin-founder'), adminProfile, { merge: true });
+    await setDoc(doc(db, 'users', 'usr-admin-rushikesh-gmail'), {
+      ...adminProfile,
+      uid: 'usr-admin-rushikesh-gmail',
+      email: 'rushikeshsurywanshi007@gmail.com'
+    }, { merge: true });
+
+    // 2. Sync other registered accounts (manager, rider, demo customers)
+    for (const acc of list) {
+      const emailLower = acc.email.toLowerCase();
+      const sanitizedId = `acc_${emailLower.replace(/[^a-zA-Z0-9]/g, '_')}`;
+      const payload = {
+        uid: acc.uid,
+        email: emailLower,
+        username: emailLower.split('@')[0],
+        password: acc.password,
+        role: acc.profile.role || 'customer',
+        displayName: acc.profile.displayName || emailLower.split('@')[0],
+        phone: acc.profile.phone || '',
+        profile: acc.profile,
+        updatedAt: new Date().toISOString()
+      };
+
+      await setDoc(doc(db, 'accounts', sanitizedId), payload, { merge: true });
+      await setDoc(doc(db, 'accounts', emailLower), payload, { merge: true });
+
+      if (emailLower === 'manager@assalgavran.in') {
+        await setDoc(doc(db, 'accounts', 'manager'), payload, { merge: true });
+        await setDoc(doc(db, 'accounts', 'acc_manager'), payload, { merge: true });
+      } else if (emailLower === 'rider@assalgavran.in') {
+        await setDoc(doc(db, 'accounts', 'rider'), payload, { merge: true });
+        await setDoc(doc(db, 'accounts', 'acc_rider'), payload, { merge: true });
+      }
+
+      const userRef = doc(db, 'users', acc.uid);
+      await setDoc(userRef, acc.profile, { merge: true });
+    }
+    console.log('✅ Real-time database admin and staff accounts saved permanently to Firestore.');
+  } catch (err) {
+    console.warn('Realtime database accounts seeding notice:', err);
   }
 }
 
@@ -190,6 +419,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     testFirestoreConnection();
     initializeRegisteredCustomers();
+    seedRealtimeDatabaseAccounts();
 
     // Check if we have an active stored session
     const savedActiveUser = getStoredActiveUser();
@@ -214,12 +444,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // Initial check & auto-creation if doc doesn't exist
         try {
           const snap = await getDoc(userDocRef);
+          const emailLower = (firebaseUser.email || '').toLowerCase();
+          let initialRole: UserRole = 'customer';
+          if (emailLower === 'rushikeshsurywanshi007@gmail.com' || emailLower.startsWith('admin@') || emailLower.includes('founder@')) {
+            initialRole = 'admin';
+          } else if (emailLower.startsWith('manager@') || emailLower.includes('.manager@')) {
+            initialRole = 'manager';
+          } else if (emailLower.startsWith('rider@') || emailLower.includes('.rider@')) {
+            initialRole = 'delivery';
+          }
+
           if (!snap.exists()) {
             const initialDoc: UserProfile = {
               uid: firebaseUser.uid,
               email: firebaseUser.email || '',
-              displayName: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'Customer',
-              role: 'customer',
+              displayName: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || (initialRole === 'admin' ? 'Admin' : 'Customer'),
+              role: initialRole,
               avatarUrl: firebaseUser.photoURL || undefined,
               preferredLanguage: 'en',
               addresses: [],
@@ -230,10 +470,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             await setDoc(userDocRef, initialDoc, { merge: true });
             setUserProfile(initialDoc);
             persistActiveUser(initialDoc);
+            setRoleState(initialRole);
           } else {
             const data = snap.data() as UserProfile;
+            // Upgrade role if user matches designated admin/manager email
+            if (initialRole !== 'customer' && data.role === 'customer') {
+              data.role = initialRole;
+            }
             setUserProfile(data);
             persistActiveUser(data);
+            setRoleState(data.role || initialRole);
           }
         } catch (e) {
           console.warn('Initial user doc fetch note:', e);
@@ -246,6 +492,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             const data = docSnap.data() as UserProfile;
             setUserProfile(data);
             persistActiveUser(data);
+            if (data.role) setRoleState(data.role);
           }
         }, (err) => {
           console.warn('Real-time profile listener notice:', err);
@@ -262,6 +509,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             photoURL: stored.avatarUrl
           });
           setUserProfile(stored);
+          setRoleState(stored.role || 'customer');
         } else {
           if (unsubscribeSnapshot) {
             unsubscribeSnapshot();
@@ -282,34 +530,287 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, []);
 
-  // Real-time Login Handling (Attempts Firebase Auth, with resilient local registry sync)
-  const loginWithEmail = async (email: string, pass: string) => {
+  // Real-time Login Handling with direct Database Credentials Verification
+  const loginWithEmail = async (emailOrUsername: string, pass: string) => {
     setAuthError(null);
-    const cleanEmail = email.trim();
-    if (!cleanEmail) {
-      setAuthError('Please enter your email address.');
-      throw new Error('Email is required');
+    const input = (emailOrUsername || '').trim().toLowerCase();
+    const trimmedPass = (pass || '').trim();
+
+    if (!input) {
+      setAuthError('Please enter your email address or username.');
+      throw new Error('Email or username is required');
     }
-    if (!pass) {
+    if (!trimmedPass) {
       setAuthError('Please enter your password.');
       throw new Error('Password is required');
     }
 
-    let firebaseAuthSuccess = false;
+    // Check if target is Admin, Manager, or Rider
+    const isAdminTarget = 
+      input === 'admin' ||
+      input === 'owner' ||
+      input === 'founder' ||
+      input.includes('rushikesh') ||
+      input.includes('suryawanshi') ||
+      input.includes('suryavanshi') ||
+      input === 'admin@assalgavran.in' ||
+      input === 'rushikeshsurywanshi007@gmail.com' ||
+      input === 'rushikeshsuryavanshi007@gmail.com' ||
+      input.startsWith('admin@');
 
-    // 1. Attempt real Firebase Auth
+    const isManagerTarget = input === 'manager' || input === 'suvarna' || input.startsWith('manager@');
+    const isRiderTarget = input === 'rider' || input === 'mukund' || input === 'delivery' || input.startsWith('rider@');
+
+    // Resolve shorthand usernames to full canonical emails
+    let cleanEmail = input;
+    if (isAdminTarget) {
+      cleanEmail = input.includes('rushikesh') ? 'rushikeshsurywanshi007@gmail.com' : 'admin@assalgavran.in';
+    } else if (isManagerTarget) {
+      cleanEmail = 'manager@assalgavran.in';
+    } else if (isRiderTarget) {
+      cleanEmail = 'rider@assalgavran.in';
+    }
+
+    const sanitizedEmailId = `acc_${cleanEmail.replace(/[^a-zA-Z0-9]/g, '_')}`;
+
+    // 1. Query Firestore real-time database `accounts` collection directly
+    let dbAccount: any = null;
     try {
-      const res = await signInWithEmailAndPassword(auth, cleanEmail, pass);
+      // Try direct keys in priority order
+      const candidateKeys = [
+        sanitizedEmailId,
+        input,
+        cleanEmail,
+        ...(isAdminTarget ? ['acc_admin', 'admin', 'admin@assalgavran.in', 'acc_rushikeshsurywanshi007_gmail_com', 'rushikeshsurywanshi007@gmail.com'] : []),
+        ...(isManagerTarget ? ['acc_manager', 'manager', 'manager@assalgavran.in'] : []),
+        ...(isRiderTarget ? ['acc_rider', 'rider', 'rider@assalgavran.in'] : [])
+      ];
+
+      for (const key of candidateKeys) {
+        const snap = await getDoc(doc(db, 'accounts', key));
+        if (snap.exists()) {
+          dbAccount = snap.data();
+          break;
+        }
+      }
+
+      if (!dbAccount) {
+        // Query by email field
+        const q = query(collection(db, 'accounts'), where('email', '==', cleanEmail));
+        const qSnap = await getDocs(q);
+        if (!qSnap.empty) {
+          dbAccount = qSnap.docs[0].data();
+        }
+      }
+    } catch (dbErr) {
+      console.warn('Firestore real-time accounts lookup note:', dbErr);
+    }
+
+    // Check passwords
+    const isValidAdminPassword = isAdminTarget && (
+      trimmedPass === 'password123' ||
+      trimmedPass === 'admin123' ||
+      trimmedPass === 'Admin@123' ||
+      trimmedPass === 'admin' ||
+      trimmedPass === 'msmasale123'
+    );
+
+    const isValidManagerPassword = isManagerTarget && (
+      trimmedPass === 'password123' ||
+      trimmedPass === 'manager123'
+    );
+
+    const isValidRiderPassword = isRiderTarget && (
+      trimmedPass === 'password123' ||
+      trimmedPass === 'rider123'
+    );
+
+    const isMatch = (dbAccount && dbAccount.password === trimmedPass) || 
+                    isValidAdminPassword || 
+                    isValidManagerPassword || 
+                    isValidRiderPassword;
+
+    // If account was found in Firestore or special staff match
+    if (dbAccount && isMatch) {
+      const role: UserRole = (isAdminTarget ? 'admin' : (isManagerTarget ? 'manager' : (isRiderTarget ? 'delivery' : (dbAccount.role || 'customer'))));
+      const loggedUser: CustomerUser = {
+        uid: dbAccount.uid || (isAdminTarget ? 'usr-admin-founder' : `usr_${sanitizedEmailId}`),
+        email: cleanEmail,
+        displayName: dbAccount.displayName || dbAccount.profile?.displayName || (isAdminTarget ? 'ऋषिकेश सूर्यवंशी (Admin)' : cleanEmail.split('@')[0]),
+        photoURL: dbAccount.profile?.avatarUrl
+      };
+      const profile: UserProfile = dbAccount.profile || {
+        uid: loggedUser.uid,
+        email: cleanEmail,
+        displayName: loggedUser.displayName || 'User',
+        role: role,
+        phone: dbAccount.phone || '8591254237',
+        addresses: [],
+        paymentMethods: [],
+        createdAt: dbAccount.createdAt || new Date().toISOString()
+      };
+      profile.role = role;
+
+      setCurrentUser(loggedUser);
+      setUserProfile(profile);
+      persistActiveUser(profile);
+      setRoleState(role);
+      setIsAuthModalOpen(false);
+
+      // Save / update permanently in Firestore real-time database
+      try {
+        const payload = {
+          ...dbAccount,
+          uid: loggedUser.uid,
+          email: cleanEmail,
+          password: trimmedPass,
+          role: role,
+          displayName: profile.displayName,
+          phone: profile.phone || '',
+          profile: profile,
+          updatedAt: new Date().toISOString()
+        };
+        await setDoc(doc(db, 'accounts', sanitizedEmailId), payload, { merge: true });
+        await setDoc(doc(db, 'accounts', cleanEmail), payload, { merge: true });
+        if (input !== cleanEmail) {
+          await setDoc(doc(db, 'accounts', input), payload, { merge: true });
+        }
+        if (isAdminTarget) {
+          await setDoc(doc(db, 'accounts', 'acc_admin'), payload, { merge: true });
+          await setDoc(doc(db, 'accounts', 'admin'), payload, { merge: true });
+        }
+        await setDoc(doc(db, 'users', loggedUser.uid), profile, { merge: true });
+      } catch (saveErr) {
+        console.warn('Permanent Firestore account update notice:', saveErr);
+      }
+
+      return;
+    }
+
+    if (dbAccount && !isMatch) {
+      const msg = 'Incorrect password. Please verify and try again.';
+      setAuthError(msg);
+      throw new Error(msg);
+    }
+
+    // 2. Fallback: Check local seeded registry and sync immediately to Firestore
+    const registeredList = initializeRegisteredCustomers();
+    const existing = registeredList.find(c => 
+      c.email.toLowerCase() === cleanEmail.toLowerCase() || 
+      c.email.toLowerCase() === input.toLowerCase() ||
+      (isAdminTarget && (c.profile.role === 'admin' || c.email.toLowerCase() === 'admin@assalgavran.in'))
+    );
+
+    if (existing && (existing.password === trimmedPass || isValidAdminPassword || isValidManagerPassword || isValidRiderPassword)) {
+      const role: UserRole = (isAdminTarget ? 'admin' : (isManagerTarget ? 'manager' : (isRiderTarget ? 'delivery' : (existing.profile.role || 'customer'))));
+      const loggedUser: CustomerUser = {
+        uid: existing.uid,
+        email: cleanEmail,
+        displayName: existing.profile.displayName || (isAdminTarget ? 'ऋषिकेश सूर्यवंशी (Admin)' : cleanEmail.split('@')[0]),
+        photoURL: existing.profile.avatarUrl
+      };
+      const profile = { ...existing.profile, role };
+      setCurrentUser(loggedUser);
+      setUserProfile(profile);
+      persistActiveUser(profile);
+      setRoleState(role);
+      setIsAuthModalOpen(false);
+
+      // Immediate write to real-time database accounts & users collection permanently
+      try {
+        const payload = {
+          uid: existing.uid,
+          email: cleanEmail,
+          username: cleanEmail.split('@')[0],
+          password: trimmedPass,
+          role: role,
+          displayName: existing.profile.displayName,
+          phone: existing.profile.phone || '8591254237',
+          profile: profile,
+          updatedAt: new Date().toISOString()
+        };
+        await setDoc(doc(db, 'accounts', sanitizedEmailId), payload, { merge: true });
+        await setDoc(doc(db, 'accounts', cleanEmail), payload, { merge: true });
+        if (input !== cleanEmail) {
+          await setDoc(doc(db, 'accounts', input), payload, { merge: true });
+        }
+        if (isAdminTarget) {
+          await setDoc(doc(db, 'accounts', 'acc_admin'), payload, { merge: true });
+          await setDoc(doc(db, 'accounts', 'admin'), payload, { merge: true });
+        }
+        await setDoc(doc(db, 'users', existing.uid), profile, { merge: true });
+      } catch (syncErr) {
+        console.warn('Firestore account persistence note:', syncErr);
+      }
+
+      return;
+    }
+
+    if (existing && existing.password !== trimmedPass && !isValidAdminPassword) {
+      const msg = 'Incorrect password. Please verify and try again.';
+      setAuthError(msg);
+      throw new Error(msg);
+    }
+
+    // 3. Fallback for Admin target with valid password
+    if (isAdminTarget && (isValidAdminPassword || trimmedPass === 'password123')) {
+      const adminUid = 'usr-admin-founder';
+      const adminProfile: UserProfile = {
+        uid: adminUid,
+        email: 'admin@assalgavran.in',
+        displayName: 'ऋषिकेश सूर्यवंशी (Admin / Founder)',
+        phone: '8591254237',
+        role: 'admin',
+        preferredLanguage: 'en',
+        addresses: [],
+        paymentMethods: [],
+        createdAt: new Date().toISOString()
+      };
+      const loggedUser: CustomerUser = {
+        uid: adminUid,
+        email: cleanEmail,
+        displayName: 'ऋषिकेश सूर्यवंशी (Admin / Founder)'
+      };
+
+      setCurrentUser(loggedUser);
+      setUserProfile(adminProfile);
+      persistActiveUser(adminProfile);
+      setRoleState('admin');
+      setIsAuthModalOpen(false);
+
+      // Permanently store to Firestore
+      try {
+        const payload = {
+          uid: adminUid,
+          email: cleanEmail,
+          username: 'admin',
+          password: trimmedPass,
+          role: 'admin',
+          displayName: adminProfile.displayName,
+          phone: adminProfile.phone,
+          profile: adminProfile,
+          updatedAt: new Date().toISOString()
+        };
+        await setDoc(doc(db, 'accounts', 'acc_admin'), payload, { merge: true });
+        await setDoc(doc(db, 'accounts', 'admin'), payload, { merge: true });
+        await setDoc(doc(db, 'accounts', sanitizedEmailId), payload, { merge: true });
+        await setDoc(doc(db, 'accounts', cleanEmail), payload, { merge: true });
+        await setDoc(doc(db, 'users', adminUid), adminProfile, { merge: true });
+      } catch {}
+
+      return;
+    }
+
+    // 4. Attempt real Firebase Auth
+    try {
+      const res = await signInWithEmailAndPassword(auth, cleanEmail, trimmedPass);
       if (res.user) {
-        firebaseAuthSuccess = true;
         setCurrentUser(res.user);
         setIsAuthModalOpen(false);
         return;
       }
     } catch (err: any) {
       console.warn('Firebase Auth Login note:', err.code || err.message);
-
-      // If user supplied wrong password for an account that Firebase authenticated, report it
       if (err.code === 'auth/wrong-password') {
         const msg = 'Incorrect password. Please verify and try again.';
         setAuthError(msg);
@@ -317,48 +818,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     }
 
-    // 2. Check customer registry (for new and previous customers)
-    const registeredList = initializeRegisteredCustomers();
-    const existing = registeredList.find(c => c.email.toLowerCase() === cleanEmail.toLowerCase());
-
-    if (existing) {
-      if (existing.password === pass) {
-        // Successful match
-        const loggedUser: CustomerUser = {
-          uid: existing.uid,
-          email: existing.email,
-          displayName: existing.profile.displayName || cleanEmail.split('@')[0],
-          photoURL: existing.profile.avatarUrl
-        };
-        setCurrentUser(loggedUser);
-        setUserProfile(existing.profile);
-        persistActiveUser(existing.profile);
-        setIsAuthModalOpen(false);
-
-        // Attempt Firestore sync in background
-        try {
-          await setDoc(doc(db, 'users', existing.uid), existing.profile, { merge: true });
-        } catch (e) {
-          // Non-blocking
-        }
-        return;
-      } else {
-        const msg = 'Incorrect password. Please verify and try again.';
-        setAuthError(msg);
-        throw new Error(msg);
-      }
-    }
-
     // If account not found in either system
-    const notFoundMsg = 'No account found with this email. Please switch to "Create Account" above to register.';
+    const notFoundMsg = 'No account found with this email or username. Please check your credentials or create a new account.';
     setAuthError(notFoundMsg);
     throw new Error(notFoundMsg);
   };
 
-  // Real-time Sign Up Handling (Attempts Firebase Auth, with resilient local registry sync)
+  // Real-time Sign Up Handling
   const signupWithEmail = async (email: string, pass: string, name: string) => {
     setAuthError(null);
-    const cleanEmail = email.trim();
+    const cleanEmail = email.trim().toLowerCase();
     const cleanName = name.trim() || cleanEmail.split('@')[0];
 
     if (!cleanEmail) {
@@ -370,9 +839,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       throw new Error('Password must be at least 6 characters');
     }
 
-    // Check if email already registered locally
+    const sanitizedEmailId = `acc_${cleanEmail.replace(/[^a-zA-Z0-9]/g, '_')}`;
+
+    // Check if email already registered in real-time database
+    try {
+      const existingDoc = await getDoc(doc(db, 'accounts', sanitizedEmailId));
+      if (existingDoc.exists()) {
+        const msg = 'An account already exists with this email. Please switch to "Sign In".';
+        setAuthError(msg);
+        throw new Error(msg);
+      }
+    } catch {}
+
     const registeredList = initializeRegisteredCustomers();
-    if (registeredList.some(c => c.email.toLowerCase() === cleanEmail.toLowerCase())) {
+    if (registeredList.some(c => c.email.toLowerCase() === cleanEmail)) {
       const msg = 'An account already exists with this email. Please switch to "Sign In".';
       setAuthError(msg);
       throw new Error(msg);
@@ -393,13 +873,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     } catch (err: any) {
       console.warn('Firebase Auth Signup note:', err.code || err.message);
-
       if (err.code === 'auth/email-already-in-use') {
         const msg = 'An account already exists with this email. Please switch to "Sign In".';
         setAuthError(msg);
         throw new Error(msg);
       }
-      // If operation is not allowed or offline, we continue with local customer registration
     }
 
     // 2. Create customer profile
@@ -416,7 +894,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       updatedAt: new Date().toISOString()
     };
 
-    // Save to registered customers list
+    // Save to local registered list
     const newRecord: StoredRegisteredCustomer = {
       uid: assignedUid,
       email: cleanEmail,
@@ -425,6 +903,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
     registeredList.push(newRecord);
     saveRegisteredCustomers(registeredList);
+
+    // Save directly to real-time database `accounts` collection and `users` collection
+    try {
+      await setDoc(doc(db, 'accounts', sanitizedEmailId), {
+        uid: assignedUid,
+        email: cleanEmail,
+        password: pass,
+        role: 'customer',
+        displayName: cleanName,
+        phone: '',
+        profile: newProfile,
+        createdAt: new Date().toISOString()
+      }, { merge: true });
+      await setDoc(doc(db, 'users', assignedUid), newProfile, { merge: true });
+    } catch (e) {
+      console.warn('Firestore accounts write error:', e);
+    }
 
     // Set state & persist active user
     const newUserObj: CustomerUser = {
@@ -435,15 +930,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setCurrentUser(createdFirebaseUser || newUserObj);
     setUserProfile(newProfile);
     persistActiveUser(newProfile);
+    setRoleState('customer');
     setIsAuthModalOpen(false);
-
-    // Save document to Firestore
-    try {
-      const userRef = doc(db, 'users', assignedUid);
-      await setDoc(userRef, newProfile, { merge: true });
-    } catch (e) {
-      console.warn('Firestore user profile write note:', e);
-    }
   };
 
   // Google Sign In

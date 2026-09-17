@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { UserRole, Language, CartItem, Product, ProductCategory, CustomChutneyConfig, WhatsAppNotification, Order } from '../types';
+import { UserRole, Language, CartItem, Product, ProductCategory, CustomChutneyConfig, WhatsAppNotification, Order, BogoOfferConfig } from '../types';
 import { PRODUCTS, INITIAL_CATEGORIES, INITIAL_ORDERS } from '../data/initialData';
 import { 
   subscribeToProducts, 
@@ -8,7 +8,11 @@ import {
   deleteProductFromFirestore, 
   saveCategoryToFirestore, 
   deleteCategoryFromFirestore,
-  seedCatalogToFirestore 
+  seedCatalogToFirestore,
+  ensureAllProductsInFirestore,
+  DEFAULT_BOGO_CONFIG,
+  saveBogoOfferToFirestore,
+  subscribeToBogoOffer
 } from '../lib/firestoreService';
 import { subscribeToOrders } from '../lib/firestoreSync';
 
@@ -45,6 +49,11 @@ interface AppContextType {
   deleteCategory: (categoryId: string) => Promise<void>;
   seedCatalog: () => Promise<void>;
   isSyncingCatalog: boolean;
+
+  // BOGO Offer Configuration (Admin Dashboard Dynamic Control)
+  bogoConfig: BogoOfferConfig;
+  updateBogoConfig: (config: BogoOfferConfig) => Promise<void>;
+  resetBogoConfig: () => Promise<void>;
 
   // Navigation & View control
   activeTab: string;
@@ -132,8 +141,24 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [categories, setCategories] = useState<ProductCategory[]>(INITIAL_CATEGORIES);
   const [isSyncingCatalog, setIsSyncingCatalog] = useState<boolean>(false);
 
-  // Firestore Real-time Subscriptions for Catalog
+  // BOGO Offer State (with localStorage caching + live Firestore subscription)
+  const [bogoConfig, setBogoConfigState] = useState<BogoOfferConfig>(() => {
+    try {
+      const saved = localStorage.getItem('ms_bogo_offer_config');
+      if (saved) {
+        return { ...DEFAULT_BOGO_CONFIG, ...JSON.parse(saved) };
+      }
+    } catch (e) {
+      console.warn('Error reading saved BOGO config:', e);
+    }
+    return DEFAULT_BOGO_CONFIG;
+  });
+
+  // Firestore Real-time Subscriptions for Catalog & BOGO
   useEffect(() => {
+    // Ensure all baseline products and categories are safely persisted to Firestore
+    ensureAllProductsInFirestore().catch(e => console.warn('Catalog Firestore check:', e));
+
     const unsubProducts = subscribeToProducts((remoteProds) => {
       if (remoteProds && remoteProds.length > 0) {
         setProducts(remoteProds);
@@ -146,11 +171,48 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       }
     });
 
+    const unsubBogo = subscribeToBogoOffer((remoteBogo) => {
+      if (remoteBogo) {
+        setBogoConfigState(remoteBogo);
+        try {
+          localStorage.setItem('ms_bogo_offer_config', JSON.stringify(remoteBogo));
+        } catch {}
+      }
+    });
+
     return () => {
       unsubProducts();
       unsubCategories();
+      unsubBogo();
     };
   }, []);
+
+  const updateBogoConfig = async (newConfig: BogoOfferConfig) => {
+    setBogoConfigState(newConfig);
+    try {
+      localStorage.setItem('ms_bogo_offer_config', JSON.stringify(newConfig));
+      localStorage.setItem('ms_bogo_banner_img', newConfig.imageUrl);
+    } catch {}
+    try {
+      await saveBogoOfferToFirestore(newConfig);
+      showToast('🎉 BOGO Offer & Banner updated successfully!');
+    } catch (err) {
+      console.warn('Firestore BOGO save fallback:', err);
+      showToast('Saved BOGO offer locally!');
+    }
+  };
+
+  const resetBogoConfig = async () => {
+    setBogoConfigState(DEFAULT_BOGO_CONFIG);
+    try {
+      localStorage.setItem('ms_bogo_offer_config', JSON.stringify(DEFAULT_BOGO_CONFIG));
+      localStorage.setItem('ms_bogo_banner_img', DEFAULT_BOGO_CONFIG.imageUrl);
+      await saveBogoOfferToFirestore(DEFAULT_BOGO_CONFIG);
+      showToast('Reset BOGO offer to default Peanut & Garlic Chutney!');
+    } catch (err) {
+      console.warn('Reset error:', err);
+    }
+  };
 
   const addProduct = async (newProd: Product) => {
     setIsSyncingCatalog(true);
@@ -523,7 +585,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         updateCategory,
         deleteCategory,
         seedCatalog,
-        isSyncingCatalog
+        isSyncingCatalog,
+        bogoConfig,
+        updateBogoConfig,
+        resetBogoConfig
       }}
     >
       {children}

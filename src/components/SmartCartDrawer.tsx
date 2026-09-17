@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Trash2, ShoppingBag, ArrowRight, Sparkles, Tag, ShieldCheck, Plus, Minus, Gift } from 'lucide-react';
 import { useApp } from '../context/AppContext';
-import { ChutneyArtwork } from './ChutneyArtwork';
 
 export const SmartCartDrawer: React.FC = () => {
   const { language, cart, isCartOpen, setIsCartOpen, removeFromCart, updateQuantity, cartSubtotal, setIsCheckoutOpen } = useApp();
@@ -220,7 +219,7 @@ export const SmartCartDrawer: React.FC = () => {
                 <div className="p-2.5 rounded-xl bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-300/80 flex items-center gap-2">
                   <Gift className="w-4 h-4 text-amber-700 shrink-0 animate-pulse" />
                   <p className="text-[11px] font-bold text-amber-950 leading-tight">
-                    🎁 Festive BOGO active: 1 Free Shengdana Peanut Chutney Jar included with your package!
+                    🎁 Festive BOGO active: 1 Free Peanut and Garlic Chutney (शेंगदाणा आणि लसूण चटणी) Jar included with your package!
                   </p>
                 </div>
 

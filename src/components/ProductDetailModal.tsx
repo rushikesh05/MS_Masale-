@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Star, ShoppingBag, Check, ShieldCheck, ChevronDown } from 'lucide-react';
+import { X, Star, ShoppingBag, Check, ShieldCheck, ChevronDown, Maximize2 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { ProductVisual } from './ProductVisual';
 import { StockBadge } from './StockBadge';
@@ -11,6 +11,7 @@ export const ProductDetailModal: React.FC = () => {
   const isMr = language === 'mr';
 
   const product = selectedProductDetail;
+  const [isLightboxOpen, setIsLightboxOpen] = useState<boolean>(false);
 
   // Standard sizes: 250g, 500g, 1kg
   const selectableSizes = useMemo(() => {
@@ -114,17 +115,29 @@ export const ProductDetailModal: React.FC = () => {
 
           {/* Modal Content Layout: 1 col on mobile, 2 cols on desktop */}
           <div className="flex-1 overflow-y-auto grid grid-cols-1 md:grid-cols-5 scrollbar-thin">
-            {/* Visual Header / Image Container (Compact on mobile) */}
-            <div className="md:col-span-2 relative aspect-[16/10] md:aspect-auto md:h-full bg-gradient-to-b from-[#FDFBF7] to-[#F5ECE0] overflow-hidden border-b md:border-b-0 md:border-r border-stone-200/80">
+            {/* Visual Header / Image Container (Clean pure white) */}
+            <div className="md:col-span-2 relative aspect-[16/10] md:aspect-auto md:h-full bg-white overflow-hidden border-b md:border-b-0 md:border-r border-stone-200/80 flex items-center justify-center group/modalimg">
               <ProductVisual 
                 product={product} 
                 isMarathi={isMr} 
                 aspectRatio="modal"
-                className="w-full h-full object-cover"
+                className="w-full h-full"
               />
+
+              {/* Zoom / Full Packaging Photo Button */}
+              <button
+                type="button"
+                onClick={() => setIsLightboxOpen(true)}
+                title={isMr ? 'मूळ पॅकिंग फोटो पहा' : 'View Full Packaging Photo'}
+                className="absolute top-2.5 left-2.5 z-20 px-2.5 py-1 rounded-lg bg-white/95 hover:bg-white text-stone-800 text-[10px] sm:text-xs font-semibold shadow-xs border border-stone-200 flex items-center gap-1.5 transition-transform hover:scale-105 active:scale-95 cursor-pointer"
+              >
+                <Maximize2 className="w-3 h-3 text-stone-600" />
+                <span>{isMr ? 'पॅकिंग फोटो' : 'Full Photo'}</span>
+              </button>
+
               {/* Product Badge Overlay */}
-              <div className="absolute bottom-2 left-2 pointer-events-none">
-                <span className="px-2 py-0.5 rounded-md bg-stone-900/80 backdrop-blur-xs text-white text-[10px] font-bold">
+              <div className="absolute bottom-2.5 left-2.5 pointer-events-none">
+                <span className="px-2.5 py-0.5 rounded-full bg-stone-900/75 backdrop-blur-xs text-white text-[10px] font-bold">
                   {isMr ? product.nameMr : product.badgeEn || 'MS Masale'}
                 </span>
               </div>
@@ -281,6 +294,53 @@ export const ProductDetailModal: React.FC = () => {
             </motion.button>
           </div>
         </motion.div>
+
+        {/* Full Packaging Photo Lightbox / Zoom View */}
+        {isLightboxOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-60 bg-black/90 backdrop-blur-md flex flex-col items-center justify-center p-4 sm:p-6"
+            onClick={() => setIsLightboxOpen(false)}
+          >
+            <div className="relative max-w-4xl w-full max-h-[90vh] flex flex-col items-center justify-center bg-white rounded-2xl overflow-hidden shadow-2xl p-2 sm:p-4">
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsLightboxOpen(false);
+                }}
+                className="absolute top-3 right-3 z-30 w-10 h-10 rounded-full bg-stone-900/80 hover:bg-stone-900 text-white flex items-center justify-center transition-all cursor-pointer"
+                title="Close full photo"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              <div className="w-full flex items-center justify-center overflow-auto max-h-[82vh]">
+                <img
+                  src={
+                    product.id === 'prod-metkut'
+                      ? '/products/metkut-rice-wide.jpg'
+                      : product.imageUrl || '/products/kanda-lasun.jpg'
+                  }
+                  alt={isMr ? product.nameMr : product.nameEn}
+                  className="max-w-full max-h-[80vh] object-contain rounded-lg"
+                  onClick={(e) => e.stopPropagation()}
+                />
+              </div>
+
+              <div className="w-full text-center mt-3 pt-2 border-t border-stone-100 flex items-center justify-between px-2 text-xs text-stone-600">
+                <span className="font-semibold text-stone-800">
+                  {isMr ? product.nameMr : product.nameEn} — {isMr ? 'मूळ पॅकिंग व उत्पादन' : 'Original Packaging & Product'}
+                </span>
+                <span className="text-stone-400">
+                  100% Authentic Photo
+                </span>
+              </div>
+            </div>
+          </motion.div>
+        )}
       </div>
     </AnimatePresence>
   );

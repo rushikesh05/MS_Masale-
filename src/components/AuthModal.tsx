@@ -59,13 +59,6 @@ export const AuthModal: React.FC = () => {
     }
   };
 
-  const fillDemoAccount = () => {
-    setAuthMode('login');
-    setEmail('anand.joshi@gmail.com');
-    setPassword('password123');
-    clearAuthError();
-  };
-
   return (
     <div id="auth-modal-overlay" className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-stone-900/70 backdrop-blur-md animate-in fade-in duration-200">
       <motion.div
@@ -140,22 +133,6 @@ export const AuthModal: React.FC = () => {
 
         {/* Scrollable Form Body */}
         <div className="p-5 sm:p-6 overflow-y-auto space-y-4 flex-1">
-          {/* Quick Demo Credentials helper */}
-          {authMode === 'login' && (
-            <div className="p-2.5 rounded-xl bg-amber-50/80 border border-amber-200/80 flex items-center justify-between gap-2 text-xs">
-              <span className="text-amber-900 font-medium truncate">
-                Existing user test: <span className="font-mono font-bold">anand.joshi@gmail.com</span>
-              </span>
-              <button
-                type="button"
-                onClick={fillDemoAccount}
-                className="px-2 py-1 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-bold text-[11px] shrink-0 transition-colors cursor-pointer"
-              >
-                Auto-fill
-              </button>
-            </div>
-          )}
-
           {/* Google Sign In Button */}
           <button
             id="btn-google-sign-in"
@@ -254,17 +231,21 @@ export const AuthModal: React.FC = () => {
             )}
 
             <div>
-              <label className="block text-xs font-bold text-stone-700 mb-1">
-                Email Address
-              </label>
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-xs font-bold text-stone-700">
+                  {authMode === 'login' ? 'Email or Username' : 'Email Address'}
+                </label>
+              </div>
               <div className="relative">
                 <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
                 <input
-                  type="email"
+                  type={authMode === 'login' ? 'text' : 'email'}
                   required
-                  placeholder="yourname@gmail.com"
+                  placeholder={authMode === 'login' ? 'Email or username' : 'yourname@gmail.com'}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  autoCapitalize="none"
+                  autoCorrect="off"
                   className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-stone-300 text-sm focus:border-amber-500 focus:ring-2 focus:ring-amber-400/30 outline-none transition-all"
                 />
               </div>
@@ -279,7 +260,6 @@ export const AuthModal: React.FC = () => {
                 <input
                   type="password"
                   required
-                  minLength={6}
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}

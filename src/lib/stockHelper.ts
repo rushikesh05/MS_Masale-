@@ -26,11 +26,9 @@ function getSeedStock(productId: string, sizeName: string = ''): { count: number
   const highDemandProducts = [
     'prod-kanda-lasun',
     'prod-kolhapuri-thecha',
-    'prod-saoji-masala',
-    'prod-karale-khurasani',
-    'prod-malvani-masala',
+    'prod-kala-masala',
     'prod-hirvi-mirchi-lonche',
-    'prod-khandeshi-kala-masala'
+    'prod-shengdana-chutney'
   ];
 
   if (highDemandProducts.includes(productId)) {

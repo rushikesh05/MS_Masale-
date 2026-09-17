@@ -48,7 +48,8 @@ export const CustomerPortal: React.FC = () => {
     products, 
     categories: dynamicCategories,
     language,
-    showToast
+    showToast,
+    bogoConfig
   } = useApp();
   const { currentUser, setIsAuthModalOpen, setAuthMode } = useAuth();
   const isMr = language === 'mr';
@@ -64,14 +65,12 @@ export const CustomerPortal: React.FC = () => {
   const [priceFilter, setPriceFilter] = useState<PriceFilterOption>('all');
   const [popularityFilter, setPopularityFilter] = useState<PopularityFilterOption>('all');
 
-  // Classic, simple category list with primary categories for Chutneys and Pickles
+  // Primary categories matching the authentic MS Masale catalog
   const categories = [
     { id: 'all', name: 'All Products' },
-    { id: 'chutneys', name: 'Chutneys' },
-    { id: 'achar-lonach', name: 'Pickles' },
-    { id: 'masala', name: 'Masalas' },
-    { id: 'thecha', name: 'Thecha' },
-    { id: 'metkut', name: 'Metkut' },
+    { id: 'chutneys', name: 'Chutneys & Thecha' },
+    { id: 'achar-lonach', name: 'Pickles (Lonche)' },
+    { id: 'masala', name: 'Masalas & Metkut' },
     ...dynamicCategories
       .filter(dc => !['all', 'masala', 'pickles', 'achar-lonach', 'thecha', 'dry-chutneys', 'chutneys', 'metkut', 'bestsellers', 'healthy', 'chutney', 'pickle', 'specialty'].includes(dc.id))
       .map(dc => ({ id: dc.id, name: dc.nameEn }))
@@ -85,15 +84,11 @@ export const CustomerPortal: React.FC = () => {
   // Base category products before user-applied filter/search
   const categoryProducts = products.filter(p => {
     if (selectedCategory === 'chutneys' || selectedCategory === 'chutney' || selectedCategory === 'dry-chutneys') {
-      return p.category === 'chutney' || p.category === 'chutneys' || p.id.includes('chutney') || p.id.includes('thecha') || p.id.includes('kanda-lasun') || p.id.includes('vada-pav') || p.id.includes('shengdana') || p.id.includes('til') || p.id.includes('javas') || p.id.includes('karale') || p.id.includes('panchamrut');
+      return p.category === 'chutney' || p.category === 'chutneys' || p.category === 'thecha' || p.id.includes('chutney') || p.id.includes('thecha') || p.id.includes('kanda-lasun') || p.id.includes('vada-pav') || p.id.includes('shengdana') || p.id.includes('til');
     } else if (selectedCategory === 'achar-lonach' || selectedCategory === 'pickle' || selectedCategory === 'pickles') {
-      return p.category === 'pickle' || p.category === 'achar-lonach' || p.id.includes('lonche') || p.id.includes('pickle') || p.id.includes('achar');
+      return p.category === 'pickle' || p.category === 'achar-lonach' || p.id.includes('lonche') || p.id.includes('pickle');
     } else if (selectedCategory === 'masala') {
-      return p.category === 'masala' || p.id.includes('masala');
-    } else if (selectedCategory === 'thecha') {
-      return p.id.includes('thecha') || p.id.includes('panchamrut');
-    } else if (selectedCategory === 'metkut') {
-      return p.id.includes('metkut');
+      return p.category === 'masala' || p.id.includes('masala') || p.id.includes('metkut');
     } else if (selectedCategory !== 'all') {
       return p.category === selectedCategory;
     }
@@ -184,12 +179,13 @@ export const CustomerPortal: React.FC = () => {
       <BogoBanner
         language={language}
         onClaimOffer={() => {
-          showToast('🎁 BOGO Offer: Buy 1 Get 1 Free on Shengdana Peanut Chutney!');
-          const shengdana = products.find(p => p.id === 'prod-shengdana-chutney');
-          if (shengdana) {
-            setSelectedProductDetail(shengdana);
+          const featuredProd = products.find(p => p.id === bogoConfig?.productId) || products.find(p => p.id === 'prod-shengdana-chutney');
+          const prodName = featuredProd ? (isMr ? featuredProd.nameMr : featuredProd.nameEn) : 'Special Product';
+          showToast(isMr ? `🎁 १ वर १ मोफत ऑफर: ${prodName}!` : `🎁 BOGO Offer: ${prodName} (Buy 1 Get 1 Free)!`);
+          if (featuredProd) {
+            setSelectedProductDetail(featuredProd);
           } else {
-            scrollToCatalog('chutneys');
+            scrollToCatalog('all');
           }
         }}
         onExploreAll={() => {
@@ -227,15 +223,13 @@ export const CustomerPortal: React.FC = () => {
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pt-1">
             <div>
               <h2 className="text-2xl font-bold text-stone-900 font-serif">
-                {(selectedCategory === 'chutneys' || selectedCategory === 'chutney' || selectedCategory === 'dry-chutneys') ? 'Chutneys' : 
-                 (selectedCategory === 'achar-lonach' || selectedCategory === 'pickle' || selectedCategory === 'pickles') ? 'Pickles' : 
-                 selectedCategory === 'masala' ? 'Masalas' : 
-                 selectedCategory === 'thecha' ? 'Thecha' : 
-                 selectedCategory === 'metkut' ? 'Metkut' : 
-                 'All Products'}
+                {(selectedCategory === 'chutneys' || selectedCategory === 'chutney' || selectedCategory === 'dry-chutneys') ? 'Chutneys & Thecha' : 
+                 (selectedCategory === 'achar-lonach' || selectedCategory === 'pickle' || selectedCategory === 'pickles') ? 'Pickles (Lonche)' : 
+                 selectedCategory === 'masala' ? 'Masalas & Metkut' : 
+                 'All Authentic Products'}
               </h2>
               <p className="text-xs text-stone-500 mt-0.5">
-                Traditional recipes packed in sealed jars. For phone orders call: <strong className="text-stone-800">8591254237</strong>
+                Authentic Maharashtrian recipes in hygienic freshness packaging. Phone orders: <strong className="text-stone-800">8591254237</strong>
               </p>
             </div>
 

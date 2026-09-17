@@ -13,7 +13,7 @@ interface ProductCardProps {
 }
 
 export const ProductCard: React.FC<ProductCardProps> = ({ product, onSelectProduct }) => {
-  const { addToCart, setSelectedProductDetail, language } = useApp();
+  const { addToCart, setSelectedProductDetail, language, bogoConfig } = useApp();
   const isMr = language === 'mr';
 
   // Standard sizes: 250g, 500g, 1kg
@@ -80,47 +80,50 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onSelectProdu
     ((activeSizeObj.originalPrice - activeSizeObj.price) / activeSizeObj.originalPrice) * 100
   );
 
-  const isBogoEligible = product.id === 'prod-shengdana-chutney';
+  const isBogoEligible = bogoConfig && bogoConfig.isActive !== false
+    ? product.id === bogoConfig.productId
+    : product.id === 'prod-shengdana-chutney';
 
   return (
     <motion.div
-      whileHover={{ y: -5 }}
+      whileHover={{ y: -4 }}
       transition={{ type: 'spring', stiffness: 320, damping: 24 }}
       onClick={handleCardClick}
-      className="bg-white rounded-2xl sm:rounded-3xl overflow-hidden border border-stone-200/90 shadow-xs hover:shadow-xl hover:border-amber-400 transition-all duration-300 flex flex-col justify-between cursor-pointer group group/card relative"
+      className="bg-white rounded-2xl sm:rounded-3xl overflow-hidden border border-stone-200/80 shadow-xs hover:shadow-md hover:border-amber-400/80 transition-all duration-300 flex flex-col justify-between cursor-pointer group group/card relative"
     >
-      {/* Product Image Container (1:1 Aspect Ratio) */}
-      <div className="relative aspect-square w-full bg-gradient-to-b from-[#FDFBF7] to-[#F3ECE1] overflow-hidden border-b border-stone-100">
+      {/* Product Image Frame (Sleek, Minimalist 4:3 Aspect Ratio) */}
+      <div className="relative aspect-[4/3] w-full bg-white overflow-hidden border-b border-stone-100/70 flex items-center justify-center">
         <ProductVisual 
           product={product} 
           isMarathi={isMr} 
-          aspectRatio="square"
+          aspectRatio="card"
+          className="w-full h-full"
         />
         
-        {/* Single Primary Highlight Badge (Top-Left) */}
-        <div className="absolute top-3 left-3 z-10 pointer-events-none">
+        {/* Minimalist Highlight Badge (Top-Left) */}
+        <div className="absolute top-2.5 left-2.5 z-10 pointer-events-none">
           {isBogoEligible ? (
-            <span className="px-2.5 py-1 rounded-lg bg-gradient-to-r from-amber-600 via-orange-600 to-rose-600 text-white text-[10px] sm:text-xs font-black shadow-md flex items-center gap-1">
-              <Gift className="w-3 h-3 text-amber-200" />
-              <span>Buy 1 Get 1 Free</span>
+            <span className="px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-600 to-rose-600 text-white text-[10px] font-bold shadow-xs flex items-center gap-1">
+              <Gift className="w-2.5 h-2.5" />
+              <span>Buy 1 Get 1</span>
             </span>
           ) : product.id === 'prod-kanda-lasun' ? (
-            <span className="px-2.5 py-1 rounded-lg bg-gradient-to-r from-amber-500 to-orange-600 text-white text-[10px] sm:text-xs font-black shadow-md flex items-center gap-1">
-              <Zap className="w-3 h-3 fill-amber-200 text-amber-200" />
-              <span>Flagship Blend</span>
+            <span className="px-2 py-0.5 rounded-full bg-amber-500 text-stone-950 text-[10px] font-bold shadow-xs flex items-center gap-1">
+              <Zap className="w-2.5 h-2.5 fill-stone-950 text-stone-950" />
+              <span>Flagship</span>
             </span>
           ) : product.isBestSeller ? (
-            <span className="px-2.5 py-1 rounded-lg bg-amber-500 text-stone-950 text-[10px] sm:text-xs font-black shadow-md flex items-center gap-1">
-              <Zap className="w-3 h-3 fill-stone-950 text-stone-950" />
+            <span className="px-2 py-0.5 rounded-full bg-amber-500 text-stone-950 text-[10px] font-bold shadow-xs flex items-center gap-1">
+              <Zap className="w-2.5 h-2.5 fill-stone-950 text-stone-950" />
               <span>Best Seller</span>
             </span>
           ) : null}
         </div>
 
-        {/* Discount Badge on Image Bottom-Left */}
+        {/* Minimalist Discount Badge (Bottom-Left) */}
         {discountPercent >= 10 && (
-          <div className="absolute bottom-3 left-3 z-10 pointer-events-none">
-            <span className="px-2 py-0.5 rounded-md bg-rose-600 text-white text-[10px] sm:text-[11px] font-black shadow-sm">
+          <div className="absolute bottom-2.5 left-2.5 z-10 pointer-events-none">
+            <span className="px-2 py-0.5 rounded-full bg-rose-600 text-white text-[10px] font-bold shadow-xs">
               {discountPercent}% OFF
             </span>
           </div>

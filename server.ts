@@ -1,5 +1,6 @@
 import express, { Request, Response } from 'express';
 import path from 'path';
+import fs from 'fs';
 import { createServer as createViteServer } from 'vite';
 import { GoogleGenAI } from '@google/genai';
 import { PRODUCTS, BASE_INGREDIENTS, INITIAL_ORDERS, INITIAL_RAW_STOCKS } from './src/data/initialData';
@@ -263,7 +264,54 @@ async function startServer() {
   const app = express();
   const PORT = 3000;
 
-  app.use(express.json());
+  app.use(express.json({ limit: '50mb' }));
+  app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+
+  // Dedicated High-Efficiency Image Upload API Endpoint
+  app.post('/api/upload-image', async (req: Request, res: Response) => {
+    try {
+      const { image, filename } = req.body;
+      if (!image || typeof image !== 'string') {
+        return res.status(400).json({ success: false, error: 'No image data provided' });
+      }
+
+      const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
+      if (!fs.existsSync(uploadsDir)) {
+        fs.mkdirSync(uploadsDir, { recursive: true });
+      }
+
+      // Check if data URL
+      const matches = image.match(/^data:image\/([a-zA-Z0-9+]+);base64,(.+)$/);
+      let buffer: Buffer;
+      let ext = 'webp';
+
+      if (matches && matches.length === 3) {
+        ext = matches[1] === 'jpeg' ? 'jpg' : matches[1];
+        buffer = Buffer.from(matches[2], 'base64');
+      } else {
+        // Raw base64 string
+        buffer = Buffer.from(image, 'base64');
+      }
+
+      const uniqueName = `img_${Date.now()}_${Math.random().toString(36).slice(2, 7)}.${ext}`;
+      const filePath = path.join(uploadsDir, uniqueName);
+
+      fs.writeFileSync(filePath, buffer);
+
+      const publicUrl = `/uploads/${uniqueName}`;
+      console.log(`[Upload] Image saved successfully: ${publicUrl} (${Math.round(buffer.length / 1024)} KB)`);
+
+      res.json({
+        success: true,
+        url: publicUrl,
+        sizeKb: Math.round(buffer.length / 1024),
+        filename: uniqueName
+      });
+    } catch (error: any) {
+      console.error('[Upload] Error uploading image:', error);
+      res.status(500).json({ success: false, error: error.message || 'Failed to process image upload' });
+    }
+  });
 
   // API 1: Products Catalog
   app.get('/api/products', (req: Request, res: Response) => {
@@ -1024,8 +1072,28 @@ Respond strictly in JSON format matching this schema:
     });
   });
 
-  // Serve public directory assets
-  app.use(express.static(path.join(process.cwd(), 'public')));
+  // Serve uploads with immutable caching for fast customer loads
+  const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
+  if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+  }
+
+  app.use('/uploads', express.static(uploadsDir, {
+    maxAge: '30d',
+    immutable: true,
+    etag: true
+  }));
+
+  // Serve public directory assets with 7-day browser caching
+  app.use(express.static(path.join(process.cwd(), 'public'), {
+    maxAge: '7d',
+    etag: true,
+    setHeaders: (res, filePath) => {
+      if (filePath.match(/\.(jpg|jpeg|png|webp|svg|gif|avif|ico|woff2?)$/i)) {
+        res.setHeader('Cache-Control', 'public, max-age=604800, stale-while-revalidate=86400');
+      }
+    }
+  }));
 
   // Vite middleware in development & static serving in production
   if (process.env.NODE_ENV !== 'production') {

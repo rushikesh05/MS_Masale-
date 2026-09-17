@@ -185,11 +185,11 @@ export const AISommelier: React.FC = () => {
 
             {/* Right Product Card Match (4 cols) */}
             <div className="md:col-span-4 bg-white text-[#2D2424] rounded-xl p-4 shadow-xl border border-white/20 text-center group group/ai">
-              <div className="w-full aspect-square max-h-48 overflow-hidden rounded-xl mb-3 shadow-xs border border-amber-100/90 transition-shadow duration-300 group-hover/ai:shadow-md">
+              <div className="w-full aspect-[4/3] max-h-48 overflow-hidden rounded-xl mb-3 shadow-xs border border-amber-100/90 transition-shadow duration-300 group-hover/ai:shadow-md bg-white flex items-center justify-center">
                 <ProductVisual
                   product={matchedProduct}
                   isMarathi={isMr}
-                  aspectRatio="square"
+                  aspectRatio="card"
                 />
               </div>
               <div className="font-bold text-xs line-clamp-1 font-brand">

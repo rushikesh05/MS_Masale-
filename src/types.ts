@@ -383,3 +383,21 @@ export interface WholesaleRequest {
   updatedAt?: string;
 }
 
+export interface BogoOfferConfig {
+  id: string; // e.g. 'bogo-festive'
+  isActive: boolean;
+  productId: string; // Linked product ID from catalog
+  titleEn: string;
+  titleMr: string;
+  descriptionEn: string;
+  descriptionMr: string;
+  badgeEn?: string;
+  badgeMr?: string;
+  tagEn?: string;
+  tagMr?: string;
+  couponCode: string;
+  imageUrl: string;
+  countdownHours?: number;
+  updatedAt?: string;
+}
+
